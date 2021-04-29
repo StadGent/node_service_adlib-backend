@@ -1,0 +1,40 @@
+{
+  "name": "node_service_adlib-backend",
+  "version": "0.0.1",
+  "description": "node_service_adlib-backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "debug": "~2.6.9",
+    "esm": "^3.2.25",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "httpntlm": "^1.7.6",
+    "ladc": "^0.22.14",
+    "mariadb": "^2.5.3",
+    "md5": "^2.3.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^2.2.5",
+    "node-cron": "^3.0.0",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "pug": "3.0.2",
+    "sequelize": "^6.5.0",
+    "sqlite3": "^5.0.2",
+    "tedious": "^11.0.5",
+    "toml": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StadGent/node_service_adlib-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StadGent/node_service_adlib-backend/issues"
+  },
+  "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme"
+}
