@@ -8,11 +8,11 @@ module.exports.getConfig = function() {
             schedule: data.adlib.schedule,
             baseUrl: data.adlib.baseUrl,
             username: data.adlib.username,
-            password: data.adlib.password,
+            password: process.env.ADLIB_SECRET ? process.env.ADLIB_SECRET : data.adlib.password,
             limit: data.adlib.limit
         },
         database: {
-            connectionURI: data.database.connectionURI
+            connectionURI: process.env.ADLIB_DB_URI ? process.env.ADLIB_DB_URI : data.database.connectionURI
         },
         mapping: {
           baseURI: data.mapping.baseURI
