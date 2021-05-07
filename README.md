@@ -38,9 +38,14 @@ Run following command to start harvesting the Adlib API:
 npm start
 ```
 
-When no `Members` table exists in the database, it will create a new table.
-When the table is empty, it will harvest all Adlib objects.
-When the table is not empty (e.g. when you run it as a cronjob), it will look up when the last object was harvested and start fetching Adlib from that point on.
+By running with the NPM command above, versioning is enabled by default using environment variable `npm_package_version` created from `package.json`.
+If you want to run with `node app.js`,then you need to manually set environment variable `npm_package_version` to enable versioning:
+```
+npm_package_version=0.0.1 node app.js
+```
+
+When `npm_package_version` is not defined, then the `Members` table will be emptied and all objects from Adlib will be harvested again.
+When `npm_package_version` is updated, all objects from Adlib will be harvested BUT the already harvested objects will still be maintained (append to the event stream).
 
 ## Cronjob
 
