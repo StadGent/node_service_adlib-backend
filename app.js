@@ -15,11 +15,10 @@ let cron = require('node-cron');
 
 start();
 
-cron.schedule(config.adlib.schedule, () => {
-    start();
-});
+cron.schedule(config.adlib.schedule, start);
 
 async function start() {
+    console.log("Starting")
     sequelize = await Utils.initDb();
 
     startHva();
