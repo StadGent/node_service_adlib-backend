@@ -47,7 +47,7 @@ export default class Utils {
         if (!process.env.npm_package_version) {
             this.log("EMPTYING DATABASE", "adlib-backend/lib/utils.js:initDb", "INFO", correlator.getId());
             await sequelize.sync({force: true});
-        };
+        }
         await sequelize.sync();
 
         return sequelize;
