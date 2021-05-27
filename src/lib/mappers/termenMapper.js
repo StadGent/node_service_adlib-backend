@@ -1,12 +1,13 @@
-const { Transform } = require('stream');
-let config = require("../../config/config.js").getConfig();
-let Adlib = require('../adlib.js');
-const Utils = require('../utils');
+import { Transform } from 'stream';
+import Config from "../../config/config.js";
+import Adlib from '../adlib.js';
+import Utils from "./utils.js";
 
-let port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
-let path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
+const config = Config.getConfig();
+const port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
+const path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
 
-class TermenMapper extends Transform {
+export default class TermenMapper extends Transform {
     constructor(options) {
         super({objectMode: true});
 
@@ -334,5 +335,3 @@ class TermenMapper extends Transform {
         }
     }
 }
-
-module.exports = TermenMapper;

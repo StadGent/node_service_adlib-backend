@@ -1,7 +1,7 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class DmgMapper extends ObjectMapper {
+export default class DmgMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
@@ -31,28 +31,28 @@ class DmgMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            await utils.mapCollectie(input,mappedObject, this._adlib);
-            utils.mapObjectnummer(input, mappedObject);
-            await utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
-            utils.mapOplage(input, mappedObject);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            await Utils.mapCollectie(input,mappedObject, this._adlib);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
+            Utils.mapOplage(input, mappedObject);
 
             // Vervaardiging | datering
-            await utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            await utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
+            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
 
             // Verwerving
-            await utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
+            await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
             // Standplaats
-            utils.mapStandplaatsDMG(input, mappedObject);
+            Utils.mapStandplaatsDMG(input, mappedObject);
 
             // Tentoonstellingen
-            await utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
 
             // reproductie
 
@@ -62,5 +62,3 @@ class DmgMapper extends ObjectMapper {
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = DmgMapper;

@@ -1,7 +1,7 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class HvAMapper extends ObjectMapper {
+export default class HvAMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
@@ -31,22 +31,22 @@ class HvAMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            utils.mapObjectnummer(input, mappedObject);
-            await utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
 
-                await utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
+                await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging
-            await utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Associaties
-            await utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
             // iconografie
-            await utils.mapIconografie(input, mappedObject, this._adlib);
+            await Utils.mapIconografie(input, mappedObject, this._adlib);
 
         } catch (e) {
             console.error(e);
@@ -54,5 +54,3 @@ class HvAMapper extends ObjectMapper {
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = HvAMapper;

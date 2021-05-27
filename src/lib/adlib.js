@@ -1,10 +1,11 @@
-var httpntlm = require('httpntlm');
-const { Readable } = require('stream');
-let config = require("../config/config.js").getConfig();
+import httpntlm from 'httpntlm';
+import { Readable } from'stream';
+import Config from "../config/config.js";
+import Utils from './utils.js';
 
-const Utils = require('./utils.js');
+const config = Config.getConfig();
 
-class Adlib {
+export default class Adlib {
     constructor(options) {
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
@@ -147,5 +148,3 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         return Utils.getURIFromRecord(null, priref, type, database);
     }
 }
-
-module.exports = Adlib ;

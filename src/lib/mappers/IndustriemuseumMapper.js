@@ -1,7 +1,7 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class IndustriemuseumMapper extends ObjectMapper {
+export default class IndustriemuseumMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
@@ -30,28 +30,28 @@ class IndustriemuseumMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            await utils.mapCollectie(input,mappedObject, this._adlib);
-            utils.mapObjectnummer(input, mappedObject);
-            await utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
-            await utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            await Utils.mapCollectie(input,mappedObject, this._adlib);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging | datering
-            await utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            await utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
+            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
 
             // opschriften
-            utils.mapOpschriften(objectURI, input, mappedObject);
+            Utils.mapOpschriften(objectURI, input, mappedObject);
 
             // merken
-            utils.mapMerken(input, mappedObject);
+            Utils.mapMerken(input, mappedObject);
 
             // Associaties
-            await utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
         } catch (e) {
             console.error(e);
@@ -60,5 +60,3 @@ class IndustriemuseumMapper extends ObjectMapper {
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = IndustriemuseumMapper;

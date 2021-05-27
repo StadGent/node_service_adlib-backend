@@ -1,11 +1,12 @@
-let config = require("../config/config.js").getConfig();
-let port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
-let path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
+import Config from "../config/config.js";
+import { Sequelize } from 'sequelize';
 
-const { Sequelize } = require('sequelize');
+const config = Config.getConfig();
+const port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
+const path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
 
-module.exports = new class Utils {
-    async insertObject(institution, db, object, adlibDatabase, correlator) {
+export default class Utils {
+    static async insertObject(institution, db, object, adlibDatabase, correlator) {
         const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
         let generatedAtTime = new Date(object["prov:generatedAtTime"]).toISOString();
         let URI = object["@id"];
@@ -22,7 +23,7 @@ module.exports = new class Utils {
         });
     }
 
-    sendNotFound(req, res) {
+    static sendNotFound(req, res) {
         res.set({
             'Content-Type': 'text/html'
         });
@@ -30,7 +31,7 @@ module.exports = new class Utils {
         res.status(404).send('Not data found. Discover more here: <a href="' + homepage + '">' + homepage + '</a>');
     }
 
-    async initDb(correlator) {
+    static async initDb(correlator) {
         const sequelize = new Sequelize(config.database.connectionURI);
         const Member = require('./models/Member').Member;
         const memberAttributes = require('./models/Member').attributes;
@@ -52,7 +53,7 @@ module.exports = new class Utils {
         return sequelize;
     }
 
-    getURIFromRecord(record, priref, type, database) {
+    static getURIFromRecord(record, priref, type, database) {
         if (record) {
             for (let s in record.source) {
                 const source = record.source[s].endsWith('/') ? record.source[s] : `${record.source[s]}/`
@@ -68,7 +69,7 @@ module.exports = new class Utils {
         return `${baseURI}${type}/${priref}`;
     }
 
-    getInstitutionNameFromPriref(priref) {
+    static getInstitutionNameFromPriref(priref) {
         const prefix = priref.substr(0,2);
         switch (prefix) {
             case '55':
@@ -86,20 +87,20 @@ module.exports = new class Utils {
         }
     }
 
-    getInstitutionURIFromPrirefId(institutionId) {
+    static getInstitutionURIFromPrirefId(institutionId) {
         // 53 is DMG
         if (institutionId === 53) return 'http://www.wikidata.org/entity/Q1809071';
         // HVA is 47
         else if (institutionId === 47) return 'http://www.wikidata.org/entity/Q2358158';
         // STAM is 55
-        else if (institutionId === 47) return 'http://www.wikidata.org/entity/Q980285';
+        else if (institutionId === 55) return 'http://www.wikidata.org/entity/Q980285';
         // Industriemuseum is 57
         else if (institutionId === 57) return 'http://www.wikidata.org/entity/Q2245203';
         // Archief Gent is ?
         else return 'http://www.wikidata.org/entity/Q41776192';
     }
 
-    log(message, loggerName, level, correlationId) {
+    static log(message, loggerName, level, correlationId) {
         let levelValue = 0;
         if (level === "INFO") levelValue = 4;
         else if (level === "ERROR") levelValue = 2;
