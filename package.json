@@ -4,7 +4,10 @@
   "description": "node_service_adlib-backend",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "dev": "nodemon --exec babel-node src/app.js",
+    "build": "babel src --out-dir dist --copy-files",
+    "start": "node dist/app.js",
+    "lint": "eslint src/"
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
@@ -38,5 +41,13 @@
   "bugs": {
     "url": "https://github.com/StadGent/node_service_adlib-backend/issues"
   },
-  "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme"
+  "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/node": "^7.14.2",
+    "@babel/preset-env": "^7.14.2",
+    "eslint": "^7.27.0",
+    "nodemon": "^2.0.7"
+  }
 }
