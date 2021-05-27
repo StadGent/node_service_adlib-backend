@@ -1,11 +1,8 @@
 import { Transform } from 'stream';
 import Config from "../../config/config.js";
-import Adlib from '../adlib.js';
 import Utils from "./utils.js";
 
 const config = Config.getConfig();
-const port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
-const path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
 
 export default class TermenMapper extends Transform {
     constructor(options) {
