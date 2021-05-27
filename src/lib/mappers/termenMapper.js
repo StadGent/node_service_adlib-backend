@@ -1,6 +1,6 @@
 import { Transform } from 'stream';
 import Config from "../../config/config.js";
-import Utils from "./utils.js";
+import Utils from "../utils.js";
 
 const config = Config.getConfig();
 
