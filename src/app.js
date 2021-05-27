@@ -30,7 +30,7 @@ cron.schedule(config.adlib.schedule, start);
 
 async function start() {
     correlator.withId(async () => {
-        Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId())
+        Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
 
         sequelize = await Utils.initDb(correlator);
 
@@ -131,7 +131,7 @@ function startStam() {
         options["adlib"] = objectAdlib;
         let objectMapper = new StamMapper(options);
         objectAdlib.getStream().pipe(objectMapper).pipe(backend);
-    })
+    });
 }
 
 function startThesaurus() {
@@ -149,7 +149,7 @@ function startThesaurus() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
-    })
+    });
 }
 
 function startPersonen() {
@@ -167,7 +167,7 @@ function startPersonen() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
-    })
+    });
 }
 
 function startHealthcheckAPI() {
@@ -181,8 +181,8 @@ function startHealthcheckAPI() {
         res.setHeader("Content-Type", "application/text");
         res.send("OK");
         res.end();
-        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", correlator.getId())
-    })
+        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", correlator.getId());
+    });
 
     app.get('/status/db', async (req, res) => {
         res.setHeader("Content-Type", "application/json");
@@ -200,11 +200,11 @@ function startHealthcheckAPI() {
                     "result": "CRIT",
                     "details": "Failed to connect"
                 }
-            ]
+            ];
         }
         res.send(status);
         res.end();
-    })
+    });
 
     // catch 404 and forward to error handler
     app.use(function (req, res, next) {

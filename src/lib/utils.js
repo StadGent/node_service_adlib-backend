@@ -11,7 +11,7 @@ export default class Utils {
         let generatedAtTime = new Date(object["prov:generatedAtTime"]).toISOString();
         let URI = object["@id"];
 
-        this.log(`Inserting object with URI ${URI}`, "adlib-backend/lib/utils.js:insertObject", "INFO", correlator.getId())
+        this.log(`Inserting object with URI ${URI}`, "adlib-backend/lib/utils.js:insertObject", "INFO", correlator.getId());
 
         await db.models.Member.create({
             URI: URI,
@@ -45,7 +45,7 @@ export default class Utils {
         await Member.init(memberAttributes, memberOptions);
         // Clean database when versioning is not enabled
         if (!process.env.npm_package_version) {
-            this.log("EMPTYING DATABASE", "adlib-backend/lib/utils.js:initDb", "INFO", correlator.getId())
+            this.log("EMPTYING DATABASE", "adlib-backend/lib/utils.js:initDb", "INFO", correlator.getId());
             await sequelize.sync({force: true});
         };
         await sequelize.sync();
@@ -56,7 +56,7 @@ export default class Utils {
     static getURIFromRecord(record, priref, type, database) {
         if (record) {
             for (let s in record.source) {
-                const source = record.source[s].endsWith('/') ? record.source[s] : `${record.source[s]}/`
+                const source = record.source[s].endsWith('/') ? record.source[s] : `${record.source[s]}/`;
                 if (source.startsWith('http') && record['term.number']) {
                     const termNumber = record['term.number'][s].toLowerCase().trim().replace(' ', '');
                     return `${source}${termNumber}`;

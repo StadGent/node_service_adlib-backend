@@ -5,7 +5,7 @@ module.exports = {
 
     mapCollectie: async (input, mappedObject, adlib) => {
         if (input["collection"] && input["collection"][0]) {
-            mappedObject["MensgemaaktObject.maaktDeelUitVan"] = []
+            mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
             for (let c in input["collection"]) {
                 const collectionURI = await adlib.getURIFromPriref("thesaurus", input["collection.lref"][c], "concept");
 
@@ -19,7 +19,7 @@ module.exports = {
                             "@language": "nl"
                         }
                     }
-                })
+                });
             }
         }
     },
@@ -28,7 +28,7 @@ module.exports = {
         if (input["object_number"]) mappedObject["Object.identificator"] = {
             "@type": "Identificator",
             "Identificator.identificator": input["object_number"]
-        }
+        };
     },
 
     mapObjectnaam: async (objectURI, input, mappedObject, adlib) => {
@@ -110,71 +110,71 @@ module.exports = {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q1809071",
                     "label": "Design Museum Gent"
-                }
+                };
             } else if (locationContext.startsWith('BELvue')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q728437",
                     "opmerking": "bruikleen: BELvue museum"
-                }
+                };
             } else if (locationContext.startsWith('Hotel')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q2120186",
                     "opmerking": "bruikleen: objecten opgesteld in Hotel d'Hane Steenhuysen"
-                }
+                };
             } else if (locationContext.startsWith('Museum voor Schone Kunsten')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q2365880",
                     "opmerking": "bruikleen: Museum voor Schone Kunsten (MSK)"
-                }
+                };
             } else if (locationContext.startsWith('Sint-Pietersabdij')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q1170767",
                     "opmerking": "bruikleen: Sint-Pietersabdij"
-                }
+                };
             } else if (locationContext.startsWith('Koninklijke Bibliotheek van België')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q383931",
                     "opmerking": "bruikleen: KBR"
-                }
+                };
             } else if (locationContext.startsWith('M-Museum')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q2362660",
                     "opmerking": "bruikleen: M-leuven"
-                }
+                };
             } else if (locationContext.startsWith('MAS')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q1646305",
                     "opmerking": "bruikleen: MAS"
-                }
+                };
             } else if (locationContext.startsWith('STAM')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q980285",
                     "opmerking": "bruikleen: STAM"
-                }
+                };
             } else if (locationContext.startsWith('Industriemuseum')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q2245203",
                     "opmerking": "bruikleen: Industriemuseum"
-                }
+                };
             } else if (locationContext.startsWith('Verbeke')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q1888920",
                     "opmerking": "bruikleen: Verbeke Foundation"
-                }
+                };
             } else if (locationContext.startsWith('Koninklijk Museum voor Schone Kunsten Antwerpen')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q1471477",
                     "opmerking": "bruikleen: KMSKA"
-                }
+                };
             } else if (locationContext.startsWith('Nederlands Zilvermuseum Schoonhoven')) {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "@id": "https://www.wikidata.org/wiki/Q2246858",
                     "opmerking": "bruikleen: Nederlands Zilvermuseum Schoonhoven"
-                }
+                };
             } else {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "opmerking": "depot"
-                }
+                };
             }
         }
     },
@@ -213,7 +213,7 @@ module.exports = {
                             if (!c["Gebeurtenis.tijd"]) c["Gebeurtenis.tijd"] = {
                                 "@value": "",
                                 "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                            }
+                            };
                             if (ontwerp_date['production.date.end.prec'] && ontwerp_date['production.date.end.prec'][0] === "circa") {
                                 c["Gebeurtenis.tijd"]["@value"] = "/" + ontwerp_date['production.date.end'][0] + "~";
                             } else {
@@ -233,7 +233,7 @@ module.exports = {
                                         "@value": pro["creator"][0],
                                         "@language": "nl"
                                     }
-                                }
+                                };
                                 if (pro['production.place']) {
                                     const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
                                     c["Gebeurtenis.plaats"] = {
@@ -260,7 +260,7 @@ module.exports = {
                                             }
                                         }
                                     }
-                                }
+                                };
                             }
                         }
 
@@ -302,7 +302,7 @@ module.exports = {
                         if (!p["Gebeurtenis.tijd"]) c["Gebeurtenis.tijd"] = {
                             "@value": "",
                             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                        }
+                        };
                         if (prod_date['production.date.end.prec'] && prod_date['production.date.end.prec'][0] === "circa") {
                             p["Gebeurtenis.tijd"]["@value"] += "/" + prod_date['production.date.end'][0] + "~";
                         } else {
@@ -346,7 +346,7 @@ module.exports = {
                                 }
                             }
                         }
-                    }
+                    };
                 }
                 productions.push(p);
             }
@@ -378,7 +378,7 @@ module.exports = {
                                     "@value": mate,
                                     "@language": "nl"
                                 }
-                            })
+                            });
                         } else {
                             mappedObject["MensgemaaktObject.materiaal"].push({
                                 "@id": materialURI,
@@ -386,7 +386,7 @@ module.exports = {
                                     "@value": mate,
                                     "@language": "nl"
                                 }
-                            })
+                            });
                         }
                     }
                 }
@@ -416,7 +416,7 @@ module.exports = {
                         "Dimensie.type": afmeting,
                         "Dimensie.waarde": waarde,
                         "Dimensie.eenheid": eenheid
-                    })
+                    });
                 } else {
                     mappedObject["MensgemaaktObject.dimensie"].push({
                         "@type": "Dimensie",
@@ -439,7 +439,7 @@ module.exports = {
     mapVerwerving: async (objectURI, institutionURI, input, mappedObject, adlib) => {
         let v = {
             "@type": "Verwerving"
-        }
+        };
 
         if (input["acquisition.date"]) {
             const datum = input["acquisition.date"][0];
@@ -447,7 +447,7 @@ module.exports = {
                 "@type": "Periode",
                 "Periode.begin": datum,
                 "Periode.einde": datum
-            }
+            };
         }
 
         if (input["acquisition.method"]) {
@@ -459,7 +459,7 @@ module.exports = {
                     "@value": methode,
                     "@language": "nl"
                 }
-            }
+            };
         }
         if (input["acquisition.place"]) {
             const plaats = input["acquisition.place"] ? input["acquisition.place"][0] : "";
@@ -470,7 +470,7 @@ module.exports = {
                     "@value": plaats,
                     "@language": "nl"
                 }
-            }
+            };
         }
 
         v["Verwerving.overdrachtVan"] = objectURI;
@@ -487,7 +487,7 @@ module.exports = {
                 let exh = {
                     "@type": "Activiteit",
                     "Entiteit.type": "http://vocab.getty.edu/aat/300054766" // Tentoonstelling
-                }
+                };
                 const exhibition = input["Exhibition"][e];
                 if (exhibition["exhibition"] && exhibition["exhibition"][0]) {
                     const beschrijving = exhibition["exhibition"] && exhibition["exhibition"][0] ? exhibition["exhibition"][0] : "";
@@ -496,7 +496,7 @@ module.exports = {
                 exh["Gebeurtenis.tijd"] = {
                     "@value": "",
                     "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                }
+                };
                 // unknown period
                 if (!exhibition["exhibition.date.start"] && !exhibition["exhibition.date.end"]) exh["Gebeurtenis.tijd"]["@value"] = "/";
 
@@ -515,13 +515,13 @@ module.exports = {
                             "@value": plaats,
                             "@language": "nl"
                         }
-                    }
+                    };
                 }
 
                 const c = {
                     "@type": "Collectie",
                     "gebruiktBijActiviteit": exh
-                }
+                };
                 mappedObject["Entiteit.maaktDeelUitVan"].push(c);
             }
         }
@@ -533,7 +533,7 @@ module.exports = {
             "InformatieObject.drager": objectURI,
             "InformatieObject.verwijstNaar": [],
             "InformatieObject.gaatOver": []
-        }
+        };
 
         // Geass. Persoon / instelling
         if (input["Associated_person"] && input["Associated_person"][0]) {
@@ -657,7 +657,7 @@ module.exports = {
     mapMerken: (input, mappedObject) => {
         //console.log(input)
     }
-}
+};
 
 
 // Draft
@@ -665,12 +665,12 @@ function processCondition(id, condition) {
     let c = {
         "@type": "Conditiebeoordeling",
         "conditie_van": id
-    }
+    };
     if (condition["condition"]) {
         c["Conditiebeoordeling.vastgesteldeStaat"] = {
             "@type": "Conditie",
             "Conditie.nota": condition["condition"][0]
-        }
+        };
     }
 
     if (condition["condition.date"] && condition["condition.date"][0] != "") {
@@ -678,7 +678,7 @@ function processCondition(id, condition) {
             "@type": "Periode",
             "Periode.begin": condition["condition.date"][0].begin,
             "Periode.einde": condition["condition.date"][0].end
-        }
+        };
     }
     return c;
 }
