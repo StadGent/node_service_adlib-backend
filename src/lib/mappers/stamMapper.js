@@ -1,7 +1,7 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class StamMapper extends ObjectMapper {
+export default class StamMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
@@ -31,21 +31,21 @@ class StamMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            utils.mapObjectnummer(input, mappedObject);
-            await utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
-            await utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging | datering
-            await utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            await utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
+            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
 
             // Verwerving
-            await utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
+            await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
         } catch (e) {
             console.error(e);
@@ -53,5 +53,3 @@ class StamMapper extends ObjectMapper {
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = StamMapper;

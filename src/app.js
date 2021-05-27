@@ -1,25 +1,27 @@
-let Adlib = require('./lib/adlib.js');
-let DmgMapper = require('./lib/mappers/dmgMapper');
-let StamMapper = require('./lib/mappers/stamMapper');
-const HvAMapper = require("./lib/mappers/hvaMapper");
-const ArchiefGentMapper = require("./lib/mappers/archiefGentMapper");
-const IndustriemuseumMapper = require("./lib/mappers/IndustriemuseumMapper");
-const TermenMapper = require("./lib/mappers/termenMapper");
-const Backend = require("./lib/Backend");
-const Utils = require('./lib/utils.js');
-const config = require("./config/config.js").getConfig();
-const correlator = require("correlation-id");
+import Adlib from './lib/adlib.js';
+import DmgMapper from './lib/mappers/dmgMapper';
+import StamMapper from './lib/mappers/stamMapper';
+import HvAMapper from "./lib/mappers/hvaMapper";
+import ArchiefGentMapper from "./lib/mappers/archiefGentMapper";
+import IndustriemuseumMapper from "./lib/mappers/IndustriemuseumMapper";
+import TermenMapper from "./lib/mappers/termenMapper";
+import Backend from "./lib/Backend";
+import Utils from './lib/utils.js';
+import Config from "./config/config.js";
+import correlator from "correlation-id";
+import http from 'http';
+import createError from 'http-errors';
+import path from 'path';
+import correlatorExpress from 'express-correlation-id';
+import express from 'express';
 
-const correlatorExpress = require('express-correlation-id');
-const express = require('express');
-var http = require('http');
-var createError = require('http-errors');
-var path = require('path');
+const config = Config.getConfig();
+
 var server;
 
 let sequelize;
 
-let cron = require('node-cron');
+const cron = require('node-cron');
 
 start();
 startHealthcheckAPI();
