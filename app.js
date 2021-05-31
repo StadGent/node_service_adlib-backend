@@ -179,7 +179,7 @@ function startHealthcheckAPI() {
         res.setHeader("Content-Type", "application/text");
         res.send("OK");
         res.end();
-        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", correlator.getId())
+        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", req.correlationId())
     })
 
     app.get('/status/db', async (req, res) => {
@@ -187,10 +187,10 @@ function startHealthcheckAPI() {
         let status;
         try {
             await sequelize.authenticate();
-            Utils.log('Connection has been established successfully.', "adlib-backend:app.js:startHealthcheckAPI", "INFO", correlator.getId());
+            Utils.log('Connection has been established successfully.', "adlib-backend:app.js:startHealthcheckAPI", "INFO", req.correlationId());
             status = ["OK"];
         } catch (error) {
-            Utils.log(`Unable to connect to the database: ${error}`, "adlib-backend:app.js:startHealthcheckAPI", "CRIT", correlator.getId());
+            Utils.log(`Unable to connect to the database: ${error}`, "adlib-backend:app.js:startHealthcheckAPI", "CRIT", req.correlationId());
             status = [
                 "CRIT",
                 {
