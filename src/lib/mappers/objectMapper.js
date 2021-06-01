@@ -1,11 +1,9 @@
-const { Transform } = require('stream');
-let config = require("../../config/config.js").getConfig();
-let Adlib = require('../adlib.js');
+import { Transform } from 'stream';
+import Config from "../../config/config.js";
 
-let port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
-let path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
+const config = Config.getConfig();
 
-class ObjectMapper extends Transform {
+export default class ObjectMapper extends Transform {
     constructor(options) {
         super({objectMode: true});
 
@@ -36,6 +34,3 @@ class ObjectMapper extends Transform {
         this._correlator = options.correlator;
     }
 }
-
-
-module.exports = ObjectMapper;

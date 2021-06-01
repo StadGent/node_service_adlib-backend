@@ -1,10 +1,11 @@
-var httpntlm = require('httpntlm');
-const { Readable } = require('stream');
-let config = require("../config/config.js").getConfig();
+import httpntlm from 'httpntlm';
+import { Readable } from'stream';
+import Config from "../config/config.js";
+import Utils from './utils.js';
 
-const Utils = require('./utils.js');
+const config = Config.getConfig();
 
-class Adlib {
+export default class Adlib {
     constructor(options) {
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
@@ -22,7 +23,7 @@ class Adlib {
 
 Adlib.prototype.getStream = function () {
     return this._stream;
-}
+};
 
 Adlib.prototype.run = async function () {
     const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
@@ -60,7 +61,7 @@ Adlib.prototype.run = async function () {
                 getPrirefFromURI = lastURI.split('/')[(lastURI.split('/').indexOf("id")+2)];
             }
         } catch (e) {
-            Utils.log('Failed to retrieve priref from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId())
+            Utils.log('Failed to retrieve priref from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId());
         }
         if (getPrirefFromURI) lastPriref = getPrirefFromURI;
         // update lastModifiedDate
@@ -71,13 +72,13 @@ Adlib.prototype.run = async function () {
     await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
 
     if (lastPriref) {
-        Utils.log("All objects for institution " + this._institution + " from previous run are fetched from Adlib! Now retrieving objects starting from " + lastModifiedDate, "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId())
+        Utils.log("All objects for institution " + this._institution + " from previous run are fetched from Adlib! Now retrieving objects starting from " + lastModifiedDate, "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
         lastPriref = null; // reset
         await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
     }
-    Utils.log("All objects are fetched from Adlib!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId())
+    Utils.log("All objects are fetched from Adlib!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
     this._stream.push(null);
-}
+};
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
     await sleep(5000); // wait 5 seconds
@@ -87,7 +88,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
     if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
     else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
     else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
-    else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`
+    else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
     else querypath += "all";
 
     // When lastPriref is not null, then we try to finalize previous run with the max generatedAtTime and priref
@@ -102,17 +103,17 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
             this._stream.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
         }
         let hits = objects.adlibJSON.diagnostic.hits;
-        Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", this._correlator.getId())
+        Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", this._correlator.getId());
 
         let nextStartFrom = startFrom + limit;
         if (nextStartFrom < hits) await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, nextStartFrom, limit);
     } else {
         return;
     }
-}
+};
 
 Adlib.prototype.fetchWithNTLM = function(querypath) {
-    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTML", "INFO", this._correlator.getId())
+    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTML", "INFO", this._correlator.getId());
     const self = this;
     return new Promise((resolve, reject) => {
         httpntlm.get({
@@ -131,7 +132,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
             }
         });
     });
-}
+};
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -146,6 +147,4 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     } else {
         return Utils.getURIFromRecord(null, priref, type, database);
     }
-}
-
-module.exports = Adlib ;
+};

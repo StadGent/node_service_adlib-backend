@@ -1,12 +1,10 @@
-const { Transform } = require('stream');
-let config = require("../../config/config.js").getConfig();
-let Adlib = require('../adlib.js');
-const Utils = require('../utils');
+import { Transform } from 'stream';
+import Config from "../../config/config.js";
+import Utils from "../utils.js";
 
-let port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
-let path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
+const config = Config.getConfig();
 
-class TermenMapper extends Transform {
+export default class TermenMapper extends Transform {
     constructor(options) {
         super({objectMode: true});
 
@@ -85,7 +83,7 @@ class TermenMapper extends Transform {
                 )
             ) {
                 mappedObject["@id"] = versionURI;
-                if (this._adlibDatabase === "personen") mappedObject["@type"] = "Agent"
+                if (this._adlibDatabase === "personen") mappedObject["@type"] = "Agent";
                 else mappedObject["@type"] = "skos:Concept";
                 // Event stream metadata
                 mappedObject["dcterms:isVersionOf"] = objectURI;
@@ -103,7 +101,7 @@ class TermenMapper extends Transform {
                     mappedObject["skos:prefLabel"] = {
                         "@value": input['term'][0],
                         "@language": "nl"
-                    }
+                    };
                 }
 
                 mappedObject["skos:inscheme"] = this._conceptscheme;
@@ -120,7 +118,7 @@ class TermenMapper extends Transform {
                                 "@value": broaderTerm,
                                 "@language": "nl"
                             }
-                        })
+                        });
                     }
                 }
 
@@ -136,7 +134,7 @@ class TermenMapper extends Transform {
                                 "@value": narrowerTerm,
                                 "@language": "nl"
                             }
-                        })
+                        });
                     }
                 }
 
@@ -175,13 +173,13 @@ class TermenMapper extends Transform {
                         mappedObject['heeftGeboorte'] = {
                             "@type": "Geboorte",
                             "datum": input['birth.date.start'][0]
-                        }
+                        };
                     }
                     // geboorteplaats
                     if (input['birth.place'] && input['birth.place'][0]) {
                         if (!mappedObject["heeftGeboorte"]) mappedObject["heeftGeboorte"] = {
                             "@type": "Geboorte"
-                        }
+                        };
                         const birthPlaceLabel = input["birth.place"][0];
                         //if (input['birth.place.lref'] && input['birth.place.lref'][0]) {
                         const birthPlaceURI = await this._adlib.getURIFromPriref("thesaurus", input["birth.place.lref"][0], "concept");
@@ -193,7 +191,7 @@ class TermenMapper extends Transform {
                                 "@value": birthPlaceLabel,
                                 "@language": "nl"
                             }
-                        }
+                        };
                     }
 
                     // sterftedatum
@@ -201,14 +199,14 @@ class TermenMapper extends Transform {
                         mappedObject['heeftOverlijden'] = {
                             "@type": "Overlijden",
                             "datum": input['death.date.start'][0]
-                        }
+                        };
                     }
 
                     // sterfteplaats
                     if (input['death.place'] && input['death.place'][0]) {
                         if (!mappedObject["heeftOverlijden"]) mappedObject["heeftOverlijden"] = {
                             "@type": "Overlijden"
-                        }
+                        };
                         const deathPlaceLabel = input["death.place"][0];
                         //if (input['death.place.lref'] && input['death.place.lref'][0]) {
                         const deathPlaceURI = await this._adlib.getURIFromPriref("thesaurus", input["death.place.lref"][0], "concept");
@@ -220,7 +218,7 @@ class TermenMapper extends Transform {
                                 "@value": deathPlaceLabel,
                                 "@language": "nl"
                             }
-                        }
+                        };
                     }
 
                     if (input['forename'] || input['surname']) {
@@ -247,7 +245,7 @@ class TermenMapper extends Transform {
                             mappedObject["label"] = {
                                 "@value": input['name'][0],
                                 "@language": "nl"
-                            }
+                            };
                         }
 
                         // geslacht
@@ -334,5 +332,3 @@ class TermenMapper extends Transform {
         }
     }
 }
-
-module.exports = TermenMapper;

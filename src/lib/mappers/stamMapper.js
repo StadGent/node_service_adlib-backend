@@ -1,13 +1,17 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class ArchiefGentMapper extends ObjectMapper {
+export default class StamMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
 
     _transform(object, encoding, done) {
         let input = JSON.parse(object);
+        this.doMapping(input, done);
+    }
+
+    async doMapping(input, done) {
         let mappedObject = {};
         mappedObject["@context"] = this._context;
 
@@ -20,36 +24,28 @@ class ArchiefGentMapper extends ObjectMapper {
             mappedObject["@type"] = "MensgemaaktObject";
             // Event stream metadata
             mappedObject["dcterms:isVersionOf"] = objectURI;
+            // mappedObject["prov:generatedAtTime"] = new Date(input["@attributes"].modification).toISOString();
             mappedObject["prov:generatedAtTime"] = now;
 
             // Convenience method to make our URI dereferenceable by District09
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            utils.mapCollectie(input,mappedObject);
-            utils.mapObjectnummer(input, mappedObject);
-            utils.mapObjectnaam(objectURI, input, mappedObject);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
-            utils.mapOplage(input, mappedObject);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging | datering
-            utils.mapVervaardiging(objectURI, input, mappedObject);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            utils.mapFysiekeKenmerken(input, mappedObject);
+            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
 
             // Verwerving
-            utils.mapVerwervingDMG(objectURI, this._institutionURI, input, mappedObject);
-
-            // Standplaats
-            utils.mapStandplaatsDMG(input, mappedObject);
-
-            // Tentoonstellingen
-            utils.mapTentoonstelling(objectURI, input, mappedObject);
-
-            // reproductie
+            await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
         } catch (e) {
             console.error(e);
@@ -57,5 +53,3 @@ class ArchiefGentMapper extends ObjectMapper {
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = ArchiefGentMapper;
