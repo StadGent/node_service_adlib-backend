@@ -5,11 +5,11 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec babel-node src/app.js",
-    "build": "babel src --out-dir dist --copy-files",
-    "start": "node dist/app.js",
+    "start": "node main.js",
     "lint": "eslint src/"
   },
   "dependencies": {
+    "@babel/register": "^7.13.16",
     "cookie-parser": "^1.4.5",
     "correlation-id": "^3.1.1",
     "debug": "~2.6.9",
