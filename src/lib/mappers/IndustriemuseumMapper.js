@@ -1,7 +1,7 @@
-let utils = require("./utils.js");
-const ObjectMapper = require("./objectMapper");
+import Utils from "./utils.js";
+import ObjectMapper from "./objectMapper";
 
-class DmgMapper extends ObjectMapper {
+export default class IndustriemuseumMapper extends ObjectMapper {
     constructor(options) {
         super(options);
     }
@@ -24,43 +24,39 @@ class DmgMapper extends ObjectMapper {
             mappedObject["@type"] = "MensgemaaktObject";
             // Event stream metadata
             mappedObject["dcterms:isVersionOf"] = objectURI;
-            // mappedObject["prov:generatedAtTime"] = new Date(input["@attributes"].modification).toISOString();
             mappedObject["prov:generatedAtTime"] = now;
 
             // Convenience method to make our URI dereferenceable by District09
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
-            utils.mapInstelling(this._institutionURI, input, mappedObject);
-            await utils.mapCollectie(input,mappedObject, this._adlib);
-            utils.mapObjectnummer(input, mappedObject);
-            await utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
-            utils.mapTitel(input, mappedObject);
-            utils.mapBeschrijving(input, mappedObject);
-            utils.mapOplage(input, mappedObject);
+            Utils.mapInstelling(this._institutionURI, input, mappedObject);
+            await Utils.mapCollectie(input,mappedObject, this._adlib);
+            Utils.mapObjectnummer(input, mappedObject);
+            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
+            Utils.mapTitel(input, mappedObject);
+            Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging | datering
-            await utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            await utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
+            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
 
-            // Verwerving
-            await utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
+            // opschriften
+            Utils.mapOpschriften(objectURI, input, mappedObject);
 
-            // Standplaats
-            utils.mapStandplaatsDMG(input, mappedObject);
+            // merken
+            Utils.mapMerken(input, mappedObject);
 
-            // Tentoonstellingen
-            await utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
-
-            // reproductie
+            // Associaties
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
         } catch (e) {
             console.error(e);
         }
+
         done(null, JSON.stringify(mappedObject));
     }
 }
-
-module.exports = DmgMapper;

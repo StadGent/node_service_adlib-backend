@@ -1,13 +1,14 @@
-let fs = require("fs");
-let toml = require('toml');
+import fs from "fs";
+import toml from 'toml';
 
-module.exports.getConfig = function() {
+export default class Config {
+  static getConfig() {
     let data = toml.parse(fs.readFileSync(__dirname + "/../config.tml").toString());
     return {
         adlib: {
             schedule: data.adlib.schedule,
-            baseUrl: data.adlib.baseUrl,
-            username: data.adlib.username,
+            baseUrl: process.env.ADLIB_ENDPOINT ? process.env.ADLIB_ENDPOINT : data.adlib.baseUrl,
+            username: process.env.ADLIB_USER ? process.env.ADLIB_USER : data.adlib.username,
             password: process.env.ADLIB_SECRET ? process.env.ADLIB_SECRET : data.adlib.password,
             limit: data.adlib.limit
         },
@@ -45,13 +46,14 @@ module.exports.getConfig = function() {
             institutionURI: data.stam.institutionURI
         }
     };
-};
+  }
 
-module.exports.getInstitutionFromURI = function(institutionURI) {
+  static getInstitutionFromURI(institutionURI) {
     let config = this.getConfig();
     for(let i in Object.keys(config)) {
-        let key = Object.keys(config)[i];
-        if (config[key].institutionURI && config[key].institutionURI === institutionURI) return key;
+      let key = Object.keys(config)[i];
+      if (config[key].institutionURI && config[key].institutionURI === institutionURI) return key;
     }
     return "";
+  }
 }

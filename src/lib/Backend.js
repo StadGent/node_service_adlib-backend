@@ -1,11 +1,9 @@
-const { Writable } = require('stream');
-const Utils = require('./utils.js');
-let Config = require("../config/config.js");
+import { Writable } from 'stream';
+import Utils from './utils.js';
 
 class Backend extends Writable {
     constructor(options) {
         super();
-        let config = Config.getConfig();
 
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;

@@ -1,25 +1,27 @@
-let Adlib = require('./lib/adlib.js');
-let DmgMapper = require('./lib/mappers/dmgMapper');
-let StamMapper = require('./lib/mappers/stamMapper');
-const HvAMapper = require("./lib/mappers/hvaMapper");
-const ArchiefGentMapper = require("./lib/mappers/archiefGentMapper");
-const IndustriemuseumMapper = require("./lib/mappers/IndustriemuseumMapper");
-const TermenMapper = require("./lib/mappers/termenMapper");
-const Backend = require("./lib/Backend");
-const Utils = require('./lib/utils.js');
-const config = require("./config/config.js").getConfig();
-const correlator = require("correlation-id");
+import Adlib from './lib/adlib.js';
+import DmgMapper from './lib/mappers/dmgMapper';
+import StamMapper from './lib/mappers/stamMapper';
+import HvAMapper from "./lib/mappers/hvaMapper";
+import ArchiefGentMapper from "./lib/mappers/archiefGentMapper";
+import IndustriemuseumMapper from "./lib/mappers/IndustriemuseumMapper";
+import TermenMapper from "./lib/mappers/termenMapper";
+import Backend from "./lib/Backend";
+import Utils from './lib/utils.js';
+import Config from "./config/config.js";
+import correlator from "correlation-id";
+import http from 'http';
+import createError from 'http-errors';
+import path from 'path';
+import correlatorExpress from 'express-correlation-id';
+import express from 'express';
 
-const correlatorExpress = require('express-correlation-id');
-const express = require('express');
-var http = require('http');
-var createError = require('http-errors');
-var path = require('path');
+const config = Config.getConfig();
+
 var server;
 
 let sequelize;
 
-let cron = require('node-cron');
+const cron = require('node-cron');
 
 start();
 startHealthcheckAPI();
@@ -28,7 +30,7 @@ cron.schedule(config.adlib.schedule, start);
 
 async function start() {
     correlator.withId(async () => {
-        Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId())
+        Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
 
         sequelize = await Utils.initDb(correlator);
 
@@ -129,7 +131,7 @@ function startStam() {
         options["adlib"] = objectAdlib;
         let objectMapper = new StamMapper(options);
         objectAdlib.getStream().pipe(objectMapper).pipe(backend);
-    })
+    });
 }
 
 function startThesaurus() {
@@ -147,7 +149,7 @@ function startThesaurus() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
-    })
+    });
 }
 
 function startPersonen() {
@@ -165,7 +167,7 @@ function startPersonen() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
-    })
+    });
 }
 
 function startHealthcheckAPI() {
@@ -179,8 +181,8 @@ function startHealthcheckAPI() {
         res.setHeader("Content-Type", "application/text");
         res.send("OK");
         res.end();
-        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", req.correlationId())
-    })
+        Utils.log("GET /status/am-i-up", "app.js:startHealthcheckAPI", "INFO", req.correlationId());
+    });
 
     app.get('/status/db', async (req, res) => {
         res.setHeader("Content-Type", "application/json");
@@ -198,11 +200,11 @@ function startHealthcheckAPI() {
                     "result": "CRIT",
                     "details": "Failed to connect"
                 }
-            ]
+            ];
         }
         res.send(status);
         res.end();
-    })
+    });
 
     // catch 404 and forward to error handler
     app.use(function (req, res, next) {
