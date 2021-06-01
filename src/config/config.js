@@ -7,8 +7,8 @@ export default class Config {
     return {
         adlib: {
             schedule: data.adlib.schedule,
-            baseUrl: data.adlib.baseUrl,
-            username: data.adlib.username,
+            baseUrl: process.env.ADLIB_ENDPOINT ? process.env.ADLIB_ENDPOINT : data.adlib.baseUrl,
+            username: process.env.ADLIB_USER ? process.env.ADLIB_USER : data.adlib.username,
             password: process.env.ADLIB_SECRET ? process.env.ADLIB_SECRET : data.adlib.password,
             limit: data.adlib.limit
         },
