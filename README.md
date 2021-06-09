@@ -20,13 +20,21 @@ Fill in `config.tml` with the password of the Adlib API you want to use.
 adlib-backend uses an ORM (Sequelize) to support following databases: Postgres, MySQL, MariaDB, SQLite and Microsoft SQL Server.
 Fill in the connection URI in `config.tml` of the database you want to use. For example: `'sqlite://./eventstream.db'` or `'postgresql://postgres:yourPassword@127.0.0.1:5432'` or `'postgresql://postgres:yourPassword@yourDockerContainer:5432'`
 
-Adapt the block `[institution]` with the name (or abbreviation) of the institution that will have its data published and fill in:
+## How to add a mapping
+
+1) Add a new block to `config.tml` with the abbrevation of the institution/dataset, for example ['dmg'] with dmg = Design Museum Ghent.
+This abbreviation will be used for the creation of URIs and as namespace for the event stream in the Web API. Fill in:
 * `institutionName` with the exact spelling (`institution.name` field) used in Adlib
 * `institutionURI` with a URI of the organization
 
-`[institution]` will be used as a subpath of the Web API.
-
-Create a new `start` function inside `adlib2backend.js` for your dataset and adapt the option object so that the value of `institution` matches with `[institution]` of the configuration file.
+2) Create a new `start...` function inside `app.js` for your dataset/institution. Copy one of the start functions (e.g. `startDmg`) and rename it with your abbreviation.
+3) Add the new `start...` function inside the `start` function of `app.js` 
+4) Adapt the option object so that the value of `institution` matches with abbreviation used in the configuration file.
+5) Adapt the option object so that the value of `adlibDatabase` matches with the database name in Adlib that needs to be harvested
+6) Adapt the option object so that the value of `checkEuropeanaFlag` whether the `EUROPEANA` field of a record needs to be "checked" in order to be published.
+7) Create a specific mapper (for example: `TestMapper.js`) in the folder `mappers` for your dataset. Copy (e.g. `dmgMapper.js`) and rename an existing mapper to do this.
+8) Import your mapper in `app.js` by adding an import statement, for example `import TestMapper from './lib/mappers/TestMapper';` Also, rename the mapper in the `start...` function
+9) To add new mapping functions for your mapper, create a new function in `mappers/utils.js` in a similar way as the existing functions.
 
 ## Run
 
