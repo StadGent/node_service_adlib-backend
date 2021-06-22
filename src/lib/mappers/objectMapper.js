@@ -7,9 +7,9 @@ export default class ObjectMapper extends Transform {
     constructor(options) {
         super({objectMode: true});
 
-        this._context = ["https://data.vlaanderen.be/doc/applicatieprofiel/cultureel-erfgoed-object/kandidaatstandaard/2020-07-17/context/cultureel-erfgoed-object-ap.jsonld",
-            "https://data.vlaanderen.be/context/persoon-basis.jsonld",
-            "https://brechtvdv.github.io/demo-data/cultureel-erfgoed-event-ap.jsonld",
+        this._context = ["https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-event-ap.jsonld",
             {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
