@@ -3,6 +3,17 @@ module.exports = {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
     },
 
+    mapAfdeling: (institutionURI, input, mappedObject) => {
+        if (input['administration_name'] && input['administration_name'][0]) {
+            const administrationName = input['administration_name'][0];
+            mappedObject["MaterieelDing.beheerder"] = {
+                "@type": "OrganisatieEenheid",
+                "voorkeursnaam": administrationName,
+                "isEenheidVan": institutionURI
+            };
+        }
+    },
+
     mapCollectie: async (input, mappedObject, adlib) => {
         if (input["collection"] && input["collection"][0]) {
             mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
@@ -24,11 +35,84 @@ module.exports = {
         }
     },
 
-    mapObjectnummer: (input, mappedObject) => {
-        if (input["object_number"]) mappedObject["Object.identificator"] = {
-            "@type": "Identificator",
-            "Identificator.identificator": input["object_number"]
-        };
+    mapObjectnummer: (input, mappedObject, baseURI) => {
+        if (input["object_number"]) {
+            const id = {
+                "@type": "Identificator",
+                "Identificator.identificator": {
+                    "@value": input["object_number"][0],
+                    "@type": `${baseURI}identificatiesysteem/objectnummer`
+                }
+            }
+            if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
+            mappedObject["Object.identificator"].push(id);
+        }
+    },
+
+    mapAlternativeNumber: (input, mappedObject, baseURI) => {
+        if (input["Alternative_number"]) {
+            let an = [];
+            for (let a in input["Alternative_number"]) {
+                const number = input["Alternative_number"][a]['alternative_number'][0];
+                const type = input["Alternative_number"][a]['alternative_number.type'][0];
+                const id = {
+                    "@type": "Identificator",
+                    "Identificator.identificator": {
+                        "@value": input["Alternative_number"],
+                        "@type": `${baseURI}identificatiesysteem/${type}`
+                    }
+                };
+                an.push(id);
+            }
+
+            if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
+            mappedObject["Object.identificator"].concat(an);
+        }
+    },
+
+    mapRelatiesKoepelrecord: async (objectURI, input, mappedObject, adlib) => {
+        if (input['Part_of'] && input['Part_of'][0]) {
+            // object - part of - dossier
+            let dossiers = [];
+            for (let p in input['Part_of']) {
+                const title = input['Part_of'][p]['part_of.title'][0];
+                const dossierURI = await adlib.getURIFromPriref("objecten", input['Part_of'][p]['part_of_reference.lref'][0], "doos");
+                const dossier = {
+                    "@id": dossierURI,
+                    "@type": "GecureerdeCollectie",
+                    "Collectie.naam": title
+                };
+                dossiers.push(dossier);
+            }
+            if (!mappedObject["MensgemaaktObject.maaktDeelUitVan"]) mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
+            mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(dossiers);
+        }
+
+        if (input['Parts'] && input['Parts'][0]) {
+            // dossier - has parts
+            let objecten = [];
+            for (let p in input['Parts']) {
+                const title = input['Parts'][p]['parts.title'][0];
+                const objectURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                const object = {
+                    "@id": objectURI,
+                    "@type": "MensgemaaktObject",
+                    "MensgemaaktObject.titel": title
+                };
+                objecten.push(object);
+            }
+            if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
+            mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+        }
+    },
+
+    mapRecordType: (input, mappedObject) => {
+        if (input["record_type"] && input["record_type"][0]) {
+            const recordType = input["record_type"][0];
+            mappedObject["Entiteit.type"] = {
+                "@value": recordType
+            }
+        }
     },
 
     mapObjectnaam: async (objectURI, input, mappedObject, adlib) => {
@@ -50,6 +134,16 @@ module.exports = {
         }
         if (mappedObject["Entiteit.classificatie"]) mappedObject["Entiteit.classificatie"] = mappedObject["Entiteit.classificatie"].concat(c);
         else mappedObject["Entiteit.classificatie"] = c;
+    },
+
+    mapOnderdeelEnAantal: (input, mappedObject) => {
+        if (input['number_of_parts'] && input['number_of_parts'][0]) {
+            for (let p in input['number_of_parts']) {
+                const nr = input['number_of_parts'][p];
+                const part = input['part'][p];
+                // todo
+            }
+        }
     },
 
     mapObjectCategorie: async (objectURI, input, mappedObject, adlib) => {
@@ -311,15 +405,17 @@ module.exports = {
                     }
                 }
 
-                const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "entiteit");
-                p["Activiteit.uitgevoerdDoor"] = {
-                    "@id": creatorURI,
-                    "@type": "Agent",
-                    "label": {
-                        "@value": pro["creator"][0],
-                        "@language": "nl"
-                    }
-                };
+                if(pro["creator.lref"] && pro["creator.lref"][0]) {
+                    const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "entiteit");
+                    p["Activiteit.uitgevoerdDoor"] = {
+                        "@id": creatorURI,
+                        "@type": "Agent",
+                        "label": {
+                            "@value": pro["creator"][0],
+                            "@language": "nl"
+                        }
+                    };
+                }
                 if (pro['production.place'] && pro['production.place'][0] != "") {
                     const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
                     p["Gebeurtenis.plaats"] = {
@@ -337,7 +433,7 @@ module.exports = {
                     p["@reverse"] = {
                         "Rol.activiteit": {
                             "@type": "Rol",
-                            "Rol.agent": creatorURI,
+                            "Rol.agent": roleURI,
                             "Rol.rol": {
                                 "@id": roleURI,
                                 "skos:prefLabel": {
@@ -348,6 +444,24 @@ module.exports = {
                         }
                     };
                 }
+                // add techniques to the production event
+                // part and notes are not mapped
+                if (input.Technique) {
+                    for(let t in input.Technique) {
+                        const techniqueLabel = input.Technique[t]["technique"][0];
+                        // const part = input.Technique[t]["technique.part"][0];
+                        // const notes = input.Technique[t]["technique.notes"][0];
+                        const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                        if (!p["Activiteit.gebruikteTechniek"]) p["Activiteit.gebruikteTechniek"] = [];
+                        p["Activiteit.gebruikteTechniek"].push({
+                            "@id": techniqueURI,
+                            "skos:prefLabel": {
+                                "@value": techniqueLabel,
+                                "@language": "nl"
+                            }
+                        });
+                    }
+                }
                 productions.push(p);
             }
             if (mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = mappedObject["MaterieelDing.productie"].concat(productions);
@@ -355,7 +469,7 @@ module.exports = {
         }
     },
 
-    mapFysiekeKenmerken: async (input, mappedObject, adlib) => {
+    mapFysiekeKenmerken: async (objectURI, input, mappedObject, adlib) => {
         let components = {};
         // Materialen
         if(input.Material && input.Material[0]) {
@@ -394,6 +508,28 @@ module.exports = {
         }
 
         // technieken
+        // when there is no Production activity, map it here
+        // otherwise it is already added in mapVervaardiging
+        if(input.Technique && input.Technique[0] && input.Production) {
+            mappedObject["MaterieelDing.productie"] = {
+                "@type": "Productie",
+                "Productie.product": objectURI
+            };
+            for(let t in input.Technique) {
+                const techniqueLabel = input.Technique[t]["technique"][0];
+                // const part = input.Technique[t]["technique.part"][0];
+                // const notes = input.Technique[t]["technique.notes"][0];
+                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                if (!mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"]) mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"] = [];
+                mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"].push({
+                    "@id": techniqueURI,
+                    "skos:prefLabel": {
+                        "@value": techniqueLabel,
+                        "@language": "nl"
+                    }
+                });
+            }
+        }
 
         // afmetingen
         if(input.Dimension && input.Dimension[0]) {
@@ -526,6 +662,30 @@ module.exports = {
             }
         }
     },
+
+    mapTrefwoorden: async (objectURI, input, mappedObject, adlib) => {
+        if (input['phys_characteristic.keyword'] && input['phys_characteristic.keyword'][0]) {
+            let t = [];
+            for(let k in input["phys_characteristic.keyword"]) {
+                const trefwoordURI = await adlib.getURIFromPriref("thesaurus",input['phys_characteristic.keyword.lref'][k], "concept");
+                const trefwoordLabel = input['phys_characteristic.keyword'][k];
+                t.push({
+                    "@type": "Classificatie",
+                    "Classificatie.getypeerdeEntiteit": objectURI,
+                    "Classificatie.toegekendType": {
+                        "@id": trefwoordURI,
+                        "skos:prefLabel": {
+                            "@value": trefwoordLabel,
+                            "@language": "nl"
+                        }
+                    }
+                });
+            }
+            if (mappedObject["Entiteit.classificatie"]) mappedObject["Entiteit.classificatie"] = mappedObject["Entiteit.classificatie"].concat(t);
+            else mappedObject["Entiteit.classificatie"] = t;
+        }
+    },
+
 
     mapAssociaties: async (objectURI, input, mappedObject, adlib) => {
         let informatieObject = {

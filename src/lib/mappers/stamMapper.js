@@ -32,7 +32,7 @@ export default class StamMapper extends ObjectMapper {
 
             // Identificatie
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
-            Utils.mapObjectnummer(input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject, this._baseURI);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
             await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
             Utils.mapTitel(input, mappedObject);
@@ -42,7 +42,7 @@ export default class StamMapper extends ObjectMapper {
             await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
-            await Utils.mapFysiekeKenmerken(input, mappedObject, this._adlib);
+            await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);
 
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);

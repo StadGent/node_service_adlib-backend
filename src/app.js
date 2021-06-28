@@ -37,7 +37,7 @@ async function start() {
         startHva();
         startDmg();
         startIndustriemuseum();
-        //startArchiefgent();
+        startArchiefgent();
         startStam();
 
         startThesaurus();
@@ -89,7 +89,7 @@ function startIndustriemuseum() {
             "checkEuropeanaFlag": true,
             "correlator": correlator
         };
-        // Create eventstream "personen" of Industriemuseum
+        // Create eventstream "objecten" of Industriemuseum
         const backend = new Backend(options);
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
@@ -107,7 +107,7 @@ function startArchiefgent() {
             "checkEuropeanaFlag": true,
             "correlator": correlator
         };
-        // Create eventstream "personen" of Archief Gent
+        // Create eventstream "objecten" of Archief Gent
         const backend = new Backend(options);
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;

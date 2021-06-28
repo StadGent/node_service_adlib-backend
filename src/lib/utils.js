@@ -43,8 +43,10 @@ export default class Utils {
             indexes: require('./models/Member').indexes
         };
         await Member.init(memberAttributes, memberOptions);
-        // Clean database when versioning is not enabled
-        if (!process.env.npm_package_version) {
+        const pattern = /\d+\.\d+\.\d+/g;
+        const versionRegex = new RegExp(pattern);
+        // Clean database when versioning is not enabled or not three digits separated with dots pattern
+        if (!process.env.npm_package_version || !versionRegex.test(process.env.npm_package_version)) {
             this.log("EMPTYING DATABASE", "adlib-backend/lib/utils.js:initDb", "INFO", correlator.getId());
             await sequelize.sync({force: true});
         }
