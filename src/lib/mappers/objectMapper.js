@@ -28,7 +28,7 @@ export default class ObjectMapper extends Transform {
         this._institution = options.institution;
         this._institutionURI = config[options.institution].institutionURI;
 
-        this._baseURI = config.mapping.baseURI;
+        this._baseURI = config.mapping.baseURI.endsWith('/') ? config.mapping.baseURI : config.mapping.baseURI + '/';
 
         this._adlib = options.adlib;
         this._correlator = options.correlator;

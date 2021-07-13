@@ -13,8 +13,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
 
         try {
             let now = new Date().toISOString();
-            let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
-            let objectURI = baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
+            let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
             let versionURI = objectURI + "/" + now;
             mappedObject["@id"] = versionURI;
             mappedObject["@type"] = "MensgemaaktObject";
@@ -27,7 +26,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
 
             // Identificatie
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
-            Utils.mapCollectie(input,mappedObject);
+            Utils.mapCollectie(input,mappedObject, this._adlib, this._baseURI);
             Utils.mapObjectnummer(input, mappedObject);
             Utils.mapObjectnaam(objectURI, input, mappedObject);
             Utils.mapTitel(input, mappedObject);

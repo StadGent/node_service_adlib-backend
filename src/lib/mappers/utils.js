@@ -3,23 +3,29 @@ module.exports = {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
     },
 
-    mapCollectie: async (input, mappedObject, adlib) => {
+    mapCollectie: async (input, mappedObject, adlib, baseURI) => {
         if (input["collection"] && input["collection"][0]) {
             mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
             for (let c in input["collection"]) {
-                const collectionURI = await adlib.getURIFromPriref("thesaurus", input["collection.lref"][c], "concept");
+                const type = "concept";
+                const collectionURI = await adlib.getURIFromPriref("thesaurus", input["collection.lref"][c], type);
+                const adlibCollectionURI = `${baseURI}${type}/${input["collection.lref"][c]}`;
 
-                mappedObject["MensgemaaktObject.maaktDeelUitVan"].push({
+                let collectie = {
+                    "@id": adlibCollectionURI,
                     "@type": "Collectie",
-                    "Entiteit.beschrijving": input["collection"][c],
-                    "Entiteit.type": {
-                        "@id": collectionURI,
-                        "label": {
-                            "@value": input["collection"][c],
-                            "@language": "nl"
-                        }
+                    "Entiteit.beschrijving": input["collection"][c]
+                };
+                // when external URI is given, then Linked Art's typing pattern is used
+                if (collectionURI != adlibCollectionURI) collectie["Entiteit.type"] = {
+                    "@id": collectionURI,
+                    "label": {
+                        "@value": input["collection"][c],
+                        "@language": "nl"
                     }
-                });
+                };
+
+                mappedObject["MensgemaaktObject.maaktDeelUitVan"].push(collectie);
             }
         }
     },
