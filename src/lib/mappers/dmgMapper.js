@@ -17,8 +17,7 @@ export default class DmgMapper extends ObjectMapper {
 
         try {
             let now = new Date().toISOString();
-            let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
-            let objectURI = baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
+            let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
             let versionURI = objectURI + "/" + now;
             mappedObject["@id"] = versionURI;
             mappedObject["@type"] = "MensgemaaktObject";
@@ -32,7 +31,7 @@ export default class DmgMapper extends ObjectMapper {
 
             // Identificatie
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
-            await Utils.mapCollectie(input,mappedObject, this._adlib);
+            await Utils.mapCollectie(input,mappedObject, this._adlib, this._baseURI);
             Utils.mapObjectnummer(input, mappedObject);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
             Utils.mapTitel(input, mappedObject);
