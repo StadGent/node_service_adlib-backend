@@ -9,11 +9,12 @@ export default class TermenMapper extends Transform {
         super({objectMode: true});
 
         this._context = [
-            "https://data.vlaanderen.be/context/persoon-basis.jsonld",
-            "https://data.vlaanderen.be/doc/applicatieprofiel/cultureel-erfgoed-object/kandidaatstandaard/2020-07-17/context/cultureel-erfgoed-object-ap.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
             {
                "skos": "http://www.w3.org/2004/02/skos/core#",
-                "owl": "http://www.w3.org/2002/07/owl#"
+                "owl": "http://www.w3.org/2002/07/owl#",
+                "opmerking": "http://www.w3.org/2004/02/skos/core#note"
             }
         ];
         this._adlibDatabase = options.adlibDatabase;
@@ -78,7 +79,7 @@ export default class TermenMapper extends Transform {
                     // Archief Gent
                     ( (institution === 'archiefgent')
                         && (input['name.status'] && input['name.status'][0].value[2] === "descriptor")
-                        && (isPersoon) || (isInstelling)
+                        && ((isPersoon) || (isInstelling))
                     )
                 )
             ) {
@@ -93,6 +94,19 @@ export default class TermenMapper extends Transform {
 
                 // External URI found
                 if (uri != objectURI) mappedObject["owl:sameAs"] = uri;
+
+                // referentienummer
+                if (input['reference_number'] && input['reference_number'][0]) {
+                    const id = {
+                        "@type": "Identificator",
+                        "Identificator.identificator": {
+                            "@value": input["reference_number"][0],
+                            "@type": `${this._baseURI}identificatiesysteem/referentienummer`
+                        }
+                    }
+                    if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
+                    mappedObject["Object.identificator"].push(id);
+                }
 
                 if (input['scope_note']) mappedObject["skos:scopeNote"] = input['scope_note'][0];
                 if (input['biography'] && input['biography'][0]) mappedObject["skos:note"] = input['biography'][0];
@@ -167,6 +181,7 @@ export default class TermenMapper extends Transform {
                     mappedObject["prov:wasAttributedTo"] = {
                         "@id": institutionURI
                     };
+                    mappedObject["alternatieveNaam"] = [];
 
                     // geboortedatum
                     if (input['birth.date.start'] && input['birth.date.start'][0]) {
@@ -221,107 +236,142 @@ export default class TermenMapper extends Transform {
                         };
                     }
 
-                    if (input['forename'] || input['surname']) {
-                        // voornamen
-                        if (input['forename'] && input['forename'][0]) {
-                            mappedObject["voornaam"] = [];
-                            for (const f in input['forename'])
-                                mappedObject["voornaam"].push(input['forename'][f]);
-                        }
+                    // aanhef
+                    let aanhef = "";
+                    if (input['salutation'] && input['salutation'][0])
+                        aanhef = input['salutation'][0];
 
-                        // achternaam
-                        if (input['surname'] && input['surname'][0]) {
-                            let achternaam = "";
-                            for (const f in input['forename'])
-                                achternaam += input['surname'][f];
-                            mappedObject["achternaam"] = achternaam;
-                        }
-                        // volledige naam
-                        if (input['name'] && input['name'][0]) {
-                            mappedObject["volledigeNaam"] = input['name'][0];
-                        }
-                    } else {
-                        if (input['name'] && input['name'][0]) {
-                            mappedObject["label"] = {
-                                "@value": input['name'][0],
-                                "@language": "nl"
-                            };
-                        }
+                    // titel
+                    let titel = "";
+                    if (input['title'] && input['title'][0])
+                        titel = input['title'][0];
 
-                        // geslacht
-                        if (input['gender'] && input['gender'][0]) {
-                            if (input['gender'][0]["value"].contains('man')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/MALE";
-                            else if (input['gender'][0]["value"].contains('vrouw')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/FEMALE";
-                            else mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/NKN";
-                        }
+                    // voornamen
+                    let voornaam = "input['forename'][0]";
+                    if (input['forename'] && input['forename'][0]) {
+                        voornaam = input['forename'][0];
+                        mappedObject["voornaam"] = [];
+                        for (const f in input['forename'])
+                            mappedObject["voornaam"].push(input['forename'][f]);
+                    }
 
-                        // relatie naar andere bron
-                        if (input['Source'] && input['Source'][0]) {
-                            mappedObject["owl:sameAs"] = [];
-                            for (const f in input['Source']) {
-                                const bron = input['Source'][f]["source"] + input['Source'][f]["source.number"];
-                                mappedObject["owl:sameAs"].push(bron);
-                            }
-                        }
+                    // achternaam
+                    let achternaam = ""
+                    if (input['surname'] && input['surname'][0]) {
+                        achternaam = input['surname'][0];
+                        for (const f in input['surname'])
+                            achternaam += input['surname'][f];
+                        mappedObject["achternaam"] = achternaam;
+                    }
+                    // volledige naam
+                    if (input['name'] && input['name'][0]) {
+                        mappedObject["volledigeNaam"] = input['name'][0];
+                    }
 
-                        // relatie (use)
-                        if (input['use'] && input['use'][0]) {
-                            mappedObject["skos:related"] = [];
-                            for (const f in input['use']) {
-                                const useLabel = input['use'][f];
-                                const useURI = await this._adlib.getURIFromPriref("thesaurus", input["use.lref"][f], "concept");
-                                mappedObject["skos:related"].push({
-                                    "@id": useURI,
-                                    "Entiteit.beschrijving": {
-                                        "@value": useLabel,
-                                        "@language": "nl"
-                                    }
-                                });
-                            }
+                    // alternatieve namen
+                    if (input['structures_genealogy'] && input['structures_genealogy'][0]) {
+                        for (let s in input['structures_genealogy']) {
+                            mappedObject["alternatieveNaam"].push(input['structures_genealogy'][s]);
                         }
+                    }
+                    if (titel && voornaam && achternaam) mappedObject["alternatieveNaam"].push(`${titel} ${voornaam} ${achternaam}`);
+                    if (titel && aanhef && achternaam) mappedObject["alternatieveNaam"].push(`${aanhef} ${achternaam}, ${titel}`);
 
-                        // relatie used_for
-                        if (input['used_for'] && input['used_for'][0]) {
-                            if (!mappedObject["skos:related"]) mappedObject["skos:related"] = [];
-                            for (const f in input['used_for']) {
-                                const usedForLabel = input['used_for'][f];
-                                const usedForURI = await this._adlib.getURIFromPriref("thesaurus", input["used_for.lref"][f], "concept");
-                                mappedObject["skos:related"].push({
-                                    "@id": usedForURI,
-                                    "Entiteit.beschrijving": {
-                                        "@value": usedForLabel,
-                                        "@language": "nl"
-                                    }
-                                });
-                            }
+                    // geslacht
+                    if (input['gender'] && input['gender'][0]) {
+                        if (input['gender'][0]["value"].contains('man')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/MALE";
+                        else if (input['gender'][0]["value"].contains('vrouw')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/FEMALE";
+                        else mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/NKN";
+                    }
+
+                    // relatie naar andere bron
+                    if (input['Source'] && input['Source'][0]) {
+                        mappedObject["owl:sameAs"] = [];
+                        for (const f in input['Source']) {
+                            const bron = input['Source'][f]["source"] + input['Source'][f]["source.number"];
+                            mappedObject["owl:sameAs"].push(bron);
                         }
+                    }
 
-                        // beroep
-                        if (input['occupation'] && input['occupation'][0]) {
-                            mappedObject["Agent.voerdeUit"] = [];
-                            for (const f in input['occupation']) {
-                                const occupationLabel = input['occupation'][f];
-                                const occupationURI = await this._adlib.getURIFromPriref("thesaurus", input["occupation.lref"][f], "concept");
-                                mappedObject["Agent.voerdeUit"].push({
-                                    "@type": "Activiteit",
-                                    "Entiteit.type": occupationURI,
-                                    "Entiteit.beschrijving": {
-                                        "@value": occupationLabel,
-                                        "@language": "nl"
-                                    }
-                                });
-                            }
-                        }
-
-                        // nationaliteit
-                        if (input['nationality'] && input['nationality'][0]) {
-                            mappedObject["heeftNationaliteit"] = {
-                                "@type": "Nationaliteit",
+                    // relatie (use)
+                    if (input['use'] && input['use'][0]) {
+                        mappedObject["skos:related"] = [];
+                        for (const f in input['use']) {
+                            const useLabel = input['use'][f];
+                            const useURI = await this._adlib.getURIFromPriref("thesaurus", input["use.lref"][f], "concept");
+                            mappedObject["skos:related"].push({
+                                "@id": useURI,
                                 "Entiteit.beschrijving": {
-                                    "@value": input['nationality'][0],
+                                    "@value": useLabel,
                                     "@language": "nl"
                                 }
-                            };
+                            });
+                        }
+                    }
+
+                    // relatie used_for
+                    if (input['used_for'] && input['used_for'][0]) {
+                        if (!mappedObject["skos:related"]) mappedObject["skos:related"] = [];
+                        for (const f in input['used_for']) {
+                            const usedForLabel = input['used_for'][f];
+                            const usedForURI = await this._adlib.getURIFromPriref("thesaurus", input["used_for.lref"][f], "concept");
+                            mappedObject["skos:related"].push({
+                                "@id": usedForURI,
+                                "Entiteit.beschrijving": {
+                                    "@value": usedForLabel,
+                                    "@language": "nl"
+                                }
+                            });
+                        }
+                    }
+
+                    // beroep
+                    if (input['occupation'] && input['occupation'][0]) {
+                        mappedObject["Agent.voerdeUit"] = [];
+                        for (const f in input['occupation']) {
+                            const occupationLabel = input['occupation'][f];
+                            const occupationURI = await this._adlib.getURIFromPriref("thesaurus", input["occupation.lref"][f], "concept");
+                            mappedObject["Agent.voerdeUit"].push({
+                                "@type": "Activiteit",
+                                "Entiteit.type": occupationURI,
+                                "Entiteit.beschrijving": {
+                                    "@value": occupationLabel,
+                                    "@language": "nl"
+                                }
+                            });
+                        }
+                    }
+
+                    // nationaliteit
+                    if (input['nationality'] && input['nationality'][0]) {
+                        mappedObject["heeftNationaliteit"] = {
+                            "@type": "Nationaliteit",
+                            "Entiteit.beschrijving": {
+                                "@value": input['nationality'][0],
+                                "@language": "nl"
+                            }
+                        };
+                    }
+
+                    // relatie naar andere personen
+                    if (input['Related'] && input['Related'][0]) {
+                        let personenrelaties = [];
+                        for (let r in input['Related']) {
+                            const relatedWith = input['Related'][p]['relationship'][0];
+                            const relatedWithURI = adlib.getURIFromPriref("personen", input['Related'][p]['relationship.lref'][0], "agent");
+                            const relatedWithNotes = input['Related'][p]['relationship.notes'][0];
+                            const relatedWithCategory = input['Related'][p]['relationship.category'][0];
+
+                            const personenrelatie = {
+                                "@type": "Persoonsrelatie",
+                                "skos:notes": relatedWithNotes,
+                                "Entiteit.type": relatedWithCategory,
+                                "Persoonsrelatie.heeftRelatieMet": {
+                                    "@id": relatedWithURI,
+                                    "volledigeNaam": relatedWith
+                                }
+                            }
+                            personenrelaties.push(personenrelatie);
                         }
                     }
                 }

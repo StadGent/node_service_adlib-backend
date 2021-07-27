@@ -10,6 +10,7 @@ export default class ObjectMapper extends Transform {
         this._context = ["https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-event-ap.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/organisatie-basis.jsonld",
             {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
