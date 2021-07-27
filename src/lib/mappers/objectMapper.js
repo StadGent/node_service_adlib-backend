@@ -10,6 +10,7 @@ export default class ObjectMapper extends Transform {
         this._context = ["https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-event-ap.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/organisatie-basis.jsonld",
             {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
@@ -28,7 +29,7 @@ export default class ObjectMapper extends Transform {
         this._institution = options.institution;
         this._institutionURI = config[options.institution].institutionURI;
 
-        this._baseURI = config.mapping.baseURI;
+        this._baseURI = config.mapping.baseURI.endsWith('/') ? config.mapping.baseURI : config.mapping.baseURI + '/';
 
         this._adlib = options.adlib;
         this._correlator = options.correlator;
