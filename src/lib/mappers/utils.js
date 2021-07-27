@@ -322,7 +322,7 @@ module.exports = {
                         for (let p in input["Production"]) {
                             let pro = input["Production"][p];
                             if (pro['creator.role'] && pro['creator.role'][0] === "ontwerper") {
-                                const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "entiteit");
+                                const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
 
                                 c["Activiteit.uitgevoerdDoor"] = {
                                     "@id": creatorURI,
@@ -410,7 +410,7 @@ module.exports = {
                 }
 
                 if(pro["creator.lref"] && pro["creator.lref"][0]) {
-                    const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "entiteit");
+                    const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
                     p["Activiteit.uitgevoerdDoor"] = {
                         "@id": creatorURI,
                         "@type": "Agent",
@@ -704,7 +704,7 @@ module.exports = {
             for (let p in input["Associated_person"]) {
                 if (input["Associated_person"][p]["association.person"] && input["Associated_person"][p]["association.person"][0]) {
                     let personLabel = input["Associated_person"][p]["association.person"][0];
-                    const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "entiteit");
+                    const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "agent");
 
                     informatieObject["InformatieObject.verwijstNaar"].push({
                         "@id": personURI,
@@ -776,7 +776,7 @@ module.exports = {
             for (let p in input["Content_person"]) {
                 if (input["Content_person"][p]["content.person.name"]) {
                     let personLabel = input["Content_person"][p]["content.person.name"][0];
-                    const personURI = await adlib.getURIFromPriref("personen", input["Content_person"][p]["content.person.name.lref"][0], "entiteit");
+                    const personURI = await adlib.getURIFromPriref("personen", input["Content_person"][p]["content.person.name.lref"][0], "agent");
 
                     mappedObject["Entiteit.beeldtUit"].push({
                         "@id": personURI,
