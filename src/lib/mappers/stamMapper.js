@@ -17,8 +17,7 @@ export default class StamMapper extends ObjectMapper {
 
         try {
             let now = new Date().toISOString();
-            let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
-            let objectURI = baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
+            let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
             let versionURI = objectURI + "/" + now;
             mappedObject["@id"] = versionURI;
             mappedObject["@type"] = "MensgemaaktObject";
