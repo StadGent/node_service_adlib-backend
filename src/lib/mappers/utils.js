@@ -110,6 +110,25 @@ module.exports = {
         }
     },
 
+    mapRelatiesKoepelRecordDossier: async (objectURI, input, mappedObject, adlib) => {
+        // dossier = has works (stuk)
+        if (input['Parts'] && input['Parts'][0]) {
+            let stukken = [];
+            for (let p in input['Parts']) {
+                const naam = input['Parts'][p]['parts.title'][0];
+                const stukURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                const stuk = {
+                    "@id": stukURI,
+                    "@type": "Stuk",
+                    "Stuk.naam": naam
+                };
+                stukken.push(stuk);
+            }
+            if (!mappedObject["Dossier.bestaatUit"])mappedObject["Dossier.bestaatUit"] = [];
+            mappedObject["Dossier.bestaatUit"].concat(stukken);
+        }
+    },
+
     mapRecordType: (input, mappedObject) => {
         if (input["record_type"] && input["record_type"][0]) {
             const recordType = input["record_type"][0];
@@ -397,7 +416,7 @@ module.exports = {
                         }
                     }
                     if (prod_date['production.date.end']) {
-                        if (!p["Gebeurtenis.tijd"]) c["Gebeurtenis.tijd"] = {
+                        if (!p["Gebeurtenis.tijd"]) p["Gebeurtenis.tijd"] = {
                             "@value": "",
                             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
                         };
@@ -749,6 +768,43 @@ module.exports = {
         }
 
         mappedObject["MensgemaaktObject.draagt"] = informatieObject;
+    },
+
+    mapActiviteitArchief: async (objectURI, input, mappedObject, adlib) => {
+        // activiteit die een dossier genereert --> vb. indiening bouwaanvraag (Archief Gent)
+        // steeds slechts 1 occurence!
+
+        let v =  {
+            "@type": "Activiteit"
+        }
+
+        if (input["Associated_period"][0]["association.period.date.start"][0]) {
+            const datumStart = ["Associated_period"][0]["association.period.date.start"];
+            v["Activiteit.startdate"] = {
+                "@type": "Periode",
+                "startdatum": datumStart
+            };
+        }
+
+        if (input["Associated_period"][0]["association.period.date.start"][0]) {
+            const datumEind = ["Associated_period"][0]["association.period.date.end"];
+            v["Activiteit.einddate"] = {
+                "@type": "Periode",
+                "startdatum": datumEind
+            };
+        }
+
+        if (input["Associated_period"][0]["association.period.date.start"][0]) {
+            const activiteitType = ["Associated_period"][0]["association.period.assoc"];
+            const activityURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][0]["association.period.assoc.lref"][0], "concept")
+            v["Activiteit.naam"] = {
+                "@id": activityURI,
+                "skos:prefLabel": {
+                    "@value": activiteitType,
+                    "@language": "nl"
+                }
+            };
+        }
     },
 
     mapIconografie: async (input, mappedObject, adlib) => {

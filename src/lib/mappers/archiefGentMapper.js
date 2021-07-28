@@ -53,6 +53,12 @@ export default class ArchiefGentMapper extends ObjectMapper {
             // Relatie met andere objecten (koepelrecord of object)
             await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib);
 
+            // Dossier bestaat uit werken (koepelrecord of object)
+            await Utils.mapRelatiesKoepelRecordDossier(objectURI, input, mappedObject, this._adlib);
+
+            // werk resulteert in dossier (koepelrecord)
+            await Utils.mapActiviteitArchief(objectURI, input, mappedObject, this._adlib);
+
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
