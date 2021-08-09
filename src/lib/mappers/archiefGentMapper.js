@@ -40,6 +40,9 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapTitel(input, mappedObject);
             Utils.mapBeschrijving(input, mappedObject);
 
+            // Vervaardiging, datering
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+
             // Associaties
             await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
