@@ -11,6 +11,7 @@ export default class ObjectMapper extends Transform {
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-event-ap.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/organisatie-basis.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/generiek-basis.jsonld",
             {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
@@ -22,6 +23,7 @@ export default class ObjectMapper extends Transform {
                 "foaf:page": {
                     "@type": "@id"
                 },
+                "cest": "https://www.projectcest.be/wiki/Publicatie:Invulboek_objecten/Veld/",
                 "inhoud": "http://www.cidoc-crm.org/cidoc-crm/P190_has_symbolic_content"
             }
         ];
