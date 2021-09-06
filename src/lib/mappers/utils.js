@@ -1,3 +1,4 @@
+const {mapInhoudOnderwerpEigennaam} = require("./utils");
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
@@ -24,8 +25,10 @@ module.exports = {
                     "@id": adlibCollectionURI,
                     "@type": "Collectie",
                     "Entiteit.beschrijving": input["collection"][c]
+                    }
                 };
                 // when external URI is given, then Linked Art's typing pattern is used
+                if (!collection["Entiteit.type"]) collectie["Entiteit.type"] = [];
                 if (collectionURI != adlibCollectionURI) collectie["Entiteit.type"] = {
                     "@id": collectionURI,
                     "label": {
@@ -33,6 +36,10 @@ module.exports = {
                         "@language": "nl"
                     }
                 };
+                collectie["Entiteit.type"].push({
+                    "@id": "cest:Naam_collectie",
+                    "label": "collectie"
+                })
 
                 mappedObject["MensgemaaktObject.maaktDeelUitVan"].push(collectie);
             }
@@ -46,6 +53,10 @@ module.exports = {
                 "Identificator.identificator": {
                     "@value": input["object_number"][0],
                     "@type": `${baseURI}identificatiesysteem/objectnummer`
+                },
+                "Entiteit.type": {
+                    "@id": "cest:Waarde_objectnummer",
+                    "label": "objectnummer"
                 }
             }
             if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
@@ -64,6 +75,10 @@ module.exports = {
                     "Identificator.identificator": {
                         "@value": input["Alternative_number"],
                         "@type": `${baseURI}identificatiesysteem/${type}`
+                    },
+                    "Entiteit.type" : {
+                        //todo "@id": "cest:",
+                        "label": "alternatief_nummer"
                     }
                 };
                 an.push(id);
@@ -84,7 +99,8 @@ module.exports = {
                 const dossier = {
                     "@id": dossierURI,
                     "@type": "GecureerdeCollectie",
-                    "Collectie.naam": title
+                    "Collectie.naam": title,
+                    //todo cest
                 };
                 dossiers.push(dossier);
             }
@@ -152,6 +168,10 @@ module.exports = {
                         "@value": input.Object_name[o].object_name[0],
                         "@language": "nl"
                     }
+                },
+                "Entiteit.type" : {
+                    "@id": "cest:Term_objectnaam",
+                    "value": "objectnaam"
                 }
             });
         }
@@ -186,6 +206,10 @@ module.exports = {
                             "@value": categoryName,
                             "@language": "nl"
                         }
+                    },
+                    "Entiteit.type" : {
+                        "@id": "cest:Term_objectnaam",
+                        "value": "objectnaam"
                     }
                 });
             }
@@ -197,14 +221,22 @@ module.exports = {
     mapTitel: (input, mappedObject) => {
         if (input.Title && input.Title[0].title) mappedObject["MensgemaaktObject.titel"] = {
             "@value": input.Title[0].title[0],
-            "@language": "nl"
+            "@language": "nl",
+            "Entiteit.type": {
+                "@id": "cest:Titel",
+                "value": "titel"
+            }
         };
     },
 
     mapBeschrijving: (input, mappedObject) => {
         if (input.Description && input.Description[0].description) mappedObject["Entiteit.beschrijving"] = {
             "@value": input.Description[0].description[0],
-            "@language": "nl"
+            "@language": "nl",
+            "Entiteit.type": {
+                "@id": "cest:Korte_beschrijving",
+                "value": "beschrijving"
+            }
         };
     },
 
@@ -215,6 +247,9 @@ module.exports = {
     mapConditie: (input, mappedObject) => {
         if(input.Condition && input.Condition[0]) mappedObject["MaterieelDing.conditiebeoordeling"] = processCondition(mappedObject["dcterms:isVersionOf"], input.Condition[0]);
     },
+
+    //todo:         ********************-----------------**************************
+    //todo;         koppeling naar thesaurus >> lijst bijhouden is niet realistisch
 
     mapStandplaatsDMG: (input, mappedObject) => {
         const opZaalDMG = ["DMG_A00_20", "DMG_A00_21", "DMG_A00_22", "DMG_A00_23", "DMG_A00_24", "DMG_A00_25", "DMG_A00_26", "DMG_A00_27", "DMG_A00_28",
@@ -318,11 +353,17 @@ module.exports = {
                                 c["Gebeurtenis.tijd"] = {
                                     "@value": ontwerp_date['production.date.start'][0] + "~",
                                     "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                                    //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                                    // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                                    // niet nodig om die aan te pakken?
                                 };
                             } else {
                                 c["Gebeurtenis.tijd"] = {
                                     "@value": ontwerp_date['production.date.start'][0],
                                     "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                                    //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                                    // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                                    // niet nodig om die aan te pakken?
                                 };
                             }
                         }
@@ -330,6 +371,9 @@ module.exports = {
                             if (!c["Gebeurtenis.tijd"]) c["Gebeurtenis.tijd"] = {
                                 "@value": "",
                                 "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                                // niet nodig om die aan te pakken?
                             };
                             if (ontwerp_date['production.date.end.prec'] && ontwerp_date['production.date.end.prec'][0] === "circa") {
                                 c["Gebeurtenis.tijd"]["@value"] = "/" + ontwerp_date['production.date.end'][0] + "~";
@@ -348,7 +392,11 @@ module.exports = {
                                     "@type": "Agent",
                                     "label": {
                                         "@value": pro["creator"][0],
-                                        "@language": "nl"
+                                        "@language": "nl",
+                                        "Entiteit.type": {
+                                            "@id": "cest:Naam_vervaardiger",
+                                            "value": "vervaardiger"
+                                        }
                                     }
                                 };
                                 if (pro['production.place']) {
@@ -357,7 +405,11 @@ module.exports = {
                                         "@id": placeURI,
                                         "skos:prefLabel": {
                                             "@value": pro['production.place'][0],
-                                            "@language": "nl"
+                                            "@language": "nl",
+                                            "Entiteit.type": {
+                                                "@id": "cest:Naam_plaats_vervaardiging",
+                                                "value": "vervaardiging.plaats"
+                                            }
                                         }
                                     };
                                 }
@@ -374,6 +426,10 @@ module.exports = {
                                             "skos:prefLabel": {
                                                 "@value": roleLabel,
                                                 "@language": "nl"
+                                            },
+                                            "Entiteit.type": {
+                                                "@id": "cest: Rol_vervaardiger",
+                                                "value": "vervaardiger.rol"
                                             }
                                         }
                                     }
@@ -407,11 +463,17 @@ module.exports = {
                             p["Gebeurtenis.tijd"] = {
                                 "@value": prod_date['production.date.start'][0] + "~",
                                 "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                                // niet nodig om die aan te pakken?
                             };
                         } else {
                             p["Gebeurtenis.tijd"] = {
                                 "@value": prod_date['production.date.start'][0],
                                 "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                                // niet nodig om die aan te pakken?
                             };
                         }
                     }
@@ -419,6 +481,9 @@ module.exports = {
                         if (!p["Gebeurtenis.tijd"]) p["Gebeurtenis.tijd"] = {
                             "@value": "",
                             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                            //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                            // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                            // niet nodig om die aan te pakken?
                         };
                         if (prod_date['production.date.end.prec'] && prod_date['production.date.end.prec'][0] === "circa") {
                             p["Gebeurtenis.tijd"]["@value"] += "/" + prod_date['production.date.end'][0] + "~";
@@ -436,6 +501,10 @@ module.exports = {
                         "label": {
                             "@value": pro["creator"][0],
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:vervaardiger_Naam",
+                            "value": "vervaardiger"
                         }
                     };
                 }
@@ -444,8 +513,12 @@ module.exports = {
                     p["Gebeurtenis.plaats"] = {
                         "@id": placeURI,
                         "skos:prefLabel": {
-                            "@value": pro['production.place'][0],
+                            "@value": pro ['production.place'][0],
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:Naam_plaats_vervaardiging",
+                            "value": "vervaardiging.plaats"
                         }
                     };
                 }
@@ -462,6 +535,10 @@ module.exports = {
                                 "skos:prefLabel": {
                                     "@value": roleLabel,
                                     "@language": "nl"
+                                },
+                                "Entiteit.type": {
+                                    "@id": "cest:Rol_vervaardiger",
+                                    "value": "vervaardiger.rol"
                                 }
                             }
                         }
@@ -481,7 +558,12 @@ module.exports = {
                             "skos:prefLabel": {
                                 "@value": techniqueLabel,
                                 "@language": "nl"
+                            },
+                            "Entiteit.type": {
+                                "@id": "cest:Term_techniek",
+                                "value": "techniek"
                             }
+
                         });
                     }
                 }
@@ -514,6 +596,10 @@ module.exports = {
                                 "skos:prefLabel": {
                                     "@value": mate,
                                     "@language": "nl"
+                                },
+                                "Entiteit.type": {
+                                    "@id": "cest:Term_materiaal",
+                                    "value": "materiaal"
                                 }
                             });
                         } else {
@@ -522,6 +608,10 @@ module.exports = {
                                 "skos:prefLabel": {
                                     "@value": mate,
                                     "@language": "nl"
+                                },
+                                "Entiteit.type": {
+                                    "@id": "cest:Term_materials",
+                                    "value": "materiaal"
                                 }
                             });
                         }
@@ -549,6 +639,10 @@ module.exports = {
                     "skos:prefLabel": {
                         "@value": techniqueLabel,
                         "@language": "nl"
+                    },
+                    "Entiteit.type": {
+                        "@id": "cest:Term_techniek",
+                        "value": "techniek"
                     }
                 });
             }
@@ -575,6 +669,8 @@ module.exports = {
                         "Dimensie.type": afmeting,
                         "Dimensie.waarde": waarde,
                         "Dimensie.eenheid": eenheid
+                        //todo: hoe mappen we dit best naar CEST, ook hier vier velden. Is het nuttig om al deze velden
+                        // afzonderlijk te gaan mappen?
                     });
                 } else {
                     mappedObject["MensgemaaktObject.dimensie"].push({
@@ -583,6 +679,8 @@ module.exports = {
                         "Dimensie.type": afmeting,
                         "Dimensie.waarde": waarde,
                         "Dimensie.eenheid": eenheid
+                        //todo: hoe mappen we dit best naar CEST, ook hier vier velden. Is het nuttig om al deze velden
+                        // afzonderlijk te gaan mappen?
                     });
                 }
             }
@@ -606,6 +704,7 @@ module.exports = {
                 "@type": "Periode",
                 "Periode.begin": datum,
                 "Periode.einde": datum
+                //todo
             };
         }
 
@@ -617,6 +716,10 @@ module.exports = {
                 "skos:prefLabel": {
                     "@value": methode,
                     "@language": "nl"
+                },
+                "Entiteit.type": {
+                    "@id": "cest:Term_verwervingsmethode",
+                    "value": "verwerving.methode"
                 }
             };
         }
@@ -628,6 +731,10 @@ module.exports = {
                 "skos:prefLabel": {
                     "@value": plaats,
                     "@language": "nl"
+                },
+                "Entiteit.type": {
+                    "@id": "cest:Plaats_verwervingsbron",
+                    "value": "verwerving.plaats"
                 }
             };
         }
@@ -639,52 +746,63 @@ module.exports = {
     },
 
     mapTentoonstelling: async (objectUri, input, mappedObject, adlib) => {
-        if (input["Exhibition"]) {
-            mappedObject["Entiteit.maaktDeelUitVan"] = [];
-            for (let e in input["Exhibition"]) {
-                // TODO: @id toevoegen van tentoonstelling
-                let exh = {
-                    "@type": "Activiteit",
-                    "Entiteit.type": "http://vocab.getty.edu/aat/300054766" // Tentoonstelling
-                };
-                const exhibition = input["Exhibition"][e];
-                if (exhibition["exhibition"] && exhibition["exhibition"][0]) {
-                    const beschrijving = exhibition["exhibition"] && exhibition["exhibition"][0] ? exhibition["exhibition"][0] : "";
-                    exh["Entiteit.beschrijving"] = beschrijving;
+    if (input["Exhibition"]) {
+        mappedObject["Entiteit.maaktDeelUitVan"] = [];
+        for (let e in input["Exhibition"]) {
+            // TODO: @id toevoegen van tentoonstelling
+            let exh = {
+                "@type": "Activiteit",
+                "Entiteit.type": "http://vocab.getty.edu/aat/300054766" // Tentoonstelling
+            };
+            const exhibition = input["Exhibition"][e];
+            if (exhibition["exhibition"] && exhibition["exhibition"][0]) {
+                const beschrijving = exhibition["exhibition"] && exhibition["exhibition"][0] ? exhibition["exhibition"][0] : "";
+                //exh["Entiteit.beschrijving"] = beschrijving;
+                exh["Entiteit.beschrijving"] = {
+                    "skos:prefLabel": {
+                        "@value": beschrijving,
+                        "@language": "nl"
+                    },
+                    "Entiteit.type": {
+                        "@id": "cest:Waarde_titel_gebeurtenis",
+                        "value": "tentoonstelling"
+                    }
                 }
-                exh["Gebeurtenis.tijd"] = {
-                    "@value": "",
-                    "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                };
-                // unknown period
-                if (!exhibition["exhibition.date.start"] && !exhibition["exhibition.date.end"]) exh["Gebeurtenis.tijd"]["@value"] = "/";
-
-                if (exhibition["exhibition.date.start"] && exhibition["exhibition.date.start"][0]) {
-                    exh["Gebeurtenis.tijd"]["@value"] = exhibition["exhibition.date.start"][0];
-                }
-                if (exhibition["exhibition.date.end"] && exhibition["exhibition.date.end"][0]) {
-                    exh["Gebeurtenis.tijd"]["@value"] += "/" + exhibition["exhibition.date.end"][0];
-                }
-                if (exhibition["exhibition.venue.place"] && exhibition["exhibition.venue.place"][0]) {
-                    const plaats = exhibition["exhibition.venue.place"][0];
-                    const plaatsURI = await adlib.getURIFromPriref("thesaurus", exhibition["exhibition.venue.place.lref"][0], "concept");
-                    exh["Gebeurtenis.plaats"] = {
-                        "@id": plaatsURI,
-                        "skos:prefLabel": {
-                            "@value": plaats,
-                            "@language": "nl"
-                        }
-                    };
-                }
-
-                const c = {
-                    "@type": "Collectie",
-                    "gebruiktBijActiviteit": exh
-                };
-                mappedObject["Entiteit.maaktDeelUitVan"].push(c);
             }
+            exh["Gebeurtenis.tijd"] = {
+                "@value": "",
+                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+            };
+            // unknown period
+            if (!exhibition["exhibition.date.start"] && !exhibition["exhibition.date.end"]) exh["Gebeurtenis.tijd"]["@value"] = "/";
+
+            if (exhibition["exhibition.date.start"] && exhibition["exhibition.date.start"][0]) {
+                exh["Gebeurtenis.tijd"]["@value"] = exhibition["exhibition.date.start"][0];
+            }
+            if (exhibition["exhibition.date.end"] && exhibition["exhibition.date.end"][0]) {
+                exh["Gebeurtenis.tijd"]["@value"] += "/" + exhibition["exhibition.date.end"][0];
+            }
+            if (exhibition["exhibition.venue.place"] && exhibition["exhibition.venue.place"][0]) {
+                const plaats = exhibition["exhibition.venue.place"][0];
+                const plaatsURI = await adlib.getURIFromPriref("thesaurus", exhibition["exhibition.venue.place.lref"][0], "concept");
+                exh["Gebeurtenis.plaats"] = {
+                    "@id": plaatsURI,
+                    "skos:prefLabel": {
+                        "@value": plaats,
+                        "@language": "nl"
+                    }
+                };
+            }
+
+            const c = {
+                "@type": "Collectie",
+                "gebruiktBijActiviteit": exh
+            };
+            mappedObject["Entiteit.maaktDeelUitVan"].push(c);
         }
-    },
+    }
+},
+
 
     mapTrefwoorden: async (objectURI, input, mappedObject, adlib) => {
         if (input['phys_characteristic.keyword'] && input['phys_characteristic.keyword'][0]) {
@@ -702,6 +820,7 @@ module.exports = {
                             "@language": "nl"
                         }
                     }
+                    //todo
                 });
             }
             if (mappedObject["Entiteit.classificatie"]) mappedObject["Entiteit.classificatie"] = mappedObject["Entiteit.classificatie"].concat(t);
@@ -727,7 +846,11 @@ module.exports = {
 
                     informatieObject["InformatieObject.verwijstNaar"].push({
                         "@id": personURI,
-                        "label": personLabel
+                        "label": personLabel,
+                        "Entiteit.type": {
+                            "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
+                            "value": "associatie.persoon"
+                        }
                     });
                 }
             }
@@ -744,6 +867,10 @@ module.exports = {
                         "skos:prefLabel": {
                             "@value": subjectLabel,
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:Naam_geassocieerd_concept",
+                            "value": "associatie.onderwerp"
                         }
                     });
                 }
@@ -761,6 +888,10 @@ module.exports = {
                         "skos:prefLabel": {
                             "@value": periodLabel,
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            //todo. "@id": "cest:",
+                            "@value": "associatie.periode"
                         }
                     });
                 }
@@ -821,6 +952,10 @@ module.exports = {
                         "skos:prefLabel": {
                             "@value": subjectLabel,
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:Naam_afgebeelde_gebeurtenis",
+                            "value": "inhoud.onderwerp"
                         }
                     });
                 }
@@ -839,6 +974,10 @@ module.exports = {
                         "label": {
                             "@value": personLabel,
                             "@language": "nl"
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:Naam_afgebeelde_persoon_of_instelling",
+                            "value": "inhoud.persoon.naam"
                         }
                     });
                 }
@@ -866,6 +1005,10 @@ module.exports = {
                                     "@language": "nl"
                                 }
                             }
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest:Inhoud_opschrift",
+                            "value": "inscriptie.inhoud"
                         }
                     });
                 }
@@ -876,7 +1019,37 @@ module.exports = {
     },
     mapMerken: (input, mappedObject) => {
         //console.log(input)
-    }
+    },
+
+    // todo mapInhoudOnderwerpEigennaam: (objectURI, input, mappedObject) => {
+    //
+    //     let InhoudOnderwerpEigennaam = [];
+    //
+    //     if(input["content"] && input["content"][0]) {
+    //         for (let i in input["content"]) {
+    //             if (input["content"][i]["subject.name"] && input["content"][i]["subject.name"][0]) {
+    //                 let InhoudOnderwerpEigennaamLabel = input["content"][i]["subject.name"][0];
+    //
+    //                 mapInhoudOnderwerpEigennaam["InformatieObject.gaatOver"].push({
+    //                     "@id": subjectURI,
+    //                     "skos:prefLabel": {
+    //                         "@value": subjectLabel,
+    //                         "@language": "nl"
+    //                     },
+    //                     "Entiteit.type": {
+    //                         "@id": "cest:Naam_geassocieerd_concept",
+    //                         "value": "associatie.onderwerp"
+    //                     }
+    //                 });
+    //
+    //             }
+    //         }
+    //
+    //         //todo: mappedObject[""] = InhoudOnderwerpEigennaam;
+    //     }
+    //
+    // },
+
 };
 
 
