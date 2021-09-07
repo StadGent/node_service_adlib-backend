@@ -25,21 +25,20 @@ module.exports = {
                     "@id": adlibCollectionURI,
                     "@type": "Collectie",
                     "Entiteit.beschrijving": input["collection"][c]
-                    }
-                };
+                }
                 // when external URI is given, then Linked Art's typing pattern is used
-                if (!collection["Entiteit.type"]) collectie["Entiteit.type"] = [];
-                if (collectionURI != adlibCollectionURI) collectie["Entiteit.type"] = {
+                if (!collectie["Entiteit.type"]) collectie["Entiteit.type"] = [];
+                if (collectionURI != adlibCollectionURI) collectie["Entiteit.type"].push({
                     "@id": collectionURI,
                     "label": {
                         "@value": input["collection"][c],
                         "@language": "nl"
                     }
-                };
+                });
                 collectie["Entiteit.type"].push({
                     "@id": "cest:Naam_collectie",
                     "label": "collectie"
-                })
+                });
 
                 mappedObject["MensgemaaktObject.maaktDeelUitVan"].push(collectie);
             }
@@ -58,7 +57,7 @@ module.exports = {
                     "@id": "cest:Waarde_objectnummer",
                     "label": "objectnummer"
                 }
-            }
+            };
             if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
             mappedObject["Object.identificator"].push(id);
         }
@@ -77,7 +76,7 @@ module.exports = {
                         "@type": `${baseURI}identificatiesysteem/${type}`
                     },
                     "Entiteit.type" : {
-                        //todo "@id": "cest:",
+                        "@id": "cest:Type_alternatief_objectnummer",
                         "label": "alternatief_nummer"
                     }
                 };
@@ -99,8 +98,7 @@ module.exports = {
                 const dossier = {
                     "@id": dossierURI,
                     "@type": "GecureerdeCollectie",
-                    "Collectie.naam": title,
-                    //todo cest
+                    "Collectie.naam": title
                 };
                 dossiers.push(dossier);
             }
@@ -171,7 +169,7 @@ module.exports = {
                 },
                 "Entiteit.type" : {
                     "@id": "cest:Term_objectnaam",
-                    "value": "objectnaam"
+                    "label": "objectnaam"
                 }
             });
         }
@@ -208,8 +206,8 @@ module.exports = {
                         }
                     },
                     "Entiteit.type" : {
-                        "@id": "cest:Term_objectnaam",
-                        "value": "objectnaam"
+                        "@id": "cest:Objectcategorie",
+                        "label": "object_category"
                     }
                 });
             }
@@ -221,22 +219,14 @@ module.exports = {
     mapTitel: (input, mappedObject) => {
         if (input.Title && input.Title[0].title) mappedObject["MensgemaaktObject.titel"] = {
             "@value": input.Title[0].title[0],
-            "@language": "nl",
-            "Entiteit.type": {
-                "@id": "cest:Titel",
-                "value": "titel"
-            }
+            "@language": "nl"
         };
     },
 
     mapBeschrijving: (input, mappedObject) => {
         if (input.Description && input.Description[0].description) mappedObject["Entiteit.beschrijving"] = {
             "@value": input.Description[0].description[0],
-            "@language": "nl",
-            "Entiteit.type": {
-                "@id": "cest:Korte_beschrijving",
-                "value": "beschrijving"
-            }
+            "@language": "nl"
         };
     },
 
@@ -388,28 +378,34 @@ module.exports = {
                                 const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
 
                                 c["Activiteit.uitgevoerdDoor"] = {
-                                    "@id": creatorURI,
                                     "@type": "Agent",
-                                    "label": {
-                                        "@value": pro["creator"][0],
-                                        "@language": "nl",
-                                        "Entiteit.type": {
-                                            "@id": "cest:Naam_vervaardiger",
-                                            "value": "vervaardiger"
+                                    "equivalent": {
+                                        "@id": creatorURI,
+                                        "@type": "Agent",
+                                        "label": {
+                                            "@value": pro["creator"][0],
+                                            "@language": "nl"
                                         }
+                                    },
+                                    "Entiteit.type": {
+                                        "@id": "cest:Naam_vervaardiger",
+                                        "label": "vervaardiger"
                                     }
                                 };
                                 if (pro['production.place']) {
                                     const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
                                     c["Gebeurtenis.plaats"] = {
-                                        "@id": placeURI,
-                                        "skos:prefLabel": {
-                                            "@value": pro['production.place'][0],
-                                            "@language": "nl",
-                                            "Entiteit.type": {
-                                                "@id": "cest:Naam_plaats_vervaardiging",
-                                                "value": "vervaardiging.plaats"
+                                        "@type": "Plaats",
+                                        "equivalent": {
+                                            "@id": placeURI,
+                                            "skos:prefLabel": {
+                                                "@value": pro['production.place'][0],
+                                                "@language": "nl"
                                             }
+                                        },
+                                        "Entiteit.type": {
+                                            "@id": "cest:Naam_plaats_vervaardiging",
+                                            "label": "vervaardiging.plaats"
                                         }
                                     };
                                 }
@@ -422,15 +418,14 @@ module.exports = {
                                         "Rol.agent": creatorURI,
                                         "Rol.rol": {
                                             "@id": roleURI,
-                                            //"@id": "http://vocab.getty.edu/aat/300386174",
                                             "skos:prefLabel": {
                                                 "@value": roleLabel,
                                                 "@language": "nl"
-                                            },
-                                            "Entiteit.type": {
-                                                "@id": "cest: Rol_vervaardiger",
-                                                "value": "vervaardiger.rol"
                                             }
+                                        },
+                                        "Entiteit.type": {
+                                            "@id": "cest: Rol_vervaardiger",
+                                            "label": "vervaardiger.rol"
                                         }
                                     }
                                 };
@@ -496,29 +491,34 @@ module.exports = {
                 if(pro["creator.lref"] && pro["creator.lref"][0]) {
                     const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
                     p["Activiteit.uitgevoerdDoor"] = {
-                        "@id": creatorURI,
                         "@type": "Agent",
-                        "label": {
-                            "@value": pro["creator"][0],
-                            "@language": "nl"
+                        "equivalent": {
+                            "@id": creatorURI,
+                            "label": {
+                                "@value": pro["creator"][0],
+                                "@language": "nl"
+                            }
                         },
                         "Entiteit.type": {
                             "@id": "cest:vervaardiger_Naam",
-                            "value": "vervaardiger"
+                            "label": "vervaardiger"
                         }
                     };
                 }
                 if (pro['production.place'] && pro['production.place'][0] != "") {
                     const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
                     p["Gebeurtenis.plaats"] = {
-                        "@id": placeURI,
-                        "skos:prefLabel": {
-                            "@value": pro ['production.place'][0],
-                            "@language": "nl"
+                        "@type": "Plaats",
+                        "equivalent": {
+                            "@id": placeURI,
+                            "skos:prefLabel": {
+                                "@value": pro['production.place'][0],
+                                "@language": "nl"
+                            }
                         },
                         "Entiteit.type": {
                             "@id": "cest:Naam_plaats_vervaardiging",
-                            "value": "vervaardiging.plaats"
+                            "label": "vervaardiging.plaats"
                         }
                     };
                 }
@@ -535,11 +535,11 @@ module.exports = {
                                 "skos:prefLabel": {
                                     "@value": roleLabel,
                                     "@language": "nl"
-                                },
-                                "Entiteit.type": {
-                                    "@id": "cest:Rol_vervaardiger",
-                                    "value": "vervaardiger.rol"
                                 }
+                            },
+                            "Entiteit.type": {
+                                "@id": "cest:Rol_vervaardiger",
+                                "label": "vervaardiger.rol"
                             }
                         }
                     };
@@ -554,16 +554,17 @@ module.exports = {
                         const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
                         if (!p["Activiteit.gebruikteTechniek"]) p["Activiteit.gebruikteTechniek"] = [];
                         p["Activiteit.gebruikteTechniek"].push({
-                            "@id": techniqueURI,
-                            "skos:prefLabel": {
-                                "@value": techniqueLabel,
-                                "@language": "nl"
-                            },
-                            "Entiteit.type": {
+                            "@type": "TypeTechniek",
+                            "Entiteit.type": [{
+                                "@id": techniqueURI,
+                                "skos:prefLabel": {
+                                    "@value": techniqueLabel,
+                                    "@language": "nl"
+                                }
+                            }, {
                                 "@id": "cest:Term_techniek",
-                                "value": "techniek"
-                            }
-
+                                "label": "techniek"
+                            }]
                         });
                     }
                 }
@@ -592,27 +593,31 @@ module.exports = {
                             if (!components[onderdeel]["Entiteit.beschrijving"]) components[onderdeel]["Entiteit.beschrijving"] = onderdeel;
                             if (!components[onderdeel]["MensgemaaktObject.materiaal"]) components[onderdeel]["MensgemaaktObject.materiaal"] = [];
                             components[onderdeel]["MensgemaaktObject.materiaal"].push({
-                                "@id": materialURI,
-                                "skos:prefLabel": {
-                                    "@value": mate,
-                                    "@language": "nl"
-                                },
-                                "Entiteit.type": {
+                                "@type": "TypeMateriaal",
+                                "Entiteit.type": [{
                                     "@id": "cest:Term_materiaal",
-                                    "value": "materiaal"
-                                }
+                                    "label": "materiaal"
+                                }, {
+                                    "@id": materialURI,
+                                    "skos:prefLabel": {
+                                        "@value": mate,
+                                        "@language": "nl"
+                                    }
+                                }]
                             });
                         } else {
                             mappedObject["MensgemaaktObject.materiaal"].push({
-                                "@id": materialURI,
-                                "skos:prefLabel": {
-                                    "@value": mate,
-                                    "@language": "nl"
-                                },
-                                "Entiteit.type": {
+                                "@type": "TypeMateriaal",
+                                "Entiteit.type": [{
+                                    "@id": materialURI,
+                                    "skos:prefLabel": {
+                                        "@value": mate,
+                                        "@language": "nl"
+                                    }
+                                },{
                                     "@id": "cest:Term_materials",
-                                    "value": "materiaal"
-                                }
+                                    "label": "materiaal"
+                                }]
                             });
                         }
                     }
@@ -635,15 +640,16 @@ module.exports = {
                 const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
                 if (!mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"]) mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"] = [];
                 mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"].push({
-                    "@id": techniqueURI,
-                    "skos:prefLabel": {
-                        "@value": techniqueLabel,
-                        "@language": "nl"
-                    },
-                    "Entiteit.type": {
+                    "Entiteit.type": [{
+                        "@id": techniqueURI,
+                        "skos:prefLabel": {
+                            "@value": techniqueLabel,
+                            "@language": "nl"
+                        }
+                    }, {
                         "@id": "cest:Term_techniek",
-                        "value": "techniek"
-                    }
+                        "label": "techniek"
+                    }]
                 });
             }
         }
@@ -712,30 +718,34 @@ module.exports = {
             const methode = input["acquisition.method"][0];
             const methodeURI = await adlib.getURIFromPriref("thesaurus", input["acquisition.method.lref"][0], "concept");
             v["Activiteit.gebruikteTechniek"] = {
-                "@id": methodeURI,
-                "skos:prefLabel": {
-                    "@value": methode,
-                    "@language": "nl"
-                },
-                "Entiteit.type": {
+                "@type": "TypeTechniek",
+                "Entiteit.type": [{
+                        "@id": methodeURI,
+                        "skos:prefLabel": {
+                            "@value": methode,
+                            "@language": "nl"
+                        }
+                }, {
                     "@id": "cest:Term_verwervingsmethode",
-                    "value": "verwerving.methode"
-                }
+                    "label": "verwerving.methode"
+                }]
             };
         }
         if (input["acquisition.place"]) {
             const plaats = input["acquisition.place"] ? input["acquisition.place"][0] : "";
             const plaatsURI = await adlib.getURIFromPriref("thesaurus", input["acquisition.place.lref"][0], "concept");
             v["Gebeurtenis.plaats"] = {
-                "@id": plaatsURI,
-                "skos:prefLabel": {
-                    "@value": plaats,
-                    "@language": "nl"
-                },
-                "Entiteit.type": {
+                "@type": "Locatie",
+                "Entiteit.type": [{
+                    "@id": plaatsURI,
+                    "skos:prefLabel": {
+                        "@value": plaats,
+                        "@language": "nl"
+                    }
+                    }, {
                     "@id": "cest:Plaats_verwervingsbron",
-                    "value": "verwerving.plaats"
-                }
+                    "label": "verwerving.plaats"
+                }]
             };
         }
 
@@ -759,14 +769,8 @@ module.exports = {
                 const beschrijving = exhibition["exhibition"] && exhibition["exhibition"][0] ? exhibition["exhibition"][0] : "";
                 //exh["Entiteit.beschrijving"] = beschrijving;
                 exh["Entiteit.beschrijving"] = {
-                    "skos:prefLabel": {
                         "@value": beschrijving,
                         "@language": "nl"
-                    },
-                    "Entiteit.type": {
-                        "@id": "cest:Waarde_titel_gebeurtenis",
-                        "value": "tentoonstelling"
-                    }
                 }
             }
             exh["Gebeurtenis.tijd"] = {
@@ -845,12 +849,14 @@ module.exports = {
                     const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "agent");
 
                     informatieObject["InformatieObject.verwijstNaar"].push({
-                        "@id": personURI,
-                        "label": personLabel,
-                        "Entiteit.type": {
+                        "@type": "Persoon",
+                        "Entiteit.type": [{
+                            "@id": personURI,
+                            "label": personLabel
+                        }, {
                             "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
-                            "value": "associatie.persoon"
-                        }
+                            "label": "associatie.persoon"
+                        }]
                     });
                 }
             }
@@ -863,16 +869,18 @@ module.exports = {
                     const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.lref"][0], "concept");
 
                     informatieObject["InformatieObject.gaatOver"].push({
-                        "@id": subjectURI,
-                        "skos:prefLabel": {
-                            "@value": subjectLabel,
-                            "@language": "nl"
-                        },
-                        "Entiteit.type": {
-                            "@id": "cest:Naam_geassocieerd_concept",
-                            "value": "associatie.onderwerp"
-                        }
-                    });
+                        "@type": "Entiteit",
+                        "Entiteit.type": [{
+                            "@id": subjectURI,
+                            "skos:prefLabel": {
+                                "@value": subjectLabel,
+                                "@language": "nl"
+                            }
+                        }, {
+                                "@id": "cest:Naam_geassocieerd_concept",
+                                "label": "associatie.onderwerp"
+                            }]
+                        });
                 }
             }
         }
@@ -884,15 +892,17 @@ module.exports = {
                     const periodURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.lref"][0], "concept");
 
                     informatieObject["InformatieObject.verwijstNaar"].push({
-                        "@id": periodURI,
-                        "skos:prefLabel": {
-                            "@value": periodLabel,
-                            "@language": "nl"
-                        },
-                        "Entiteit.type": {
-                            //todo. "@id": "cest:",
-                            "@value": "associatie.periode"
-                        }
+                        "@type": "Entiteit",
+                        "Entiteit.type": [{
+                            "@id": periodURI,
+                            "skos:prefLabel": {
+                                "@value": periodLabel,
+                                "@language": "nl"
+                            }
+                        },{
+                            "@id": "cest:Periode",
+                            "label": "associatie.periode"
+                        }]
                     });
                 }
             }
@@ -948,15 +958,17 @@ module.exports = {
                     const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Content_subject"][s]["content.subject.lref"][0], "concept");
 
                     mappedObject["Entiteit.beeldtUit"].push({
-                        "@id": subjectURI,
-                        "skos:prefLabel": {
-                            "@value": subjectLabel,
-                            "@language": "nl"
-                        },
-                        "Entiteit.type": {
+                        "@type": "Entiteit",
+                        "Entiteit.type": [{
+                            "@id": subjectURI,
+                            "skos:prefLabel": {
+                                "@value": subjectLabel,
+                                "@language": "nl"
+                            }
+                        },{
                             "@id": "cest:Naam_afgebeelde_gebeurtenis",
-                            "value": "inhoud.onderwerp"
-                        }
+                            "label": "inhoud.onderwerp"
+                        }]
                     });
                 }
             }
@@ -970,15 +982,17 @@ module.exports = {
                     const personURI = await adlib.getURIFromPriref("personen", input["Content_person"][p]["content.person.name.lref"][0], "agent");
 
                     mappedObject["Entiteit.beeldtUit"].push({
-                        "@id": personURI,
-                        "label": {
-                            "@value": personLabel,
-                            "@language": "nl"
-                        },
-                        "Entiteit.type": {
+                        "@type": "Persoon",
+                        "Entiteit.type": [{
+                            "@id": personURI,
+                            "label": {
+                                "@value": personLabel,
+                                "@language": "nl"
+                            }
+                        }, {
                             "@id": "cest:Naam_afgebeelde_persoon_of_instelling",
-                            "value": "inhoud.persoon.naam"
-                        }
+                            "label": "inhoud.persoon.naam"
+                        }]
                     });
                 }
             }
@@ -1008,7 +1022,7 @@ module.exports = {
                         },
                         "Entiteit.type": {
                             "@id": "cest:Inhoud_opschrift",
-                            "value": "inscriptie.inhoud"
+                            "label": "inscriptie.inhoud"
                         }
                     });
                 }
@@ -1019,7 +1033,7 @@ module.exports = {
     },
     mapMerken: (input, mappedObject) => {
         //console.log(input)
-    },
+    }
 
     // todo mapInhoudOnderwerpEigennaam: (objectURI, input, mappedObject) => {
     //

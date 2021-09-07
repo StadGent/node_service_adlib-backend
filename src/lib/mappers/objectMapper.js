@@ -24,7 +24,12 @@ export default class ObjectMapper extends Transform {
                     "@type": "@id"
                 },
                 "cest": "https://www.projectcest.be/wiki/Publicatie:Invulboek_objecten/Veld/",
-                "inhoud": "http://www.cidoc-crm.org/cidoc-crm/P190_has_symbolic_content"
+                "inhoud": "http://www.cidoc-crm.org/cidoc-crm/P190_has_symbolic_content",
+                "la": "https://linked.art/ns/terms/",
+                "equivalent": {
+                    "@id": "la:equivalent",
+                    "@type": "@id"
+                }
             }
         ];
         this._adlibDatabase = options.adlibDatabase;

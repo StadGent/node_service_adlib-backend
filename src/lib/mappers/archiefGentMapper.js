@@ -32,7 +32,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             Utils.mapAfdeling(this._institutionURI, input, mappedObject);
             await Utils.mapCollectie(input,mappedObject, this._adlib, this._baseURI);
-            Utils.mapObjectnummer(input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject, this._baseURI);
             Utils.mapRecordType(input, mappedObject);
             await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
