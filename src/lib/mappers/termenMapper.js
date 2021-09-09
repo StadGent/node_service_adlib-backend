@@ -156,16 +156,18 @@ export default class TermenMapper extends Transform {
                 if (input['term.type'] && input['term.type'][0]) {
                     mappedObject["skos:note"] = [];
                     for (let t in input['term.type']) {
-                        const termTypeNl = input['term.type'][t]['value'][2];
-                        mappedObject["skos:note"].push({
-                            "@value": termTypeNl,
-                            "@language": "nl"
-                        });
-                        const termTypeEn = input['term.type'][t]['value'][1];
-                        mappedObject["skos:note"].push({
-                            "@value": termTypeEn,
-                            "@language": "en"
-                        });
+                        if (input['term.type'][t]['value']) {
+                            const termTypeNl = input['term.type'][t]['value'][2];
+                            mappedObject["skos:note"].push({
+                                "@value": termTypeNl,
+                                "@language": "nl"
+                            });
+                            const termTypeEn = input['term.type'][t]['value'][1];
+                            mappedObject["skos:note"].push({
+                                "@value": termTypeEn,
+                                "@language": "en"
+                            });
+                        }
                     }
                 }
 
