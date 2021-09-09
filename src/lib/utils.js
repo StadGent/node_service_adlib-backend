@@ -4,6 +4,7 @@ import { Sequelize } from 'sequelize';
 const config = Config.getConfig();
 const port = config.eventstream.port != '' ? ':' + config.eventstream.port : '';
 const path = config.eventstream.path != '' ? config.eventstream.path + '/' : '';
+const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
 
 export default class Utils {
     static async insertObject(institution, db, object, adlibDatabase, correlator) {
@@ -108,6 +109,6 @@ export default class Utils {
         else if (level === "ERROR") levelValue = 2;
         else if (level === "CRIT") levelValue = 1;
 
-        console.log(`{"@timestamp":"${new Date().toISOString()}","@version":1,"message":"${message}","logger_name":"${loggerName}","level":${level}","level_value":${levelValue},"correlationId":"${correlationId}"}`);
+        console.log(`{"@timestamp":"${new Date().toISOString()}","@version":version,"message":"${message}","logger_name":"${loggerName}","level":${level}","level_value":${levelValue},"correlationId":"${correlationId}"}`);
     }
 }

@@ -113,7 +113,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
 };
 
 Adlib.prototype.fetchWithNTLM = function(querypath) {
-    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTML", "INFO", this._correlator.getId());
+    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTLM", "INFO", this._correlator.getId());
     const self = this;
     return new Promise((resolve, reject) => {
         httpntlm.get({
@@ -128,7 +128,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
                   self.fetchWithNTLM(querypath); 
                 }// retry
             } catch (e) {
-                Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTML", "ERROR", self._correlator.getId());
+                Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
             }
         });
     });
