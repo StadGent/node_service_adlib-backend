@@ -1,4 +1,4 @@
-# node_service_adlib-backend
+# Adlib backend
 
 adlib-backend extracts, transforms and loads from an Adlib API into a database.
 This database is then used by [eventstream-api](https://github.com/StadGent/node_service_eventstream-api) that exposes [event streams*](https://github.com/TREEcg/specification/tree/master/examples/eventstreams).
