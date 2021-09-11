@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec babel-node src/app.js",
-    "start": "node main.js",
+    "start": "if [ -z \"$MAX_NODE_MEMORY\" ]; then export MAX_NODE_MEMORY=1024; fi; node --max-old-space-size=$MAX_NODE_MEMORY main.js",
     "lint": "eslint src/"
   },
   "dependencies": {
