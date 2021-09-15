@@ -322,238 +322,99 @@ module.exports = {
     },
 
     mapVervaardiging: async (id, input, mappedObject, adlib) => {
-        // Production and Production_date are equal?
-        let productions = [];
-        if(input.Production && input.Production[0]) {
-            if (input["production.date.notes"]) {
-                for (let n in input["production.date.notes"]) {
-                    let note = input["production.date.notes"][n];
-                    const ontwerpRegex = new RegExp('ontwerp.*');
-                    if (ontwerpRegex.test(note)) {
-                        // Een ontwerp is de creatie van het concept
-                        // Entiteit -> wordtNaarVerwezenDoor ConceptueelDing -> Creatie
-                        let c = {
-                            "@type": "Creatie",
-                            "Gebeurtenis.tijd": {}
-                        };
-
-                        let ontwerp_date = input.Production_date[n];
-                        if (ontwerp_date['production.date.start']) {
-                            if (ontwerp_date['production.date.start.prec'] && ontwerp_date['production.date.start.prec'][0] === "circa") {
-                                c["Gebeurtenis.tijd"] = {
-                                    "@value": ontwerp_date['production.date.start'][0] + "~",
-                                    "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                                    //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                                    // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                                    // niet nodig om die aan te pakken?
-                                };
-                            } else {
-                                c["Gebeurtenis.tijd"] = {
-                                    "@value": ontwerp_date['production.date.start'][0],
-                                    "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                                    //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                                    // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                                    // niet nodig om die aan te pakken?
-                                };
-                            }
-                        }
-                        if (ontwerp_date['production.date.end']) {
-                            if (!c["Gebeurtenis.tijd"]) c["Gebeurtenis.tijd"] = {
-                                "@value": "",
-                                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                                // niet nodig om die aan te pakken?
-                            };
-                            if (ontwerp_date['production.date.end.prec'] && ontwerp_date['production.date.end.prec'][0] === "circa") {
-                                c["Gebeurtenis.tijd"]["@value"] = "/" + ontwerp_date['production.date.end'][0] + "~";
-                            } else {
-                                c["Gebeurtenis.tijd"]["@value"] = "/" + ontwerp_date['production.date.end'][0];
-                            }
-                        }
-
-                        for (let p in input["Production"]) {
-                            let pro = input["Production"][p];
-                            if (pro['creator.role'] && pro['creator.role'][0] === "ontwerper") {
-                                const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
-
-                                c["Activiteit.uitgevoerdDoor"] = {
-                                    "@type": "Agent",
-                                    "equivalent": {
-                                        "@id": creatorURI,
-                                        "@type": "Agent",
-                                        "label": {
-                                            "@value": pro["creator"][0],
-                                            "@language": "nl"
-                                        }
-                                    },
-                                    "Entiteit.type": {
-                                        "@id": "cest:Naam_vervaardiger",
-                                        "label": "vervaardiger"
-                                    }
-                                };
-                                if (pro['production.place']) {
-                                    const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
-                                    c["Gebeurtenis.plaats"] = {
-                                        "@type": "Plaats",
-                                        "equivalent": {
-                                            "@id": placeURI,
-                                            "skos:prefLabel": {
-                                                "@value": pro['production.place'][0],
-                                                "@language": "nl"
-                                            }
-                                        },
-                                        "Entiteit.type": {
-                                            "@id": "cest:Naam_plaats_vervaardiging",
-                                            "label": "vervaardiging.plaats"
-                                        }
-                                    };
-                                }
-                                const roleLabel = pro['creator.role'][0];
-                                const roleURI = await adlib.getURIFromPriref("thesaurus", pro['creator.role.lref'][0], "concept");
-
-                                c["@reverse"] = {
-                                    "Rol.activiteit": {
-                                        "@type": "Rol",
-                                        "Rol.agent": creatorURI,
-                                        "Rol.rol": {
-                                            "@id": roleURI,
-                                            "skos:prefLabel": {
-                                                "@value": roleLabel,
-                                                "@language": "nl"
-                                            }
-                                        },
-                                        "Entiteit.type": {
-                                            "@id": "cest: Rol_vervaardiger",
-                                            "label": "vervaardiger.rol"
-                                        }
-                                    }
-                                };
-                            }
-                        }
-
-                        mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
-                            "@type": "ConceptueelDing",
-                            "ConceptueelDing.heeftCreatie": c
-                        };
-                        productions.push(c);
+        // Get ontwerp en uitvoering data
+        if (id ==="https://stad.gent/id/mensgemaaktobject/stam/550000004"){
+            console.log("ts")
+        }
+        let ontwerp_date = {
+            "@value": "..",
+            "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+        };
+        let productie_date = {
+            "@value": "..",
+            "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+        };
+        if (input["production.date.notes"]) {
+            for (let n in input["production.date.notes"]) {
+                let note = input["production.date.notes"][n];
+                // we veronderstellen dat Production_date op hetzelfde niveau als de production note staat
+                if (input.Production_date[n]) {
+                    const p = input.Production_date[n];
+                    let date = "";
+                    if (p['production.date.start']) {
+                        date = p['production.date.start'][0];
+                        if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
+                        date += "/";
+                        //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                        // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                        // niet nodig om die aan te pakken?
+                    } else {
+                        date = "/";
                     }
+                    if (p['production.date.end']) {
+                        date += p['production.date.end'][0];
+                        if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
+                    }
+
+                    const ontwerpRegex = new RegExp('.*ontwerp.*');
+                    const uitvoeringRegex = new RegExp('.*uitvoering.*');
+                    const productieRegex = new RegExp('.*productie.*');
+                    if (ontwerpRegex.test(note)) ontwerp_date["@value"] = date;
+                    if (uitvoeringRegex.test(note) || productieRegex.test(note)) productie_date["@value"] = date;
                 }
             }
-            for (let n in input["Production"]) {
-                let pro = input["Production"][n];
+        } else if (input["Production_date"] && input["Production_date"][0]) {
+            // When no notes, use first production_date as production date
+            const p = input["Production_date"][0];
+            let date = "";
+            if (p['production.date.start']) {
+                date = p['production.date.start'][0];
+                if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
+                date += '/';
+                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
+                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
+                // niet nodig om die aan te pakken?
+            } else {
+                date = '/';
+            }
+            if (p['production.date.end']) {
+                date += p['production.date.end'][0];
+                if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
+            }
+            productie_date["@value"] = date;
+        }
 
-                let p = {
+        // Loop over ontwerpers, uitvoerders en producenten
+        let productions = [];
+        for (let p in input["Production"]) {
+            let pro = input["Production"][p];
+            const personURI = (pro["creator.lref"] && pro["creator.lref"][0]) ? await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent") : undefined;
+            let c;
+            if (pro['creator.role'] && pro['creator.role'][0] === "ontwerper") {
+                // Een ontwerp is de creatie van het concept
+                // Entiteit -> wordtNaarVerwezenDoor ConceptueelDing -> Creatie
+                c = {
+                    "@type": "Creatie",
+                    "Gebeurtenis.tijd": ontwerp_date
+                };
+            // uitvoerder of producent
+            } else if (!pro['creator.role'] || (pro['creator.role'] && pro['creator.role'][0] != "ontwerper")) {
+                c = {
                     "@type": "Productie",
+                    "Gebeurtenis.tijd": productie_date,
                     "Productie.product": id
                 };
-                // Datering van tot
-                if (input.Production_date && input.Production_date[n]) {
-                    p["Gebeurtenis.tijd"] = {
-                        "@type": "Periode"
-                    };
-                    let prod_date = input.Production_date[n];
-                    if (prod_date['production.date.start']) {
-                        if (prod_date['production.date.start.prec'] && prod_date['production.date.start.prec'][0] === "circa") {
-                            p["Gebeurtenis.tijd"] = {
-                                "@value": prod_date['production.date.start'][0] + "~",
-                                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                                // niet nodig om die aan te pakken?
-                            };
-                        } else {
-                            p["Gebeurtenis.tijd"] = {
-                                "@value": prod_date['production.date.start'][0],
-                                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                                // niet nodig om die aan te pakken?
-                            };
-                        }
-                    }
-                    if (prod_date['production.date.end']) {
-                        if (!p["Gebeurtenis.tijd"]) p["Gebeurtenis.tijd"] = {
-                            "@value": "",
-                            "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
-                            //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                            // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                            // niet nodig om die aan te pakken?
-                        };
-                        if (prod_date['production.date.end.prec'] && prod_date['production.date.end.prec'][0] === "circa") {
-                            p["Gebeurtenis.tijd"]["@value"] += "/" + prod_date['production.date.end'][0] + "~";
-                        } else {
-                            p["Gebeurtenis.tijd"]["@value"] += "/" + prod_date['production.date.end'][0];
-                        }
-                    }
-                }
 
-                if(pro["creator.lref"] && pro["creator.lref"][0]) {
-                    const creatorURI = await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent");
-                    p["Activiteit.uitgevoerdDoor"] = {
-                        "@type": "Agent",
-                        "equivalent": {
-                            "@id": creatorURI,
-                            "label": {
-                                "@value": pro["creator"][0],
-                                "@language": "nl"
-                            }
-                        },
-                        "Entiteit.type": {
-                            "@id": "cest:vervaardiger_Naam",
-                            "label": "vervaardiger"
-                        }
-                    };
-                }
-                if (pro['production.place'] && pro['production.place'][0] != "") {
-                    const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
-                    p["Gebeurtenis.plaats"] = {
-                        "@type": "Plaats",
-                        "equivalent": {
-                            "@id": placeURI,
-                            "skos:prefLabel": {
-                                "@value": pro['production.place'][0],
-                                "@language": "nl"
-                            }
-                        },
-                        "Entiteit.type": {
-                            "@id": "cest:Naam_plaats_vervaardiging",
-                            "label": "vervaardiging.plaats"
-                        }
-                    };
-                }
-                if (pro['creator.role'] && pro['creator.role'][0] != "") {
-                    const roleLabel = pro['creator.role'][0];
-                    const roleURI = await adlib.getURIFromPriref("thesaurus", pro['creator.role.lref'][0], "concept");
-
-                    p["@reverse"] = {
-                        "Rol.activiteit": {
-                            "@type": "Rol",
-                            "Rol.agent": roleURI,
-                            "Rol.rol": {
-                                "@id": roleURI,
-                                "skos:prefLabel": {
-                                    "@value": roleLabel,
-                                    "@language": "nl"
-                                }
-                            },
-                            "Entiteit.type": {
-                                "@id": "cest:Rol_vervaardiger",
-                                "label": "vervaardiger.rol"
-                            }
-                        }
-                    };
-                }
                 // add techniques to the production event
                 // part and notes are not mapped
                 if (input.Technique) {
-                    for(let t in input.Technique) {
+                    for (let t in input.Technique) {
                         const techniqueLabel = input.Technique[t]["technique"][0];
                         // const part = input.Technique[t]["technique.part"][0];
                         // const notes = input.Technique[t]["technique.notes"][0];
                         const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
-                        if (!p["Activiteit.gebruikteTechniek"]) p["Activiteit.gebruikteTechniek"] = [];
-                        p["Activiteit.gebruikteTechniek"].push({
+                        if (!c["Activiteit.gebruikteTechniek"]) c["Activiteit.gebruikteTechniek"] = [];
+                        c["Activiteit.gebruikteTechniek"].push({
                             "@type": "TypeTechniek",
                             "Entiteit.type": [{
                                 "@id": techniqueURI,
@@ -568,10 +429,106 @@ module.exports = {
                         });
                     }
                 }
-                productions.push(p);
             }
-            if (mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = mappedObject["MaterieelDing.productie"].concat(productions);
-            else mappedObject["MaterieelDing.productie"] = productions;
+
+            if (personURI) {
+                c["Activiteit.uitgevoerdDoor"] = {
+                    "@type": "Agent",
+                    "equivalent": {
+                        "@id": personURI,
+                        "@type": "Agent",
+                        "label": {
+                            "@value": pro["creator"][0],
+                            "@language": "nl"
+                        }
+                    },
+                    "Entiteit.type": {
+                        "@id": "cest:Naam_vervaardiger",
+                        "label": "vervaardiger"
+                    }
+                }
+            }
+            if (pro['production.place'] && pro['production.place.lref'] && pro['production.place.lref'][0] != "") {
+                const placeURI = await adlib.getURIFromPriref("thesaurus", pro['production.place.lref'][0], "concept");
+                c["Gebeurtenis.plaats"] = {
+                    "@type": "Plaats",
+                    "equivalent": {
+                        "@id": placeURI,
+                        "skos:prefLabel": {
+                            "@value": pro['production.place'][0],
+                            "@language": "nl"
+                        }
+                    },
+                    "Entiteit.type": {
+                        "@id": "cest:Naam_plaats_vervaardiging",
+                        "label": "vervaardiging.plaats"
+                    }
+                };
+            }
+
+            if (personURI && pro['creator.role'] && pro['creator.role'][0] && pro['creator.role'][0] != "") {
+                const roleLabel = pro['creator.role'][0];
+                const roleURI = await adlib.getURIFromPriref("thesaurus", pro['creator.role.lref'][0], "concept");
+                c["@reverse"] = {
+                    "Rol.activiteit": {
+                        "@type": "Rol",
+                        "Rol.agent": personURI,
+                        "Rol.rol": {
+                            "@id": roleURI,
+                            "skos:prefLabel": {
+                                "@value": roleLabel,
+                                "@language": "nl"
+                            }
+                        },
+                        "Entiteit.type": {
+                            "@id": "cest: Rol_vervaardiger",
+                            "label": "vervaardiger.rol"
+                        }
+                    }
+                }
+            }
+
+            if (pro['creator.role'] && pro['creator.role'][0] === "ontwerper") {
+                mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
+                    "@type": "ConceptueelDing",
+                    "ConceptueelDing.heeftCreatie": c
+                };
+            } else {
+                productions.push(c);
+            }
+        }
+
+        if (mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = mappedObject["MaterieelDing.productie"].concat(productions);
+        else mappedObject["MaterieelDing.productie"] = productions;
+
+        // when there is no Production activity, map technieken here
+        if(!input.Production && input.Technique && input.Technique[0]) {
+            let c = {
+                "@type": "Productie",
+                "Gebeurtenis.tijd": productie_date,
+                "Productie.product": id,
+                "Activiteit.gebruikteTechniek": []
+            };
+            for(let t in input.Technique) {
+                const techniqueLabel = input.Technique[t]["technique"][0];
+                // const part = input.Technique[t]["technique.part"][0];
+                // const notes = input.Technique[t]["technique.notes"][0];
+                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                c["Activiteit.gebruikteTechniek"].push({
+                    "@type": "TypeTechniek",
+                    "Entiteit.type": [{
+                        "@id": techniqueURI,
+                        "skos:prefLabel": {
+                            "@value": techniqueLabel,
+                            "@language": "nl"
+                        }
+                    }, {
+                        "@id": "cest:Term_techniek",
+                        "label": "techniek"
+                    }]
+                });
+            }
+            mappedObject["MaterieelDing.productie"].push(c);
         }
     },
 
@@ -622,35 +579,6 @@ module.exports = {
                         }
                     }
                 }
-            }
-        }
-
-        // technieken
-        // when there is no Production activity, map it here
-        // otherwise it is already added in mapVervaardiging
-        if(input.Technique && input.Technique[0] && input.Production) {
-            mappedObject["MaterieelDing.productie"] = {
-                "@type": "Productie",
-                "Productie.product": objectURI
-            };
-            for(let t in input.Technique) {
-                const techniqueLabel = input.Technique[t]["technique"][0];
-                // const part = input.Technique[t]["technique.part"][0];
-                // const notes = input.Technique[t]["technique.notes"][0];
-                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
-                if (!mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"]) mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"] = [];
-                mappedObject["MaterieelDing.productie"]["Activiteit.gebruikteTechniek"].push({
-                    "Entiteit.type": [{
-                        "@id": techniqueURI,
-                        "skos:prefLabel": {
-                            "@value": techniqueLabel,
-                            "@language": "nl"
-                        }
-                    }, {
-                        "@id": "cest:Term_techniek",
-                        "label": "techniek"
-                    }]
-                });
             }
         }
 
