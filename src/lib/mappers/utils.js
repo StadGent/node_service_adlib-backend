@@ -409,24 +409,28 @@ module.exports = {
                 // part and notes are not mapped
                 if (input.Technique) {
                     for (let t in input.Technique) {
-                        const techniqueLabel = input.Technique[t]["technique"][0];
-                        // const part = input.Technique[t]["technique.part"][0];
-                        // const notes = input.Technique[t]["technique.notes"][0];
-                        const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
-                        if (!c["Activiteit.gebruikteTechniek"]) c["Activiteit.gebruikteTechniek"] = [];
-                        c["Activiteit.gebruikteTechniek"].push({
-                            "@type": "TypeTechniek",
-                            "Entiteit.type": [{
-                                "@id": techniqueURI,
-                                "skos:prefLabel": {
-                                    "@value": techniqueLabel,
-                                    "@language": "nl"
-                                }
-                            }, {
-                                "@id": "cest:Term_techniek",
-                                "label": "techniek"
-                            }]
-                        });
+                        if (input.Technique[t]["technique"] && input.Technique[t]["technique"][0]) {
+                            const techniqueLabel = input.Technique[t]["technique"][0];
+                            // const part = input.Technique[t]["technique.part"][0];
+                            // const notes = input.Technique[t]["technique.notes"][0];
+                            if (input.Technique[t]["technique.lref"] && input.Technique[t]["technique.lref"][0]) {
+                                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                                if (!c["Activiteit.gebruikteTechniek"]) c["Activiteit.gebruikteTechniek"] = [];
+                                c["Activiteit.gebruikteTechniek"].push({
+                                    "@type": "TypeTechniek",
+                                    "Entiteit.type": [{
+                                        "@id": techniqueURI,
+                                        "skos:prefLabel": {
+                                            "@value": techniqueLabel,
+                                            "@language": "nl"
+                                        }
+                                    }, {
+                                        "@id": "cest:Term_techniek",
+                                        "label": "techniek"
+                                    }]
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -510,23 +514,27 @@ module.exports = {
                 "Activiteit.gebruikteTechniek": []
             };
             for(let t in input.Technique) {
-                const techniqueLabel = input.Technique[t]["technique"][0];
-                // const part = input.Technique[t]["technique.part"][0];
-                // const notes = input.Technique[t]["technique.notes"][0];
-                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
-                c["Activiteit.gebruikteTechniek"].push({
-                    "@type": "TypeTechniek",
-                    "Entiteit.type": [{
-                        "@id": techniqueURI,
-                        "skos:prefLabel": {
-                            "@value": techniqueLabel,
-                            "@language": "nl"
-                        }
-                    }, {
-                        "@id": "cest:Term_techniek",
-                        "label": "techniek"
-                    }]
-                });
+                if (input.Technique[t]["technique"] && input.Technique[t]["technique"][0]) {
+                    const techniqueLabel = input.Technique[t]["technique"][0];
+                    // const part = input.Technique[t]["technique.part"][0];
+                    // const notes = input.Technique[t]["technique.notes"][0];
+                    if (input.Technique[t]["technique.lref"] && input.Technique[t]["technique.lref"][0]) {
+                        const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                        c["Activiteit.gebruikteTechniek"].push({
+                            "@type": "TypeTechniek",
+                            "Entiteit.type": [{
+                                "@id": techniqueURI,
+                                "skos:prefLabel": {
+                                    "@value": techniqueLabel,
+                                    "@language": "nl"
+                                }
+                            }, {
+                                "@id": "cest:Term_techniek",
+                                "label": "techniek"
+                            }]
+                        });
+                    }
+                }
             }
             mappedObject["MaterieelDing.productie"].push(c);
         }
