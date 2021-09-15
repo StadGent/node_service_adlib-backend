@@ -58,7 +58,7 @@ export default class Utils {
     static getURIFromRecord(record, priref, type, database) {
         if (record) {
             for (let s in record.source) {
-                const source = record.source[s].endsWith('/') ? record.source[s] : `${record.source[s]}/`;
+                const source = record.source[s].trim().endsWith('/') ? record.source[s] : `${record.source[s]}/`;
                 if (source.startsWith('http') && record['term.number']) {
                     const termNumber = record['term.number'][s].toLowerCase().trim().replace(' ', '');
                     return `${source}${termNumber}`;
