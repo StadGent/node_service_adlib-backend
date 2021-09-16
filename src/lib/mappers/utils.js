@@ -84,7 +84,7 @@ module.exports = {
             }
 
             if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
-            mappedObject["Object.identificator"].concat(an);
+            mappedObject["Object.identificator"] = mappedObject["Object.identificator"].concat(an);
         }
     },
 
@@ -103,43 +103,49 @@ module.exports = {
                 dossiers.push(dossier);
             }
             if (!mappedObject["MensgemaaktObject.maaktDeelUitVan"]) mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
-            mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(dossiers);
+            mappedObject["MensgemaaktObject.maaktDeelUitVan"] = mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(dossiers);
         }
 
         if (input['Parts'] && input['Parts'][0]) {
             // dossier - has parts
             let objecten = [];
             for (let p in input['Parts']) {
-                const title = input['Parts'][p]['parts.title'][0];
-                const objectURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
-                const object = {
-                    "@id": objectURI,
-                    "@type": "MensgemaaktObject",
-                    "MensgemaaktObject.titel": title
-                };
-                objecten.push(object);
+                if (input['Parts'][p]['parts.title'] && input['Parts'][p]['parts.title'][0]) {
+                    const title = input['Parts'][p]['parts.title'][0];
+                    const objectURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                    const object = {
+                        "@id": objectURI,
+                        "@type": "MensgemaaktObject",
+                        "MensgemaaktObject.titel": title
+                    };
+                    objecten.push(object);
+                }
             }
             if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
-            mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+            mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
         }
     },
 
     mapRelatiesKoepelRecordDossier: async (objectURI, input, mappedObject, adlib) => {
         // dossier = has works (stuk)
         if (input['Parts'] && input['Parts'][0]) {
-            let stukken = [];
+            if (!mappedObject["Dossier.bestaatUit"]) mappedObject["Dossier.bestaatUit"] = [];
+
+            // Overwrite type from MensgemaaktObject to Dossier
+            mappedObject["@type"] = "Dossier";
+
             for (let p in input['Parts']) {
-                const naam = input['Parts'][p]['parts.title'][0];
-                const stukURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
-                const stuk = {
-                    "@id": stukURI,
-                    "@type": "Stuk",
-                    "Stuk.naam": naam
-                };
-                stukken.push(stuk);
+                if (input['Parts'][p]['parts_reference.lref'] && input['Parts'][p]['parts_reference.lref'][0]) {
+                    const naam = (input['Parts'][p]['parts.title'] && input['Parts'][p]['parts.title'][0]) ? input['Parts'][p]['parts.title'][0] : "";
+                    const stukURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                    const stuk = {
+                        "@id": stukURI,
+                        "@type": "Stuk",
+                        "Stuk.naam": naam
+                    };
+                    mappedObject["Dossier.bestaatUit"].push(stuk);
+                }
             }
-            if (!mappedObject["Dossier.bestaatUit"])mappedObject["Dossier.bestaatUit"] = [];
-            mappedObject["Dossier.bestaatUit"].concat(stukken);
         }
     },
 
@@ -847,40 +853,37 @@ module.exports = {
         mappedObject["MensgemaaktObject.draagt"] = informatieObject;
     },
 
-    mapActiviteitArchief: async (objectURI, input, mappedObject, adlib) => {
-        // activiteit die een dossier genereert --> vb. indiening bouwaanvraag (Archief Gent)
+    mapBouwaanvraagArchief: async (objectURI, input, mappedObject, adlib) => {
+        // vb. goedkeuring bouwaanvraag (Archief Gent)
         // steeds slechts 1 occurence!
+        for (let p in input["Associated_period"]) {
+            let datumStart;
+            let datumEinde;
+            if (input["Associated_period"][p]["association.period.date.start"] && input["Associated_period"][p]["association.period.date.start"][0])
+                datumStart = input["Associated_period"][p]["association.period.date.start"][0];
 
-        let v =  {
-            "@type": "Activiteit"
-        }
+            if (input["Associated_period"][p]["association.period.date.end"] && input["Associated_period"][p]["association.period.date.end"][0])
+                datumEinde = input["Associated_period"][p]["association.period.date.end"][0];
 
-        if (input["Associated_period"][0]["association.period.date.start"][0]) {
-            const datumStart = ["Associated_period"][0]["association.period.date.start"];
-            v["Activiteit.startdate"] = {
-                "@type": "Periode",
-                "startdatum": datumStart
-            };
-        }
-
-        if (input["Associated_period"][0]["association.period.date.start"][0]) {
-            const datumEind = ["Associated_period"][0]["association.period.date.end"];
-            v["Activiteit.einddate"] = {
-                "@type": "Periode",
-                "startdatum": datumEind
-            };
-        }
-
-        if (input["Associated_period"][0]["association.period.date.start"][0]) {
-            const activiteitType = ["Associated_period"][0]["association.period.assoc"];
-            const activityURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][0]["association.period.assoc.lref"][0], "concept")
-            v["Activiteit.naam"] = {
-                "@id": activityURI,
-                "skos:prefLabel": {
-                    "@value": activiteitType,
-                    "@language": "nl"
+            // Mapping goedkeuring bouwaanvraag
+            if (input["Associated_period"][p]["association.period.assoc"] && input["Associated_period"][p]["association.period.assoc"][0] === "goedkeuring van de bouwaanvraag") {
+                let b = {
+                    "@type": "Activiteit", // beslissing
+                    "Activiteit.naam": "goedkeuring van de bouwaanvraag"
                 }
-            };
+                if (datumStart) b["Activiteit.startdatum"] = datumStart;
+                if (datumEinde) b["Activiteit.einddatum"] = datumEinde;
+
+                // Goedkeuring van de bouwaanvraag moet beschreven geweest zijn in een legale verschijningsvorm (Stuk)
+                // Stuk is gelinkt met het gebouw
+                if(!mappedObject["Dossier.bestaatUit"]) mappedObject["Dossier.bestaatUit"] = [];
+                mappedObject["Dossier.bestaatUit"].push({
+                    "@type": "Stuk", // goedkeuringsdocument die gegenereerd is uit een beslissing
+                    "@reverse": {
+                        "Activiteit.genereert": b
+                    }
+                })
+            }
         }
     },
 
