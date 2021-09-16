@@ -11,6 +11,7 @@ export default class TermenMapper extends Transform {
         this._context = [
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/persoon-basis.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
+            "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/generiek-basis.jsonld",
             {
                "skos": "http://www.w3.org/2004/02/skos/core#",
                 "owl": "http://www.w3.org/2002/07/owl#",
@@ -362,10 +363,10 @@ export default class TermenMapper extends Transform {
                     if (input['Related'] && input['Related'][0]) {
                         let personenrelaties = [];
                         for (let r in input['Related']) {
-                            const relatedWith = input['Related'][p]['relationship'][0];
-                            const relatedWithURI = adlib.getURIFromPriref("personen", input['Related'][p]['relationship.lref'][0], "agent");
-                            const relatedWithNotes = input['Related'][p]['relationship.notes'][0];
-                            const relatedWithCategory = input['Related'][p]['relationship.category'][0];
+                            const relatedWith = input['Related'][r]['relationship'][0];
+                            const relatedWithURI = this._adlib.getURIFromPriref("personen", input['Related'][r]['relationship.lref'][0], "agent");
+                            const relatedWithNotes = input['Related'][r]['relationship.notes'][0];
+                            const relatedWithCategory = input['Related'][r]['relationship.category'][0];
 
                             const personenrelatie = {
                                 "@type": "Persoonsrelatie",
