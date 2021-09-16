@@ -54,7 +54,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapAlternativeNumber(input, mappedObject, this._baseURI);
 
             // Relatie met andere objecten (koepelrecord of object)
-            await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib, this._baseURI);
 
             // Dossier bestaat uit werken (koepelrecord of object)
             await Utils.mapRelatiesKoepelRecordDossier(objectURI, input, mappedObject, this._adlib);

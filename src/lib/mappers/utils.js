@@ -88,13 +88,14 @@ module.exports = {
         }
     },
 
-    mapRelatiesKoepelrecord: async (objectURI, input, mappedObject, adlib) => {
+    mapRelatiesKoepelrecord: async (objectURI, input, mappedObject, adlib, baseURI) => {
         if (input['Part_of'] && input['Part_of'][0]) {
             // object - part of - dossier
             let dossiers = [];
             for (let p in input['Part_of']) {
                 const title = input['Part_of'][p]['part_of.title'][0];
-                const dossierURI = await adlib.getURIFromPriref("objecten", input['Part_of'][p]['part_of_reference.lref'][0], "doos");
+                const dossierPriref = input['Part_of'][p]['part_of_reference.lref'][0];
+                const dossierURI = `${baseURI}dossier/${adlib._institution}/${dossierPriref}`;
                 const dossier = {
                     "@id": dossierURI,
                     "@type": "GecureerdeCollectie",
@@ -131,6 +132,8 @@ module.exports = {
         if (input['Parts'] && input['Parts'][0]) {
             if (!mappedObject["Dossier.bestaatUit"]) mappedObject["Dossier.bestaatUit"] = [];
 
+            // Overwrite type in URI from mensgemaaktobject to dossier
+            mappedObject["@id"] = mappedObject["@id"].replace("mensgemaaktobject", "dossier");
             // Overwrite type from MensgemaaktObject to Dossier
             mappedObject["@type"] = "Dossier";
 
@@ -329,9 +332,6 @@ module.exports = {
 
     mapVervaardiging: async (id, input, mappedObject, adlib) => {
         // Get ontwerp en uitvoering data
-        if (id ==="https://stad.gent/id/mensgemaaktobject/stam/550000004"){
-            console.log("ts")
-        }
         let ontwerp_date = {
             "@value": "..",
             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
