@@ -82,10 +82,8 @@ Adlib.prototype.run = async function () {
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
     // Wait for adlib.
-    let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
-    if (timeout > 0) {
-        await sleep(timeout);
-    }
+    await sleep(process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000);
+
     let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
     if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
@@ -143,10 +141,7 @@ function sleep(ms) {
 
 Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     // Wait for adlib.
-    let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
-    if (timeout > 0) {
-        await sleep(timeout);
-    }
+    await sleep(process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000);
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
     let object = await this.fetchWithNTLM(querypath);
     if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
