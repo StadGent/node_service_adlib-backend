@@ -48,6 +48,8 @@ export default class ArchiefGentMapper extends ObjectMapper {
 
             await Utils.mapTrefwoorden(objectURI, input, mappedObject, this._adlib);
 
+            await Utils.mapIconografie(input, mappedObject, this._adlib);
+
             // Fysieke kenmerken
             await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);
 
