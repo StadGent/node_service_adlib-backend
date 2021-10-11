@@ -889,26 +889,52 @@ module.exports = {
 
     mapIconografie: async (input, mappedObject, adlib) => {
         // Content_person en Content_subject
+        if (!mappedObject["Entiteit.beeldtUit"]) mappedObject["Entiteit.beeldtUit"] = [];
+
         if (input["Content_subject"] && input["Content_subject"][0]) {
-            if (!mappedObject["Entiteit.beeldtUit"]) mappedObject["Entiteit.beeldtUit"] = [];
             for (let s in input["Content_subject"]) {
+                // Soortnaam, bv. huis
                 if (input["Content_subject"][s]["content.subject"]) {
+                    let e = {
+                        "@type": "Entiteit",
+                        "Entiteit.type": []
+                    };
                     const subjectLabel = input["Content_subject"][s]["content.subject"][0];
                     const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Content_subject"][s]["content.subject.lref"][0], "concept");
 
-                    mappedObject["Entiteit.beeldtUit"].push({
-                        "@type": "Entiteit",
-                        "Entiteit.type": [{
-                            "@id": subjectURI,
-                            "skos:prefLabel": {
-                                "@value": subjectLabel,
-                                "@language": "nl"
-                            }
-                        },{
-                            "@id": "cest:Naam_afgebeelde_gebeurtenis",
-                            "label": "inhoud.onderwerp"
-                        }]
+                    e["Entiteit.type"].push({
+                        "@id": subjectURI,
+                        "skos:prefLabel": {
+                            "@value": subjectLabel,
+                            "@language": "nl"
+                        }
                     });
+                    e["Entiteit.type"].push({
+                        "@id": "cest:Naam_afgebeelde_gebeurtenis",
+                        "label": "inhoud.onderwerp"
+                    });
+                    mappedObject["Entiteit.beeldtUit"].push(e);
+                }
+
+                // Iconografie - eigennaam, bv. Gravensteen
+                if (input["Content_subject"][s]["content.subject.name"]) {
+                    let e = {
+                        "@type": "Entiteit",
+                        "Entiteit.type": []
+                    };
+                    const eigennaamLabel = input["Content_subject"][s]["content.subject.name"][0];
+
+                    e["Entiteit.type"].push({
+                        "label": {
+                            "@value": eigennaamLabel,
+                            "@language": "nl"
+                        }
+                    });
+                    e["Entiteit.type"].push({
+                        "@id": "cest:Eigennaam_afgebeeld_onderwerp", // nog toe te voegen in CEST
+                        "label": "inhoud.onderwerp.eigennaam"
+                    });
+                    mappedObject["Entiteit.beeldtUit"].push(e);
                 }
             }
         }
@@ -973,36 +999,6 @@ module.exports = {
     mapMerken: (input, mappedObject) => {
         //console.log(input)
     }
-
-    // todo mapInhoudOnderwerpEigennaam: (objectURI, input, mappedObject) => {
-    //
-    //     let InhoudOnderwerpEigennaam = [];
-    //
-    //     if(input["content"] && input["content"][0]) {
-    //         for (let i in input["content"]) {
-    //             if (input["content"][i]["subject.name"] && input["content"][i]["subject.name"][0]) {
-    //                 let InhoudOnderwerpEigennaamLabel = input["content"][i]["subject.name"][0];
-    //
-    //                 mapInhoudOnderwerpEigennaam["InformatieObject.gaatOver"].push({
-    //                     "@id": subjectURI,
-    //                     "skos:prefLabel": {
-    //                         "@value": subjectLabel,
-    //                         "@language": "nl"
-    //                     },
-    //                     "Entiteit.type": {
-    //                         "@id": "cest:Naam_geassocieerd_concept",
-    //                         "value": "associatie.onderwerp"
-    //                     }
-    //                 });
-    //
-    //             }
-    //         }
-    //
-    //         //todo: mappedObject[""] = InhoudOnderwerpEigennaam;
-    //     }
-    //
-    // },
-
 };
 
 
