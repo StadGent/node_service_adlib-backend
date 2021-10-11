@@ -76,7 +76,7 @@ Adlib.prototype.run = async function () {
         lastPriref = null; // reset
         await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
     }
-    Utils.log("All objects are fetched from Adlib!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
+    Utils.log("All objects are fetched from " + this._institution + "!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
     this._stream.push(null);
 };
 
@@ -106,7 +106,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
             this._stream.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
         }
         let hits = objects.adlibJSON.diagnostic.hits;
-        Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", this._correlator.getId());
+        Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
 
         let nextStartFrom = startFrom + limit;
         if (nextStartFrom < hits) await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, nextStartFrom, limit);
@@ -128,7 +128,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
             try {
                 if (res && res.body) resolve(JSON.parse(res.body));
                 else {
-                  self.fetchWithNTLM(querypath); 
+                  self.fetchWithNTLM(querypath);
                 }// retry
             } catch (e) {
                 Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
