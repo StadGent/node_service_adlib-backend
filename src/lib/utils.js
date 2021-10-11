@@ -59,8 +59,8 @@ export default class Utils {
     static getURIFromRecord(record, priref, type, database) {
         if (record) {
             for (let s in record.source) {
-                const source = record.source[s].endsWith('/') ? record.source[s] : `${record.source[s]}/`;
-                if (source.startsWith('http') && record['term.number']) {
+                const source = record.source[s].trim().endsWith('/') ? record.source[s].trim() : `${record.source[s].trim()}/`;
+                if (source.startsWith('http') && record['term.number'] && record['term.number'][s]) {
                     const termNumber = record['term.number'][s].toLowerCase().trim().replace(' ', '');
                     return `${source}${termNumber}`;
                 }
@@ -83,8 +83,8 @@ export default class Utils {
                 return 'industriemuseum';
             case '53':
                 return 'dmg';
-            // case 'todo':
-            //    return 'archiefgent';
+            case '67':
+                return 'archiefgent';
             default:
                 return 'unknown';
         }
@@ -100,7 +100,7 @@ export default class Utils {
         // Industriemuseum is 57
         else if (institutionId === 57) return 'http://www.wikidata.org/entity/Q2245203';
         // Archief Gent is ?
-        else return 'http://www.wikidata.org/entity/Q41776192';
+        else if (institutionId === 67) return 'http://www.wikidata.org/entity/Q41776192';
     }
 
     static log(message, loggerName, level, correlationId) {

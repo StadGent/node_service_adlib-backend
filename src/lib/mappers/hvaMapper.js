@@ -23,7 +23,6 @@ export default class HvAMapper extends ObjectMapper {
             mappedObject["@type"] = "MensgemaaktObject";
             // Event stream metadata
             mappedObject["dcterms:isVersionOf"] = objectURI;
-            // mappedObject["prov:generatedAtTime"] = new Date(input["@attributes"].modification).toISOString();
             mappedObject["prov:generatedAtTime"] = now;
 
             // Convenience method to make our URI dereferenceable by District09
@@ -32,7 +31,6 @@ export default class HvAMapper extends ObjectMapper {
             // Identificatie
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             Utils.mapObjectnummer(input, mappedObject, this._baseURI);
-            await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
             Utils.mapTitel(input, mappedObject);
             Utils.mapBeschrijving(input, mappedObject);
