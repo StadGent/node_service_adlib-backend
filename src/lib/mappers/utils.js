@@ -1,4 +1,3 @@
-const {mapInhoudOnderwerpEigennaam} = require("./utils");
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
