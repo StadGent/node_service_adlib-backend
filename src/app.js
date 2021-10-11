@@ -24,7 +24,7 @@ let sequelize;
 const cron = require('node-cron');
 
 startHealthcheckAPI();
-start();
+// start(); only for development
 
 cron.schedule(config.adlib.schedule, start);
 
