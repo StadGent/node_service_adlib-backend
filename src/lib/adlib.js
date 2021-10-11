@@ -81,8 +81,11 @@ Adlib.prototype.run = async function () {
 };
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
-    await sleep(5000); // wait 5 seconds
-
+    // Wait for adlib.
+    let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
+    if (timeout > 0) {
+        await sleep(timeout);
+    }
     let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
     if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
@@ -113,7 +116,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
 };
 
 Adlib.prototype.fetchWithNTLM = function(querypath) {
-    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTML", "INFO", this._correlator.getId());
+    Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTLM", "INFO", this._correlator.getId());
     const self = this;
     return new Promise((resolve, reject) => {
         httpntlm.get({
@@ -128,7 +131,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
                   self.fetchWithNTLM(querypath); 
                 }// retry
             } catch (e) {
-                Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTML", "ERROR", self._correlator.getId());
+                Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
             }
         });
     });
@@ -139,7 +142,11 @@ function sleep(ms) {
 }
 
 Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
-    await sleep(1000); // don't kill Adlib
+    // Wait for adlib.
+    let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
+    if (timeout > 0) {
+        await sleep(timeout);
+    }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
     let object = await this.fetchWithNTLM(querypath);
     if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
