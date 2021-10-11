@@ -32,7 +32,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             Utils.mapAfdeling(this._institutionURI, input, mappedObject);
             await Utils.mapCollectie(input,mappedObject, this._adlib, this._baseURI);
-            Utils.mapObjectnummer(input, mappedObject);
+            Utils.mapObjectnummer(input, mappedObject, this._baseURI);
             Utils.mapRecordType(input, mappedObject);
             await Utils.mapObjectCategorie(objectURI, input, mappedObject, this._adlib);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);
@@ -40,10 +40,15 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapTitel(input, mappedObject);
             Utils.mapBeschrijving(input, mappedObject);
 
+            // Vervaardiging, datering
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+
             // Associaties
             await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
             await Utils.mapTrefwoorden(objectURI, input, mappedObject, this._adlib);
+
+            await Utils.mapIconografie(input, mappedObject, this._adlib);
 
             // Fysieke kenmerken
             await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);
@@ -51,7 +56,13 @@ export default class ArchiefGentMapper extends ObjectMapper {
             Utils.mapAlternativeNumber(input, mappedObject, this._baseURI);
 
             // Relatie met andere objecten (koepelrecord of object)
-            await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib, this._baseURI);
+
+            // Dossier bestaat uit werken (koepelrecord of object)
+            await Utils.mapRelatiesKoepelRecordDossier(objectURI, input, mappedObject, this._adlib);
+
+            // werk resulteert in dossier (koepelrecord)
+            await Utils.mapBouwaanvraagArchief(objectURI, input, mappedObject, this._adlib);
 
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
