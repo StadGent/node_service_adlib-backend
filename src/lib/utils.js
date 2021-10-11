@@ -109,6 +109,6 @@ export default class Utils {
         else if (level === "ERROR") levelValue = 2;
         else if (level === "CRIT") levelValue = 1;
 
-        console.log(`{"@timestamp":"${new Date().toISOString()}","@version":version,"message":"${message}","logger_name":"${loggerName}","level":${level}","level_value":${levelValue},"correlationId":"${correlationId}"}`);
+        console.log(`{"@timestamp":"${new Date().toISOString()}","@version":"${version}","message":"${message}","logger_name":"${loggerName}","level":"${level}","level_value":${levelValue},"correlationId":"${correlationId}"}`);
     }
 }
