@@ -58,7 +58,7 @@ When `npm_package_version` is updated, all objects from Adlib will be harvested 
 ## Cronjob
 
 You can configure in `config.tml` when to periodically run `app.js`.
-Fill in `schedule` following the cron syntax, for example every day at midnight (`* * 0 * * *`)
+Fill in `schedule` following the cron syntax, for example every day at midnight (`0 0 * * *`)
 
 
 ## Clean data
