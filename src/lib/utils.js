@@ -115,6 +115,11 @@ export default class Utils {
             d09: {
                 correlationId: correlationId,
                 subcel: 'web'
+            },
+            memory: {
+                total: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100}MB`,
+                used: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB`,
+                buffer: `${Math.round(process.memoryUsage().arrayBuffers / 1024 / 1024 * 100) / 100}MB`
             }
         };
         console.log(JSON.stringify(entry));
