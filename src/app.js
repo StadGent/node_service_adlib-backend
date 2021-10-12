@@ -24,7 +24,11 @@ let sequelize;
 const cron = require('node-cron');
 
 startHealthcheckAPI();
-// start(); only for development
+
+// Only for development.
+if (process.env.APM_ENVIRONMENT === 'DV') {
+    start();
+}
 
 cron.schedule(config.adlib.schedule, start);
 
