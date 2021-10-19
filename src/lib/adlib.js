@@ -1,29 +1,35 @@
 import httpntlm from 'httpntlm';
-import { Readable } from'stream';
+import { Readable } from 'stream';
 import Config from "../config/config.js";
 import Utils from './utils.js';
 
 const config = Config.getConfig();
 
-export default class Adlib {
+export default class Adlib extends Readable {
     constructor(options) {
+        super({objectMode: true});
+
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
         this._institutionName = config[options.institution] && config[options.institution].institutionName ? config[options.institution].institutionName : "adlib";
         this._checkEuropeanaFlag = typeof options.checkEuropeanaFlag !== 'undefined' ? options.checkEuropeanaFlag : true;
         this._db = options.db;
         this._correlator = options.correlator;
+        this._buffer = [];
         this.run();
-        this._stream = new Readable({
-            objectMode: true,
-            read() {}
-        });
     }
 }
 
-Adlib.prototype.getStream = function () {
-    return this._stream;
-};
+Adlib.prototype._read = async function() {
+    try {
+        if (this._buffer && this._buffer.length) this.push(this._buffer.pop());
+        else {
+            this.once('object fetched', this._read);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 Adlib.prototype.run = async function () {
     const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
@@ -77,41 +83,50 @@ Adlib.prototype.run = async function () {
         await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
     }
     Utils.log("All objects are fetched from " + this._institution + "!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
-    this._stream.push(null);
+    this.push(null);
 };
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
-    // Wait for adlib.
-    let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
-    if (timeout > 0) {
-        await sleep(timeout);
-    }
-    let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
+    let hits = undefined;
+    let nextStartFrom = startFrom + limit;
+    while (!hits || (hits && nextStartFrom < hits)) {
+        let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
-    if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
-    else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
-    else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
-    else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
-    else querypath += "all";
+        if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
+        else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
+        else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
+        else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
+        else querypath += "all";
 
-    // When lastPriref is not null, then we try to finalize previous run with the max generatedAtTime and priref
-    if (lastPriref) {
-        querypath += ` AND modification <= '${lastModifiedDate.toISOString()}' AND priref > '${lastPriref}'`;
-    }
-    else if (lastModifiedDate) querypath += ` AND modification > '${lastModifiedDate.toISOString()}'`;
-
-    let objects = await this.fetchWithNTLM(querypath);
-    if(objects.adlibJSON.diagnostic.hits_on_display != "0" && objects.adlibJSON.recordList) {
-        for (let i in objects.adlibJSON.recordList.record) {
-            this._stream.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
+        // When lastPriref is not null, then we try to finalize previous run with the max generatedAtTime and priref
+        if (lastPriref) {
+            querypath += ` AND modification <= '${lastModifiedDate.toISOString()}' AND priref > '${lastPriref}'`;
         }
-        let hits = objects.adlibJSON.diagnostic.hits;
-        Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+        else if (lastModifiedDate) querypath += ` AND modification > '${lastModifiedDate.toISOString()}'`;
 
-        let nextStartFrom = startFrom + limit;
-        if (nextStartFrom < hits) await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, nextStartFrom, limit);
-    } else {
-        return;
+        let objects = await this.fetchWithNTLM(querypath);
+        if(objects.adlibJSON.diagnostic.hits_on_display != "0" && objects.adlibJSON.recordList) {
+            for (let i in objects.adlibJSON.recordList.record) {
+              // Wait for adlib.
+              let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
+              if (timeout > 0) {
+                  await sleep(timeout);
+                  while (this._buffer.length > limit) {
+                      Utils.log("Waiting until buffer count (" + this._buffer.length + ") is lower than " + limit, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                      await sleep(timeout);
+                  }
+              }
+                Utils.log("Adding object to buffer", "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                this._buffer.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
+                this.emit('object fetched');
+            }
+            hits = objects.adlibJSON.diagnostic.hits;
+            Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+            startFrom = nextStartFrom;
+            nextStartFrom = startFrom + limit;
+        } else {
+            return;
+        }
     }
 };
 
