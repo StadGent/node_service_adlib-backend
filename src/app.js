@@ -62,7 +62,7 @@ function startHva() {
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         let objectMapper = new HvAMapper(options);
-        objectAdlib.getStream().pipe(objectMapper).pipe(backend);
+        objectAdlib.pipe(objectMapper).pipe(backend);
     });
 }
 
@@ -80,7 +80,7 @@ function startDmg() {
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         let objectMapper = new DmgMapper(options);
-        objectAdlib.getStream().pipe(objectMapper).pipe(backend);
+        objectAdlib.pipe(objectMapper).pipe(backend);
     });
 }
 
@@ -98,7 +98,7 @@ function startIndustriemuseum() {
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         let objectMapper = new IndustriemuseumMapper(options);
-        objectAdlib.getStream().pipe(objectMapper).pipe(backend);
+        objectAdlib.pipe(objectMapper).pipe(backend);
     });
 }
 
@@ -116,7 +116,7 @@ function startArchiefgent() {
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         let objectMapper = new ArchiefGentMapper(options);
-        objectAdlib.getStream().pipe(objectMapper).pipe(backend);
+        objectAdlib.pipe(objectMapper).pipe(backend);
     });
 }
 
@@ -134,7 +134,7 @@ function startStam() {
         let objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         let objectMapper = new StamMapper(options);
-        objectAdlib.getStream().pipe(objectMapper).pipe(backend);
+        objectAdlib.pipe(objectMapper).pipe(backend);
     });
 }
 
@@ -152,7 +152,7 @@ function startThesaurus() {
         const objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
-        objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
+        objectAdlib.pipe(thesaurusMapper).pipe(backend);
     });
 }
 
@@ -170,7 +170,7 @@ function startPersonen() {
         const objectAdlib = new Adlib(options);
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
-        objectAdlib.getStream().pipe(thesaurusMapper).pipe(backend);
+        objectAdlib.pipe(thesaurusMapper).pipe(backend);
     });
 }
 

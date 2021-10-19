@@ -4,7 +4,7 @@
   "description": "node_service_adlib-backend",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node src/app.js",
+    "dev": "set APM_ENVIRONMENT=DV&&set ADLIB_SLEEP=1000&& set ADLIB_SLEEP_URI=5000&& nodemon --inspect --exec babel-node src/app.js",
     "start": "if [ -z \"$MAX_NODE_MEMORY\" ]; then export MAX_NODE_MEMORY=1024; fi; node --max-old-space-size=$MAX_NODE_MEMORY main.js",
     "lint": "eslint src/"
   },
