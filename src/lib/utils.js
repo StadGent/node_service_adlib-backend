@@ -104,11 +104,24 @@ export default class Utils {
     }
 
     static log(message, loggerName, level, correlationId) {
-        let levelValue = 0;
-        if (level === "INFO") levelValue = 4;
-        else if (level === "ERROR") levelValue = 2;
-        else if (level === "CRIT") levelValue = 1;
-
-        console.log(`{"@timestamp":"${new Date().toISOString()}","@version":version,"message":"${message}","logger_name":"${loggerName}","level":${level}","level_value":${levelValue},"correlationId":"${correlationId}"}`);
+        let entry = {
+            '@timestamp': new Date().toISOString(),
+            '@version': version,
+            message: message,
+            log: {
+                level: level,
+                logger: loggerName,
+            },
+            d09: {
+                correlationId: correlationId,
+                subcel: 'web'
+            },
+            memory: {
+                total: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100}MB`,
+                used: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100}MB`,
+                buffer: `${Math.round(process.memoryUsage().arrayBuffers / 1024 / 1024 * 100) / 100}MB`
+            }
+        };
+        console.log(JSON.stringify(entry));
     }
 }
