@@ -30,6 +30,7 @@ export default class StamMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
+            Utils.mapPriref(input, mappedObject, this._baseURI);
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             Utils.mapObjectnummer(input, mappedObject, this._baseURI);
             await Utils.mapObjectnaam(objectURI, input, mappedObject, this._adlib);

@@ -29,6 +29,7 @@ export default class IndustriemuseumMapper extends ObjectMapper {
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
 
             // Identificatie
+            Utils.mapPriref(input, mappedObject, this._baseURI);
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             await Utils.mapCollectie(input,mappedObject, this._adlib, this._baseURI);
             Utils.mapObjectnummer(input, mappedObject, this._baseURI);
