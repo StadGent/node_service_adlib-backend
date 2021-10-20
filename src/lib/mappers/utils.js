@@ -997,6 +997,18 @@ module.exports = {
     },
     mapMerken: (input, mappedObject) => {
         //console.log(input)
+    },
+    mapPriref(input, mappedObject, baseURI) {
+        const priref = input["@attributes"].priref;
+        const id = {
+            "@type": "Identificator",
+            "Identificator.identificator": {
+                "@value": priref,
+                "@type": `${baseURI}identificatiesysteem/priref`
+            }
+        }
+        if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
+        mappedObject["Object.identificator"].push(id);
     }
 };
 

@@ -1,6 +1,8 @@
 import { Transform } from 'stream';
 import Config from "../../config/config.js";
 import Utils from "../utils.js";
+import mappingUtils from "../mappers/utils.js";
+
 
 const config = Config.getConfig();
 
@@ -13,8 +15,14 @@ export default class TermenMapper extends Transform {
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/cultureel-erfgoed-object-ap.jsonld",
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/generiek-basis.jsonld",
             {
-               "skos": "http://www.w3.org/2004/02/skos/core#",
+                "skos": "http://www.w3.org/2004/02/skos/core#",
+                "skos:inScheme": {
+                   "@type": "@id"
+                },
                 "owl": "http://www.w3.org/2002/07/owl#",
+                "owl:sameAs": {
+                   "@type": "@id"
+                },
                 "opmerking": "http://www.w3.org/2004/02/skos/core#note",
                 "dcterms:isVersionOf": {
                     "@type": "@id"
@@ -99,6 +107,9 @@ export default class TermenMapper extends Transform {
                 // External URI found
                 if (uri != objectURI) mappedObject["owl:sameAs"] = uri;
 
+                // map priref to identificator
+                mappingUtils.mapPriref(input, mappedObject, this._baseURI);
+
                 // referentienummer
                 if (input['reference_number'] && input['reference_number'][0]) {
                     const id = {
@@ -122,7 +133,7 @@ export default class TermenMapper extends Transform {
                     };
                 }
 
-                mappedObject["skos:inscheme"] = this._conceptscheme;
+                mappedObject["skos:inScheme"] = this._conceptscheme;
 
                 if (input['broader_term.lref'] && input['broader_term.lref'][0]) {
                     mappedObject["skos:broader"] = [];
