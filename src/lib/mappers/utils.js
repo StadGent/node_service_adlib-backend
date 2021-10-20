@@ -343,8 +343,8 @@ module.exports = {
             for (let n in input["production.date.notes"]) {
                 let note = input["production.date.notes"][n];
                 // we veronderstellen dat Production_date op hetzelfde niveau als de production note staat
-                if (input.Production_date[n]) {
-                    const p = input.Production_date[n];
+                if (input["Production_date"] && input["Production_date"][n]) {
+                    const p = input["Production_date"][n];
                     let date = "";
                     if (p['production.date.start']) {
                         date = p['production.date.start'][0];
