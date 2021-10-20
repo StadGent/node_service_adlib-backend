@@ -1,6 +1,8 @@
 import { Transform } from 'stream';
 import Config from "../../config/config.js";
 import Utils from "../utils.js";
+import mappingUtils from "../mappers/utils.js";
+
 
 const config = Config.getConfig();
 
@@ -104,6 +106,9 @@ export default class TermenMapper extends Transform {
 
                 // External URI found
                 if (uri != objectURI) mappedObject["owl:sameAs"] = uri;
+
+                // map priref to identificator
+                mappingUtils.mapPriref(input, mappedObject, this._baseURI);
 
                 // referentienummer
                 if (input['reference_number'] && input['reference_number'][0]) {
