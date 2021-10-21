@@ -25,12 +25,12 @@ const cron = require('node-cron');
 
 startHealthcheckAPI();
 
-// Only for development.
-if (process.env.APM_ENVIRONMENT === 'DV') {
+// Start immediately?
+if (process.env.ADLIB_START) {
     start();
+} else {
+    cron.schedule(config.adlib.schedule, start);
 }
-
-cron.schedule(config.adlib.schedule, start);
 
 async function start() {
     correlator.withId(async () => {
