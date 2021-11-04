@@ -164,21 +164,26 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         await sleep(timeout);
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    // Get data from cache.
+    let object = null;
     await (async () => {
-        const redisClient = createClient({
-            port: 6379,
-            host: 'localhost'
-        });
-        redisClient.on('error', (err) => console.log('Redis Client Error', err));
-        await redisClient.connect();
+        // Get data from Redis cache.
+        if (config.redis.connectionURI) {
+            const redisClient = createClient({
+                uri: config.redis.connectionURI
+            });
+            redisClient.on('error', (err) => console.log('Redis Client Error', err));
+            await redisClient.connect();
 
-        let object = await redisClient.get(querypath);
-        if (object) {
-            object = JSON.parse(object);
+            object = await redisClient.get(querypath);
+            if (object) {
+                object = JSON.parse(object);
+                console.log('read from redis');
+            } else {
+                object = await this.fetchWithNTLM(querypath);
+                await redisClient.set(querypath, JSON.stringify(object));
+            }
         } else {
             object = await this.fetchWithNTLM(querypath);
-            await redisClient.set(querypath, JSON.stringify(object));
         }
 
         if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
