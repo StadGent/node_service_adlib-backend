@@ -15,6 +15,9 @@ export default class Config {
         database: {
             connectionURI: process.env.DATABASE_URI ? process.env.DATABASE_URI : data.database.connectionURI
         },
+        redis: {
+            connectionURI: process.env.REDIS_URI ? process.env.REDIS_URI : data.redis.connectionURI
+        },
         mapping: {
           baseURI: data.mapping.baseURI
         },

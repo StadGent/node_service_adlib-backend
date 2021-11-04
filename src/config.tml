@@ -8,6 +8,9 @@
 [database]
   connectionURI = 'sqlite://./eventstream.db'
 
+[redis]
+  connectionURI = 'redis://localhost:6379'
+
 [eventstream]
   protocol = 'https'
   hostname = 'localhost'
