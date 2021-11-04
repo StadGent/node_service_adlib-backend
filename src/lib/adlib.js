@@ -2,6 +2,7 @@ import httpntlm from 'httpntlm';
 import { Readable } from 'stream';
 import Config from "../config/config.js";
 import Utils from './utils.js';
+import { createClient } from 'redis';
 
 const config = Config.getConfig();
 
@@ -143,7 +144,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
             try {
                 if (res && res.body) resolve(JSON.parse(res.body));
                 else {
-                  self.fetchWithNTLM(querypath);
+                    self.fetchWithNTLM(querypath);
                 }// retry
             } catch (e) {
                 Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
@@ -163,10 +164,32 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         await sleep(timeout);
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    let object = await this.fetchWithNTLM(querypath);
-    if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
-        return Utils.getURIFromRecord(object.adlibJSON.recordList.record[0], priref, type, database);
-    } else {
-        return Utils.getURIFromRecord(null, priref, type, database);
-    }
+    let object = null;
+    await (async () => {
+        // Get data from Redis cache.
+        if (config.redis.connectionURI) {
+            const redisClient = createClient({
+                uri: config.redis.connectionURI
+            });
+            redisClient.on('error', (err) => console.log('Redis Client Error', err));
+            await redisClient.connect();
+
+            object = await redisClient.get(querypath);
+            if (object) {
+                object = JSON.parse(object);
+                console.log('read from redis');
+            } else {
+                object = await this.fetchWithNTLM(querypath);
+                await redisClient.set(querypath, JSON.stringify(object));
+            }
+        } else {
+            object = await this.fetchWithNTLM(querypath);
+        }
+
+        if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
+            return Utils.getURIFromRecord(object.adlibJSON.recordList.record[0], priref, type, database);
+        } else {
+            return Utils.getURIFromRecord(null, priref, type, database);
+        }
+    })();
 };
