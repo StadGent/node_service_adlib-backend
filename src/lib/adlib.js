@@ -169,7 +169,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         // Get data from Redis cache.
         if (config.redis.connectionURI) {
             const redisClient = createClient({
-                uri: config.redis.connectionURI
+                url: config.redis.connectionURI
             });
             redisClient.on('error', (err) => console.log('Redis Client Error', err));
             await redisClient.connect();
