@@ -6,6 +6,12 @@ import { createClient } from 'redis';
 
 const config = Config.getConfig();
 
+const redisClient = createClient({
+    url: config.redis.connectionURI
+});
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
+redisClient.connect();
+
 export default class Adlib extends Readable {
     constructor(options) {
         super({objectMode: true});
@@ -164,26 +170,16 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         await sleep(timeout);
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    let object = null;
     await (async () => {
         // Get data from Redis cache.
-        if (config.redis.connectionURI) {
-            const redisClient = createClient({
-                url: config.redis.connectionURI
-            });
-            redisClient.on('error', (err) => console.log('Redis Client Error', err));
-            await redisClient.connect();
-
-            object = await redisClient.get(querypath);
-            if (object) {
-                object = JSON.parse(object);
-                console.log('read from redis');
-            } else {
-                object = await this.fetchWithNTLM(querypath);
-                await redisClient.set(querypath, JSON.stringify(object));
-            }
+        let object = await redisClient.get(querypath);
+        if (object) {
+            object = JSON.parse(object);
+            console.log('Read from Redis.');
         } else {
             object = await this.fetchWithNTLM(querypath);
+            console.log('Read from Adlib.');
+            await redisClient.set(querypath, JSON.stringify(object));
         }
 
         if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
