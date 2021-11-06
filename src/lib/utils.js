@@ -11,11 +11,13 @@ export default class Utils {
         const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
         let generatedAtTime = new Date(object["prov:generatedAtTime"]).toISOString();
         let URI = object["@id"];
+        let priref = object["Object.identificator"][0]["Identificator.identificator"]["@value"];
 
         this.log(`Inserting object with URI ${URI}`, "adlib-backend/lib/utils.js:insertObject", "INFO", correlator.getId());
 
         await db.models.Member.create({
             URI: URI,
+            priref: priref,
             version: version,
             institution: institution,
             adlibDatabase: adlibDatabase,
