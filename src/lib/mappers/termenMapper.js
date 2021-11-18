@@ -275,7 +275,6 @@ export default class TermenMapper extends Transform {
                     // achternaam
                     let achternaam = ""
                     if (input['surname'] && input['surname'][0]) {
-                        achternaam = input['surname'][0];
                         for (const f in input['surname'])
                             achternaam += input['surname'][f];
                         mappedObject["achternaam"] = achternaam;
