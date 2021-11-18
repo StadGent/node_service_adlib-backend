@@ -65,7 +65,7 @@ export default class TentoonstellingMapper extends Transform {
             const ref_number = input["reference_number"]
 
             //URI template: https://stad.gent/id/{type}/{scheme-id}/{concept-ref}
-            let objectURI = baseURI + "tentoonstelling" + '/' + ref_number;
+            let objectURI = baseURI + "tentoonstelling" + '/' + priref;
             let versionURI = objectURI + "/" + now;
 
             //only process terms from database "tentoonstelling" with institution === "dmg" (53)
