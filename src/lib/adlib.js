@@ -101,6 +101,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
         else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
+        else if (this._adlibDatabase === "tentoonstellingen" && this._institution === "DMG") querypath += `priref Greater '530000000' And priref Smaller '540000000' And reference_number = "TE_*"`;
         else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
         else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
         else querypath += "all";
@@ -171,7 +172,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
     await (async () => {
-        // Get data from Redis cache.
+        //Get data from Redis cache.
         let object = await redisClient.get(querypath);
         if (object) {
             object = JSON.parse(object);
