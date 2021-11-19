@@ -1,8 +1,8 @@
 [adlib]
   schedule = '0 0 * * *'
   baseUrl = 'https://cjm-web.adlibhosting.com/coghentapi/wwwopac.ashx'
-  username = 'coghentapi'
-  password = 'Adlib-district09$'
+  username = ''
+  password = ''
   limit = 10
 
 [database]
