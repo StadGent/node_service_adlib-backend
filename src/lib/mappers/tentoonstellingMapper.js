@@ -72,113 +72,124 @@ export default class TentoonstellingMapper extends Transform {
             //&& reference_number .starswith("TE")
 
             //if ((institution === 'dmg') && (input['reference_number'].startsWith("TE_")))
-            {
-                mappedObject["@id"] = versionURI;
-                mappedObject["@type"] = "Activiteit";
-                mappedObject["Entiteit.type"] = {
-                    "@id": "http://vocab.getty.edu/aat/300417531",
-                    "@value": "tentoonstelling"
-                }
-                // Event stream metadata
-                mappedObject["dcterms:isVersionOf"] = objectURI;
-                mappedObject["prov:generatedAtTime"] = now;
-
-                // referentienummer
-                if (input['reference_number'] && input['reference_number'][0]) {
-                    const id = {
-                        "@type": "Identificator",
-                        "Identificator.identificator": {
-                            "@value": input["reference_number"][0],
-                            "@type": `${this._baseURI}identificatiesysteem/referentienummer`
-                        }
-                    }
-                    if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
-                    mappedObject["Object.identificator"].push(id);
-                }
-
-                // tentoonstellingstitel
-                if (input['title'] && input['title'][0]) mappedObject["InformatieObject.titel"] = {
-                    "@value": input['title'][0],
-                    "@language": "nl" //  todo: parse from source, what language is used?
-                }
-
-                // todo: alternatieve titel.
-
-                // startdatum + einddatum tentoonstelling.
-                if (input['date.start'] && input['date.end']) mappedObject["Gebeurtenis.tijd"] = {
-                    "@value": input["date.start"] + "/" + input["date.end"],
-                }
-
-                // locatie waar de tentoonstelling ploatsvindt.
-                if (input.venue[0]['venue'] && input.venue[0]['venue.lref']) {
-                    const placeURI = await this._adlib.getURIFromPriref("personen", input.venue[0]["venue.lref"], "concept");
-                    const placeLabel = input.venue[0]['venue']
-                    mappedObject["Gebeurtenis.plaats"] = {
-                        "@type": "Plaats",
-                        "equivalent": {
-                            "@id": placeURI,
-                            "skos.prefLabel": {
-                                "@value": placeLabel,
-                                "@language": "nl"
-                            }
-                        }
-                    }
-                }
-
-                // organisator van de tentoonstelling
-                if (input.organiser[0]["organiser"] && input.organiser[0]["organiser.lref"]) {
-                    const placeURI = await this._adlib.getURIFromPriref("personen", input.organiser[0]["organiser.lref"], "concept");
-                    const placeLabel = input.organiser[0]["organiser"];
-                    mappedObject["uitgevoerdDoor"] = {
-                        "@type": "Organisatie",
-                        "equivalent": {
-                            "@id": placeURI,
-                            "skos.prefLabel": {
-                                "@value": placeLabel,
-                                "@language": "nl"
-                            }
-                        }
-                    }
-                }
-
-                // objecten tentoongesteld in tentoonstelling (obejctnummer + titel) //todo: if published; add URI.
-                if (input.Object && input.Object[0]) {
-                    let objecten = [];
-                    for (let p in input.Object) {
-                        if (input.Object[p]['object.object_number'] && input.Object[p]['object.object_number'][0]) {
-                            const obj_number = input.Object[p]['object.object_number'][0];
-                            const obj_title = input.Object[p]['object.title'][0];
-
-                            const obj_uri = await this._adlib.getURIFromPriref("objecten", input.Object[p]['object.object_number.lref'], "mensgemaaktobject", "dmg");
-
-                            // check if object is already published (has URI)
-                            if (obj_uri) {
-                                const object = {
-                                    "@id": obj_uri,
-                                    "Object.identificator": obj_number,
-                                    "MensgemaaktObject.titel": obj_title,
-                                };
-                                objecten.push(object);
-                            }
-
-                            // else publish without URI
-                            else {
-                                const object = {
-                                    "Object.identificator": obj_number,
-                                    "MensgemaaktObject.titel": obj_title,
-                                };
-                                objecten.push(object);
-                            }
-
-                        }
-                    }
-                    if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
-                    mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
-                }
-
-                console.log(mappedObject);
-                done(null, JSON.stringify(mappedObject));
+            //{
+            mappedObject["@id"] = versionURI;
+            mappedObject["@type"] = "Activiteit";
+            mappedObject["Entiteit.type"] = {
+                "@id": "http://vocab.getty.edu/aat/300417531",
+                "@value": "tentoonstelling"
             }
+            // Event stream metadata
+            mappedObject["dcterms:isVersionOf"] = objectURI;
+            mappedObject["prov:generatedAtTime"] = now;
+
+            // referentienummer
+            if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
+            if (input['reference_number'] && input['reference_number'][0]) {
+                const id = {
+                    "@type": "Identificator",
+                    "Identificator.identificator": {
+                        "@value": input["reference_number"][0],
+                        "@type": `${this._baseURI}identificatiesysteem/referentienummer`
+                    }
+                }
+                    mappedObject["Object.identificator"].push(id);
+            }
+
+            // priref
+            const prirefIdentificator = {
+                "@type": "Identificator",
+                "Identificator.identificator": {
+                    "@value": priref,
+                    "@type": `${this._baseURI}identificatiesysteem/priref`
+                }
+            };
+            mappedObject["Object.identificator"].push(prirefIdentificator);
+
+            // tentoonstellingstitel
+            if (input['title'] && input['title'][0]) mappedObject["InformatieObject.titel"] = {
+                "@value": input['title'][0],
+                "@language": "nl" //  todo: parse from source, what language is used?
+            }
+
+            // todo: alternatieve titel.
+
+            // startdatum + einddatum tentoonstelling.
+            if (input['date.start'] && input['date.end']) mappedObject["Gebeurtenis.tijd"] = {
+                "@value": input["date.start"] + "/" + input["date.end"],
+                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+            }
+
+            // locatie waar de tentoonstelling ploatsvindt.
+            if (input.venue[0]['venue'] && input.venue[0]['venue.lref']) {
+                const placeURI = await this._adlib.getURIFromPriref("personen", input.venue[0]["venue.lref"], "concept");
+                const placeLabel = input.venue[0]['venue']
+                mappedObject["Gebeurtenis.plaats"] = {
+                    "@type": "Plaats",
+                    "equivalent": {
+                        "@id": placeURI,
+                        "skos.prefLabel": {
+                            "@value": placeLabel,
+                            "@language": "nl"
+                        }
+                    }
+                }
+            }
+
+            // organisator van de tentoonstelling
+            if (input.organiser[0]["organiser"] && input.organiser[0]["organiser.lref"]) {
+                const placeURI = await this._adlib.getURIFromPriref("personen", input.organiser[0]["organiser.lref"], "concept");
+                const placeLabel = input.organiser[0]["organiser"];
+                mappedObject["uitgevoerdDoor"] = {
+                    "@type": "Organisatie",
+                    "equivalent": {
+                        "@id": placeURI,
+                        "skos.prefLabel": {
+                            "@value": placeLabel,
+                            "@language": "nl"
+                        }
+                    }
+                }
+            }
+
+            // objecten tentoongesteld in tentoonstelling (obejctnummer + titel) //todo: if published; add URI.
+            if (input.Object && input.Object[0]) {
+                let objecten = [];
+                for (let p in input.Object) {
+                    if (input.Object[p]['object.object_number'] && input.Object[p]['object.object_number'][0]) {
+                        const obj_number = input.Object[p]['object.object_number'][0];
+                        const obj_title = input.Object[p]['object.title'][0];
+
+                        const obj_uri = await this._adlib.getURIFromPriref("objecten", input.Object[p]['object.object_number.lref'], "mensgemaaktobject", "dmg");
+
+                        // check if object is already published (has URI)
+                        if (obj_uri) {
+                            const object = {
+                                "@id": obj_uri,
+                                "Object.identificator": obj_number,
+                                "MensgemaaktObject.titel": obj_title,
+                            };
+                            objecten.push(object);
+                        }
+
+                        // else publish without URI
+                        else {
+                            const object = {
+                                "Object.identificator": obj_number,
+                                "MensgemaaktObject.titel": obj_title,
+                            };
+                            objecten.push(object);
+                        }
+
+                    }
+                }
+                if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
+                mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+            }
+
+            console.log(mappedObject);
+            done(null, JSON.stringify(mappedObject));
+            //}
         } catch (e) {
             console.error(e);
         }

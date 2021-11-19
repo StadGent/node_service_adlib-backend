@@ -179,7 +179,7 @@ function startPersonen() {
 function startTentoonstellingen() {
     correlator.withId(async () => {
         let options = {
-            "institution": "DMG", // one list for all institutions
+            "institution": "dmg", // one list for all institutions
             "adlibDatabase": "tentoonstellingen",
             "type": "tentoonstelling",
             //todo:"InstitutionID": "57", //only fetch tentoonstelling data from Design Museum Gent
