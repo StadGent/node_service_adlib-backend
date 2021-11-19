@@ -122,8 +122,8 @@ export default class TentoonstellingMapper extends Transform {
 
             // locatie waar de tentoonstelling ploatsvindt.
             if (input.venue[0]['venue'] && input.venue[0]['venue.lref']) {
-                const placeURI = await this._adlib.getURIFromPriref("personen", input.venue[0]["venue.lref"], "concept");
-                const placeLabel = input.venue[0]['venue']
+                const placeURI = await this._adlib.getURIFromPriref("personen", input.venue[0]["venue.lref"][0], "concept");
+                const placeLabel = input.venue[0]['venue'][0];
                 mappedObject["Gebeurtenis.plaats"] = {
                     "@type": "Plaats",
                     "equivalent": {
@@ -138,8 +138,8 @@ export default class TentoonstellingMapper extends Transform {
 
             // organisator van de tentoonstelling
             if (input.organiser[0]["organiser"] && input.organiser[0]["organiser.lref"]) {
-                const placeURI = await this._adlib.getURIFromPriref("personen", input.organiser[0]["organiser.lref"], "concept");
-                const placeLabel = input.organiser[0]["organiser"];
+                const placeURI = await this._adlib.getURIFromPriref("personen", input.organiser[0]["organiser.lref"][0], "concept");
+                const placeLabel = input.organiser[0]["organiser"][0];
                 mappedObject["uitgevoerdDoor"] = {
                     "@type": "Organisatie",
                     "equivalent": {
@@ -159,28 +159,35 @@ export default class TentoonstellingMapper extends Transform {
                     if (input.Object[p]['object.object_number'] && input.Object[p]['object.object_number'][0]) {
                         const obj_number = input.Object[p]['object.object_number'][0];
                         const obj_title = input.Object[p]['object.title'][0];
+                        const obj_priref = input.Object[p]['object.object_number.lref'][0];
+                        const obj_uri = await this._adlib.getURIFromPriref("objecten", obj_priref, "mensgemaaktobject", "dmg");
 
-                        const obj_uri = await this._adlib.getURIFromPriref("objecten", input.Object[p]['object.object_number.lref'], "mensgemaaktobject", "dmg");
+                        const object = {
+                            "@id": obj_uri,
+                            "MensgemaaktObject.titel": obj_title
+                        };
 
-                        // check if object is already published (has URI)
-                        if (obj_uri) {
-                            const object = {
-                                "@id": obj_uri,
-                                "Object.identificator": obj_number,
-                                "MensgemaaktObject.titel": obj_title,
-                            };
-                            objecten.push(object);
-                        }
+                        const objectnummer_identificator = {
+                            "@type": "Identificator",
+                            "Identificator.identificator": {
+                                "@value": obj_number,
+                                "@type": `${this._baseURI}identificatiesysteem/objectnummer`
+                            }
+                        };
 
-                        // else publish without URI
-                        else {
-                            const object = {
-                                "Object.identificator": obj_number,
-                                "MensgemaaktObject.titel": obj_title,
-                            };
-                            objecten.push(object);
-                        }
+                        const priref_identificator = {
+                            "@type": "Identificator",
+                            "Identificator.identificator": {
+                                "@value": obj_priref,
+                                "@type": `${this._baseURI}identificatiesysteem/priref`
+                            }
+                        };
+                        object["Object.identificator"] = [];
+                        object["Object.identificator"].push(objectnummer_identificator);
+                        object["Object.identificator"].push(priref_identificator);
 
+
+                        objecten.push(object);
                     }
                 }
                 if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
