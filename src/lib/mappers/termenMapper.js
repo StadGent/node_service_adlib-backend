@@ -275,7 +275,6 @@ export default class TermenMapper extends Transform {
                     // achternaam
                     let achternaam = ""
                     if (input['surname'] && input['surname'][0]) {
-                        achternaam = input['surname'][0];
                         for (const f in input['surname'])
                             achternaam += input['surname'][f];
                         mappedObject["achternaam"] = achternaam;
@@ -296,8 +295,8 @@ export default class TermenMapper extends Transform {
 
                     // geslacht
                     if (input['gender'] && input['gender'][0]) {
-                        if (input['gender'][0]["value"].contains('man')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/MALE";
-                        else if (input['gender'][0]["value"].contains('vrouw')) mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/FEMALE";
+                        if (input['gender'][0]["value"][0] === 'MALE') mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/MALE";
+                        else if (input['gender'][0]["value"][0] === 'FEMALE') mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/FEMALE";
                         else mappedObject["geslacht"] = "http://publications.europa.eu/resource/authority/human-sex/NKN";
                     }
 

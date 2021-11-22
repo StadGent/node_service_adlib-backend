@@ -101,6 +101,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
         else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
+        else if (this._adlibDatabase === "tentoonstellingen" && this._institution === "dmg") querypath += `priref Greater '530000000' And priref Smaller '540000000' And reference_number = "TE_2020*"`;
         else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
         else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
         else querypath += "all";
@@ -170,22 +171,18 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         await sleep(timeout);
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    await (async () => {
-        // Get data from Redis cache.
-        let object = await redisClient.get(querypath);
-        if (object) {
-            object = JSON.parse(object);
-            console.log('Read from Redis.');
-        } else {
-            object = await this.fetchWithNTLM(querypath);
-            console.log('Read from Adlib.');
-            await redisClient.set(querypath, JSON.stringify(object));
-        }
+    // Get data from Redis cache.
+    let object = await redisClient.get(querypath);
+    if (object) {
+        object = JSON.parse(object);
+    } else {
+        object = await this.fetchWithNTLM(querypath);
+        await redisClient.setEx(querypath, 3600, JSON.stringify(object));
+    }
 
-        if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
-            return Utils.getURIFromRecord(object.adlibJSON.recordList.record[0], priref, type, database);
-        } else {
-            return Utils.getURIFromRecord(null, priref, type, database);
-        }
-    })();
+    if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
+        return Utils.getURIFromRecord(object.adlibJSON.recordList.record[0], priref, type, database);
+    } else {
+        return Utils.getURIFromRecord(null, priref, type, database);
+    }
 };

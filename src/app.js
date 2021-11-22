@@ -5,6 +5,7 @@ import HvAMapper from "./lib/mappers/hvaMapper";
 import ArchiefGentMapper from "./lib/mappers/archiefGentMapper";
 import IndustriemuseumMapper from "./lib/mappers/IndustriemuseumMapper";
 import TermenMapper from "./lib/mappers/termenMapper";
+import TentoonstellingMapper from "./lib/mappers/tentoonstellingMapper";
 import Backend from "./lib/Backend";
 import Utils from './lib/utils.js';
 import Config from "./config/config.js";
@@ -46,6 +47,7 @@ async function start() {
 
         startThesaurus();
         startPersonen();
+        startTentoonstellingen();
     });
 }
 
@@ -172,6 +174,25 @@ function startPersonen() {
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.pipe(thesaurusMapper).pipe(backend);
     });
+}
+
+function startTentoonstellingen() {
+    correlator.withId(async () => {
+        let options = {
+            "institution": "dmg", // one list for all institutions
+            "adlibDatabase": "tentoonstellingen",
+            "type": "tentoonstelling",
+            //todo:"InstitutionID": "57", //only fetch tentoonstelling data from Design Museum Gent
+            "db": sequelize,
+            "checkEuropeanaFlag": false,
+            "correlator": correlator
+        };
+        const backend = new Backend(options);
+        const objectAdlib = new Adlib(options);
+        options["adlib"] = objectAdlib;
+        const tentoonstellingsMapper = new TentoonstellingMapper(options);
+        objectAdlib.pipe(tentoonstellingsMapper).pipe(backend);
+    })
 }
 
 function startHealthcheckAPI() {
