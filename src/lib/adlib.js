@@ -175,10 +175,8 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     let object = await redisClient.get(querypath);
     if (object) {
         object = JSON.parse(object);
-        console.log('Read from Redis.');
     } else {
         object = await this.fetchWithNTLM(querypath);
-        console.log('Read from Adlib.');
         await redisClient.setEx(querypath, 3600, JSON.stringify(object));
     }
 
