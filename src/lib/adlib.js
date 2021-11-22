@@ -171,7 +171,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         await sleep(timeout);
     }
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    //Get data from Redis cache.
+    // Get data from Redis cache.
     let object = await redisClient.get(querypath);
     if (object) {
         object = JSON.parse(object);
