@@ -179,7 +179,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     } else {
         object = await this.fetchWithNTLM(querypath);
         console.log('Read from Adlib.');
-        await redisClient.set(querypath, JSON.stringify(object));
+        await redisClient.setEx(querypath, 3600, JSON.stringify(object));
     }
 
     if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0] && object.adlibJSON.recordList.record[0].source) {
