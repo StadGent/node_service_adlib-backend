@@ -194,9 +194,7 @@ export default class TentoonstellingMapper extends Transform {
                 mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
             }
 
-            console.log(mappedObject);
             done(null, JSON.stringify(mappedObject));
-            //}
         } catch (e) {
             console.error(e);
         }
