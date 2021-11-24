@@ -392,6 +392,8 @@ export default class TermenMapper extends Transform {
                     }
                 }
                 done(null, JSON.stringify(mappedObject));
+            } else {
+                done();
             }
         } catch (e) {
             console.error(e);
