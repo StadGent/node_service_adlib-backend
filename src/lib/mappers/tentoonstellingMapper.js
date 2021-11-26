@@ -1,5 +1,5 @@
 import { Transform } from 'stream';
-import Utils from "../utils.js";
+import MainUtils from "../utils.js";
 import Config from "../../config/config";
 import Adlib from "../adlib.js";
 
@@ -62,6 +62,7 @@ export default class TentoonstellingMapper extends Transform {
             let now = new Date().toISOString();
             let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
             const priref = input["@attributes"].priref;
+            MainUtils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/tentoonstellingMapper.js:doMapping", "INFO", this._correlator.getId());
             const ref_number = input["reference_number"]
 
             //URI template: https://stad.gent/id/{type}/{scheme-id}/{concept-ref}
