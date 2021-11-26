@@ -1,4 +1,5 @@
 import Utils from "./utils.js";
+import MainUtils from "../utils.js";
 import ObjectMapper from "./objectMapper";
 
 export default class ArchiefGentMapper extends ObjectMapper {
@@ -18,6 +19,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
         try {
             let now = new Date().toISOString();
             let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
+            MainUtils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/archiefGentMapper.js:doMapping", "INFO", this._correlator.getId());
             let versionURI = objectURI + "/" + now;
             mappedObject["@id"] = versionURI;
             mappedObject["@type"] = "MensgemaaktObject";
