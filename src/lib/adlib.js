@@ -14,7 +14,7 @@ redisClient.connect();
 
 export default class Adlib extends Readable {
     constructor(options) {
-        super({objectMode: true});
+        super({objectMode: true, highWaterMark: 10});
 
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
@@ -22,20 +22,14 @@ export default class Adlib extends Readable {
         this._checkEuropeanaFlag = typeof options.checkEuropeanaFlag !== 'undefined' ? options.checkEuropeanaFlag : true;
         this._db = options.db;
         this._correlator = options.correlator;
-        this._buffer = [];
         this.run();
     }
 }
 
 Adlib.prototype._read = async function() {
-    try {
-        if (this._buffer && this._buffer.length) this.push(this._buffer.pop());
-        else {
-            this.once('object fetched', this._read);
-        }
-    } catch (e) {
-        console.error(e);
-    }
+    // Called every time this.push() is run
+    // to control whether to fetch new objects
+    // Here, control is implemented in function fetchWithNTLMRecursively
 }
 
 Adlib.prototype.run = async function () {
@@ -119,14 +113,13 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
               let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
               if (timeout > 0) {
                   await sleep(timeout);
-                  while (this._buffer.length > limit) {
-                      Utils.log("Waiting until buffer count (" + this._buffer.length + ") is lower than " + limit, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                  while (this.readableLength > limit) {
+                      Utils.log("Waiting until buffer count (" + this.readableLength + ") is lower than " + limit, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
                       await sleep(timeout);
                   }
               }
-                Utils.log("Adding object to buffer", "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
-                this._buffer.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
-                this.emit('object fetched');
+                Utils.log("Adding object " + objects.adlibJSON.recordList.record[i]["@attributes"].priref + " to buffer", "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                this.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
             }
             hits = objects.adlibJSON.diagnostic.hits;
             Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
