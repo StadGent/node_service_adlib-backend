@@ -109,15 +109,15 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
         let objects = await this.fetchWithNTLM(querypath);
         if(objects.adlibJSON.diagnostic.hits_on_display != "0" && objects.adlibJSON.recordList) {
             for (let i in objects.adlibJSON.recordList.record) {
-              // Wait for adlib.
-              let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
-              if (timeout > 0) {
-                  await sleep(timeout);
-                  while (this.readableLength > limit) {
-                      Utils.log("Waiting until buffer count (" + this.readableLength + ") is lower than " + limit, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
-                      await sleep(timeout);
-                  }
-              }
+                // Wait for adlib.
+                let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
+                await sleep(timeout);
+
+                while (this.readableLength > limit) {
+                    Utils.log("Waiting until buffer count (" + this.readableLength + ") is lower than " + limit, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                    await sleep(timeout);
+                }
+
                 Utils.log("Adding object " + objects.adlibJSON.recordList.record[i]["@attributes"].priref + " to buffer", "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
                 this.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
             }
@@ -154,15 +154,17 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
 };
 
 function sleep(ms) {
+    if (process.env.ADLIB_SLEEP_URI) {
+        Utils.log('Sleeping: ' + ms + 'ms', "adlib-backend/lib/adlib.js:sleep", "INFO", self._correlator.getId());
+    }
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
     // Wait for adlib.
-    let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
-    if (timeout > 0) {
-        await sleep(timeout);
-    }
+    let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 100;
+    await sleep(timeout);
+
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
     // Get data from Redis cache.
     let object = await redisClient.get(querypath);
