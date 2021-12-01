@@ -163,6 +163,8 @@ module.exports = {
     mapObjectnaam: async (objectURI, input, mappedObject, adlib) => {
         let c = [];
         for(let o in input.Object_name) {
+            if (!input.Object_name[o]) continue;
+
             const objectnaamURI = await adlib.getURIFromPriref("thesaurus",input.Object_name[o]['object_name.lref'][0], "concept");
 
             c.push({
