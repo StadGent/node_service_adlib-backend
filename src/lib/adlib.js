@@ -75,7 +75,7 @@ Adlib.prototype.run = async function () {
         lastModifiedDate = maxGeneratedAtTime;
     }
 
-    let startFrom = 0;
+    let startFrom = 1;
     await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
 
     if (lastPriref) {
