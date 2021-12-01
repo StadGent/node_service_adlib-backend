@@ -52,12 +52,12 @@ export default class TermenMapper extends Transform {
         let mappedObject = {};
         mappedObject["@context"] = this._context;
 
-        try {
-            let now = new Date().toISOString();
-            let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
-            const priref = input["@attributes"].priref;
-            Utils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/termenMapper.js:doMapping", "INFO", this._correlator.getId());
+        let now = new Date().toISOString();
+        let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
+        const priref = input["@attributes"].priref;
+        Utils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/termenMapper.js:doMapping", "INFO", this._correlator.getId());
 
+        try {
             // URI template: https://stad.gent/id/{type}/{scheme-id}/{concept-ref}
             let objectURI = baseURI + this._type + "/" + priref;
             let versionURI = objectURI + "/" + now;
@@ -399,6 +399,7 @@ export default class TermenMapper extends Transform {
             }
         } catch (e) {
             console.error(e);
+            console.log('Error mapping priref ' + priref);
         }
     }
 }
