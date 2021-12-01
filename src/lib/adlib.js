@@ -79,12 +79,12 @@ Adlib.prototype.run = async function () {
     await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
 
     if (lastPriref) {
-        Utils.log("All objects for institution " + this._institution + " from previous run are fetched from Adlib! Now retrieving objects starting from " + lastModifiedDate, "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
+        Utils.log("All objects for institution " + this._institution + " from database "  + this._adlibDatabase + " from previous run are fetched from Adlib! Now retrieving objects starting from " + lastModifiedDate, "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
         lastPriref = null; // reset
         await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
     }
-    Utils.log("All objects are fetched from " + this._institution + "!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
     this.push(null);
+    Utils.log("All objects are fetched for " + this._adlibDatabase + " from " + this._institution + "!", "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
 };
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
