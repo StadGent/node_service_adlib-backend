@@ -36,6 +36,12 @@ if (process.env.ADLIB_START) {
 async function start() {
     correlator.withId(async () => {
         Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
+        if (process.env.ADLIB_SLEEP) {
+            Utils.log("Settings ADLIB_SLEEP: " + process.env.ADLIB_SLEEP, "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
+        }
+        if (process.env.ADLIB_SLEEP_URI) {
+            Utils.log("Settings ADLIB_SLEEP_URI: " + process.env.ADLIB_SLEEP_URI, "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
+        }
 
         sequelize = await Utils.initDb(correlator);
 
