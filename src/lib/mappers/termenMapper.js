@@ -66,6 +66,7 @@ export default class TermenMapper extends Transform {
             let isPersoon = false;
             let isInstelling = false;
             for (let p in input['name.type']) {
+                if (!input['name.type'][p]['value']) continue;
                 if (input['name.type'][p]['value'].includes('vervaardiger')) isVervaardiger = true;
                 if (input['name.type'][p]['value'].includes('persoon')) isPersoon = true;
                 if (input['name.type'][p]['value'].includes('instelling')) isInstelling = true;
