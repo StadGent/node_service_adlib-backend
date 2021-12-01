@@ -90,7 +90,7 @@ Adlib.prototype.run = async function () {
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
     let hits = undefined;
     let nextStartFrom = startFrom + limit;
-    while (!hits || (hits && nextStartFrom < hits)) {
+    while (!hits || (hits && nextStartFrom <= hits)) {
         let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
