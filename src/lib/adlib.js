@@ -120,6 +120,9 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
 
                 Utils.log("Adding object " + objects.adlibJSON.recordList.record[i]["@attributes"].priref + " to buffer", "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
                 this.push(JSON.stringify(objects.adlibJSON.recordList.record[i]));
+                if (process.env.ADLIB_DEBUG) {
+                    Utils.log("Debug: readableLength " + this.readableLength, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+                }
             }
             hits = objects.adlibJSON.diagnostic.hits;
             Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
@@ -154,8 +157,8 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
 };
 
 function sleep(ms) {
-    if (process.env.ADLIB_SLEEP_URI) {
-        Utils.log('Sleeping: ' + ms + 'ms', "adlib-backend/lib/adlib.js:sleep", "INFO", self._correlator.getId());
+    if (process.env.ADLIB_DEBUG) {
+        Utils.log('Debug: Sleeping ' + ms + 'ms', "adlib-backend/lib/adlib.js:sleep", "INFO", self._correlator.getId());
     }
     return new Promise(resolve => setTimeout(resolve, ms));
 }
