@@ -53,9 +53,9 @@ export default class TermenMapper extends Transform {
         mappedObject["@context"] = this._context;
 
         let now = new Date().toISOString();
-        let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
         const priref = input["@attributes"].priref;
-        Utils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/termenMapper.js:doMapping", "INFO", this._correlator.getId());
+        let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
+        Utils.log("Mapping object " + priref, "adlib-backend/lib/mappers/termenMapper.js:doMapping", "INFO", this._correlator.getId());
 
         try {
             // URI template: https://stad.gent/id/{type}/{scheme-id}/{concept-ref}
@@ -375,6 +375,8 @@ export default class TermenMapper extends Transform {
                     if (input['Related'] && input['Related'][0]) {
                         let personenrelaties = [];
                         for (let r in input['Related']) {
+                            if (!input['Related'][r]['relationship.notes'] || !input['Related'][r]['relationship.category']) continue;
+
                             const relatedWith = input['Related'][r]['relationship'][0];
                             const relatedWithURI = this._adlib.getURIFromPriref("personen", input['Related'][r]['relationship.lref'][0], "agent");
                             const relatedWithNotes = input['Related'][r]['relationship.notes'][0];
@@ -395,11 +397,12 @@ export default class TermenMapper extends Transform {
                 }
                 done(null, JSON.stringify(mappedObject));
             } else {
+                // Skip this object.
                 done();
             }
         } catch (e) {
-            console.error(e);
-            console.log('Error mapping priref ' + priref);
+            console.error('Error mapping priref ' + priref + ' - ' + e);
+            done();
         }
     }
 }

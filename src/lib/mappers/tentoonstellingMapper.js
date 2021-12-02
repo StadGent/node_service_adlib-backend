@@ -58,13 +58,13 @@ export default class TentoonstellingMapper extends Transform {
         let mappedObject = {};
         mappedObject["@context"] = this._context;
 
-        try {
-            let now = new Date().toISOString();
-            let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
-            const priref = input["@attributes"].priref;
-            MainUtils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/tentoonstellingMapper.js:doMapping", "INFO", this._correlator.getId());
-            const ref_number = input["reference_number"]
+        let now = new Date().toISOString();
+        const priref = input["@attributes"].priref;
+        let baseURI = this._baseURI.endsWith('/') ? this._baseURI : this._baseURI + '/';
+        MainUtils.log("Mapping object " + priref, "adlib-backend/lib/mappers/tentoonstellingMapper.js:doMapping", "INFO", this._correlator.getId());
+        const ref_number = input["reference_number"]
 
+        try {
             //URI template: https://stad.gent/id/{type}/{scheme-id}/{concept-ref}
             let objectURI = baseURI + "tentoonstelling" + '/' + priref;
             let versionURI = objectURI + "/" + now;
@@ -194,10 +194,10 @@ export default class TentoonstellingMapper extends Transform {
                 if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
                 mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
             }
-
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
-            console.error(e);
+            console.error('Error mapping priref ' + priref + ' - ' + e);
+            done();
         }
     }
 }

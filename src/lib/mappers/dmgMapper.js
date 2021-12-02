@@ -16,10 +16,12 @@ export default class DmgMapper extends ObjectMapper {
         let mappedObject = {};
         mappedObject["@context"] = this._context;
 
+        let now = new Date().toISOString();
+        const priref = input["@attributes"].priref;
+        let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + priref;
+        MainUtils.log("Mapping object " + priref, "adlib-backend/lib/mappers/dmgMapper.js:doMapping", "INFO", this._correlator.getId());
+
         try {
-            let now = new Date().toISOString();
-            let objectURI = this._baseURI + "mensgemaaktobject" + '/' + this._institution + '/' + input["@attributes"].priref;
-            MainUtils.log("Mapping object " + input["@attributes"].priref, "adlib-backend/lib/mappers/dmgMapper.js:doMapping", "INFO", this._correlator.getId());
             let versionURI = objectURI + "/" + now;
             mappedObject["@id"] = versionURI;
             mappedObject["@type"] = "MensgemaaktObject";
@@ -58,9 +60,10 @@ export default class DmgMapper extends ObjectMapper {
 
             // reproductie
 
+            done(null, JSON.stringify(mappedObject));
         } catch (e) {
-            console.error(e);
+            console.error('Error mapping priref ' + priref + ' - ' + e);
+            done();
         }
-        done(null, JSON.stringify(mappedObject));
     }
 }
