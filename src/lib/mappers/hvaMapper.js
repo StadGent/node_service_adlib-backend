@@ -50,7 +50,8 @@ export default class HvAMapper extends ObjectMapper {
             await Utils.mapIconografie(input, mappedObject, this._adlib);
 
             // reproductie
-            await Utils.mapIIIFManifest(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapIIIFManifest(input, mappedObject);
+
 
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
