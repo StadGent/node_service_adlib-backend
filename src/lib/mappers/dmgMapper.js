@@ -59,6 +59,7 @@ export default class DmgMapper extends ObjectMapper {
             await Utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
 
             // reproductie
+            //await Utils.mapIIIFManifest(objectURI, input, mappedObject, this._adlib);
 
             done(null, JSON.stringify(mappedObject));
         } catch (e) {

@@ -1011,8 +1011,41 @@ module.exports = {
         }
         if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
         mappedObject["Object.identificator"].push(id);
+    },
+
+    mapIIIFManifest(input, mappedObject) {
+        if (input["object_number"]) {
+            const objectNumber = input["object_number"][0];
+            const manifestURI = `https://api.collectie.gent/iiif/presentation/v2/manifest/${objectNumber}`;
+            const IIIFManifest = {
+                "subject_of": {
+                    "id": manifestURI,
+                    "type": "DigitalObject",
+                    "conforms_to": [{
+                        "id": "http://iiif.example.org/presentation/1/manifest.json",
+                        "type": "InformationObject"
+                    }],
+                    "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\""
+                }
+            };
+            if (!mappedObject["subject_of"]) mappedObject["subject_of"] = [];
+            mappedObject["subject_of"].push(IIIFManifest);
+        }
     }
 };
+
+//{
+// @id: "https://stad.gent/id/mensgemaaktobject/dmg/530026423/2021-06-07T07:15:01.924Z",
+// @type: "ManMadeObject",
+//  "subject_of": [  {
+//       "id": "http://iiif.example.org/presentation/1/manifest.json",
+//       "type": "DigitalObject",
+//       "conforms_to": [ {
+//           "id": "http://iiif.io/api/presentation",
+//           "type": "InformationObject"
+//         }],
+//       "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\""
+// }]
 
 
 // Draft
