@@ -51,7 +51,8 @@ export default class HvAMapper extends ObjectMapper {
 
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
-            console.error('Error mapping priref ' + priref + ' - ' + e);
+            console.error(e);
+            console.error('Error mapping priref ' + priref);
             done();
         }
     }
