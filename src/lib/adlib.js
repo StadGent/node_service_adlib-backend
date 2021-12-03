@@ -164,16 +164,17 @@ function sleep(ms) {
 }
 
 Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
-    // Wait for adlib.
-    let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 100;
-    await sleep(timeout);
-
     let querypath = `?output=json&database=${database}&search=priref=${priref}&limit=1`;
-    // Get data from Redis cache.
+    // Try to get data from Redis cache.
     let object = await redisClient.get(querypath);
     if (object) {
         object = JSON.parse(object);
     } else {
+        // Wait for Adlib.
+        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 100;
+        await sleep(timeout);
+
+        // Get data from Adlib.
         object = await this.fetchWithNTLM(querypath);
         await redisClient.setEx(querypath, 3600, JSON.stringify(object));
     }
