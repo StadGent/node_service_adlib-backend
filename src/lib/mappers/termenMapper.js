@@ -375,7 +375,12 @@ export default class TermenMapper extends Transform {
                     if (input['Related'] && input['Related'][0]) {
                         let personenrelaties = [];
                         for (let r in input['Related']) {
-                            if (!input['Related'][r]['relationship.notes'] || !input['Related'][r]['relationship.category']) continue;
+                            if (
+                                !input['Related'][r]['relationship']
+                                || !input['Related'][r]['relationship.lref']
+                                || !input['Related'][r]['relationship.notes']
+                                || !input['Related'][r]['relationship.category']
+                            ) continue;
 
                             const relatedWith = input['Related'][r]['relationship'][0];
                             const relatedWithURI = this._adlib.getURIFromPriref("personen", input['Related'][r]['relationship.lref'][0], "agent");
