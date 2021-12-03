@@ -57,6 +57,9 @@ export default class IndustriemuseumMapper extends ObjectMapper {
             // Associaties
             await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
 
+            // reproductie
+            await Utils.mapIIIFManifest(objectURI, input, mappedObject, this._adlib);
+
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
             console.error(e);
