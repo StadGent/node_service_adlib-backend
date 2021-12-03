@@ -72,6 +72,9 @@ export default class ArchiefGentMapper extends ObjectMapper {
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
+            // reproductie
+            await Utils.mapIIIFManifest(objectURI, input, mappedObject, this._adlib);
+
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
             console.error(e);
