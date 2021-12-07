@@ -59,9 +59,10 @@ export default class DmgMapper extends ObjectMapper {
             await Utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
 
             // reproductie
-            await Utils.mapIIIFManifest(input, mappedObject);
+            await Utils.mapIIIFManifest(input, mappedObject, MainUtils);
 
             done(null, JSON.stringify(mappedObject));
+            console.log(JSON.stringify(mappedObject));
         } catch (e) {
             console.error(e);
             console.error('Error mapping priref ' + priref);
