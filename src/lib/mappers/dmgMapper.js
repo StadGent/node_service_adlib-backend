@@ -62,7 +62,6 @@ export default class DmgMapper extends ObjectMapper {
             await Utils.mapIIIFManifest(input, mappedObject, MainUtils);
 
             done(null, JSON.stringify(mappedObject));
-            console.log(JSON.stringify(mappedObject));
         } catch (e) {
             console.error(e);
             console.error('Error mapping priref ' + priref);
