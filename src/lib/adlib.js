@@ -92,7 +92,6 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
     let processed = 0;
     let nextStartFrom = startFrom + limit;
     while (!hits || (hits && (startFrom <= hits))) {
-        console.log('hits: ' + hits + ' - startFrom ' + startFrom + ' - nextStartFrom ' + nextStartFrom);
         let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
@@ -112,7 +111,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
         if(objects.adlibJSON.diagnostic.hits_on_display != "0" && objects.adlibJSON.recordList) {
             for (let i in objects.adlibJSON.recordList.record) {
                 // Wait for adlib.
-                let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
+                let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 500;
                 await sleep(timeout);
 
                 while (this.readableLength > limit) {
