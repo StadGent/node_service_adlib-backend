@@ -89,8 +89,10 @@ Adlib.prototype.run = async function () {
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
     let hits = undefined;
+    let processed = 0;
     let nextStartFrom = startFrom + limit;
-    while (!hits || (hits && (nextStartFrom < (hits + 1)))) {
+    while (!hits || (hits && (startFrom <= hits))) {
+        console.log('hits: ' + hits + ' - startFrom ' + startFrom + ' - nextStartFrom ' + nextStartFrom);
         let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
@@ -125,11 +127,12 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
                 }
             }
             hits = objects.adlibJSON.diagnostic.hits;
-            Utils.log("Processed " + nextStartFrom + " / " + hits + " for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+            processed = startFrom - 1 + parseInt(objects.adlibJSON.diagnostic.hits_on_display);
+            Utils.log("Processed " + processed + " / " + hits + " for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
             startFrom = nextStartFrom;
             nextStartFrom = startFrom + limit;
         } else {
-            Utils.log("No more results " + nextStartFrom + " / " + hits + " for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+            Utils.log("No more results for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
             return;
         }
     }
