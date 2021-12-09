@@ -125,7 +125,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
                     console.log("Debug: readableLength " + this.readableLength);
                 }
             }
-            hits = objects.adlibJSON.diagnostic.hits;
+            hits = parseInt(objects.adlibJSON.diagnostic.hits);
             processed = startFrom - 1 + parseInt(objects.adlibJSON.diagnostic.hits_on_display);
             Utils.log("Processed " + processed + " / " + hits + " for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
             startFrom = nextStartFrom;
