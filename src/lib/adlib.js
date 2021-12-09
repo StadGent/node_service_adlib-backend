@@ -68,7 +68,7 @@ Adlib.prototype.run = async function () {
                 getPrirefFromURI = lastURI.split('/')[(lastURI.split('/').indexOf("id")+2)];
             }
         } catch (e) {
-            Utils.log('Failed to retrieve priref from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId());
+            Utils.log('Failed to retrieve priref for institution ' + this._institution + ' from database '  + this._adlibDatabase + ' from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId());
         }
         if (getPrirefFromURI) lastPriref = getPrirefFromURI;
         // update lastModifiedDate
