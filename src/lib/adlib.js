@@ -111,7 +111,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
         if(objects.adlibJSON.diagnostic.hits_on_display != "0" && objects.adlibJSON.recordList) {
             for (let i in objects.adlibJSON.recordList.record) {
                 // Wait for adlib.
-                let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 500;
+                let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
                 await sleep(timeout);
 
                 while (this.readableLength > limit) {
@@ -174,7 +174,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         object = JSON.parse(object);
     } else {
         // Wait for Adlib.
-        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 100;
+        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
         await sleep(timeout);
 
         // Get data from Adlib.
