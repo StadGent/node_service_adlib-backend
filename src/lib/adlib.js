@@ -68,7 +68,7 @@ Adlib.prototype.run = async function () {
                 getPrirefFromURI = lastURI.split('/')[(lastURI.split('/').indexOf("id")+2)];
             }
         } catch (e) {
-            Utils.log('Failed to retrieve priref from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId());
+            Utils.log('Failed to retrieve priref for institution ' + this._institution + ' from database '  + this._adlibDatabase + ' from URI: ' + lastURI, "adlib-backend/lib/adlib.js", "INFO", this._correlator.getId());
         }
         if (getPrirefFromURI) lastPriref = getPrirefFromURI;
         // update lastModifiedDate
@@ -89,8 +89,9 @@ Adlib.prototype.run = async function () {
 
 Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, lastPriref, startFrom, limit) {
     let hits = undefined;
+    let processed = 0;
     let nextStartFrom = startFrom + limit;
-    while (!hits || (hits && nextStartFrom < hits + 1)) {
+    while (!hits || (hits && (startFrom <= hits))) {
         let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
@@ -124,11 +125,13 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
                     console.log("Debug: readableLength " + this.readableLength);
                 }
             }
-            hits = objects.adlibJSON.diagnostic.hits;
-            Utils.log("number of hits: " + hits, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
+            hits = parseInt(objects.adlibJSON.diagnostic.hits);
+            processed = startFrom - 1 + parseInt(objects.adlibJSON.diagnostic.hits_on_display);
+            Utils.log("Processed " + processed + " / " + hits + " for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
             startFrom = nextStartFrom;
             nextStartFrom = startFrom + limit;
         } else {
+            Utils.log("No more results for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
             return;
         }
     }
@@ -171,7 +174,7 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         object = JSON.parse(object);
     } else {
         // Wait for Adlib.
-        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 100;
+        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
         await sleep(timeout);
 
         // Get data from Adlib.
