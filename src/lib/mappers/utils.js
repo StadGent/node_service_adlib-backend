@@ -71,7 +71,7 @@ module.exports = {
                 const id = {
                     "@type": "Identificator",
                     "Identificator.identificator": {
-                        "@value": input["Alternative_number"],
+                        "@value": number,
                         "@type": `${baseURI}identificatiesysteem/${type}`
                     },
                     "Entiteit.type" : {
