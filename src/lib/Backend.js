@@ -13,7 +13,7 @@ class Backend extends Writable {
 }
 
 Backend.prototype._write = function (chunk, encoding, done) {
-    // write object  to file
+    // write object to file
     let object = JSON.parse(chunk);
     Utils.insertObject(this._institution, this._db, object, this._adlibDatabase, this._correlator);
     done();

@@ -8,6 +8,10 @@ export const attributes = {
         primaryKey: true,
         autoIncrement: true
     },
+    done: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     URI: {
         type: DataTypes.STRING,
         allowNull: false
