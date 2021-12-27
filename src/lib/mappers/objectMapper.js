@@ -28,9 +28,18 @@ export default class ObjectMapper extends Transform {
                 "cest": "https://www.projectcest.be/wiki/Publicatie:Invulboek_objecten/Veld/",
                 "inhoud": "http://www.cidoc-crm.org/cidoc-crm/P190_has_symbolic_content",
                 "la": "https://linked.art/ns/terms/",
+                "conforms_to": {
+                    "@id": "dcterms:conformsTo",
+                    "@type": "@id",
+                    "@container": "@set"
+                },
                 "equivalent": {
                     "@id": "la:equivalent",
                     "@type": "@id"
+                },
+                "dig": "http://www.ics.forth.gr/isl/CRMdig/",
+                "DigitalObject": {
+                    "@id": "dig:D1_Digital_Object"
                 }
             }
         ];
