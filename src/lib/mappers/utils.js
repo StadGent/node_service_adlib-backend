@@ -71,7 +71,7 @@ module.exports = {
                 const id = {
                     "@type": "Identificator",
                     "Identificator.identificator": {
-                        "@value": input["Alternative_number"],
+                        "@value": number,
                         "@type": `${baseURI}identificatiesysteem/${type}`
                     },
                     "Entiteit.type" : {
@@ -1013,27 +1013,26 @@ module.exports = {
         mappedObject["Object.identificator"].push(id);
     },
 
-    mapIIIFManifest(input, mappedObject) {
+    mapIIIFManifest(input, mappedObject, utils) {
         if (input["object_number"]) {
+            const priref = input["@attributes"].priref;
+            const institution =  utils.getInstitutionNameFromPriref(priref);
             const objectNumber = input["object_number"][0];
-            const manifestURI = `https://api.collectie.gent/iiif/presentation/v2/manifest/${objectNumber}`;
+            const manifestURI = `https://api.collectie.gent/iiif/presentation/v2/manifest/${institution}:${objectNumber}`;
             const IIIFManifest = {
-                "subject_of": {
-                    "id": manifestURI,
-                    "type": "DigitalObject",
-                    "conforms_to": [{
-                        "id": "http://iiif.example.org/presentation/1/manifest.json",
-                        "type": "InformationObject"
-                    }],
-                    "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\""
-                }
+                "id": manifestURI,
+                "type": "DigitalObject",
+                "conforms_to": [{
+                    "id": "http://iiif.example.org/presentation/1/manifest.json",
+                    "type": "InformatieObject"
+                }],
+                "format": 'application/ld+json;profile=\\"http://iiif.io/api/presentation/3/context.json\\"'
             };
-            if (!mappedObject["subject_of"]) mappedObject["subject_of"] = [];
-            mappedObject["subject_of"].push(IIIFManifest);
+            if (!mappedObject["Entiteit.isHetOnderwerpVan"]) mappedObject["Entiteit.isHetOnderwerpVan"] = [];
+            mappedObject["Entiteit.isHetOnderwerpVan"].push(IIIFManifest);
         }
     }
 };
-
 
 // Draft
 function processCondition(id, condition) {
