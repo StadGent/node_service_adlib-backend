@@ -71,6 +71,8 @@ function startHva() {
         options["adlib"] = objectAdlib;
         let objectMapper = new HvAMapper(options);
         objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
 }
 
@@ -89,6 +91,8 @@ function startDmg() {
         options["adlib"] = objectAdlib;
         let objectMapper = new DmgMapper(options);
         objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
 }
 
@@ -107,6 +111,8 @@ function startIndustriemuseum() {
         options["adlib"] = objectAdlib;
         let objectMapper = new IndustriemuseumMapper(options);
         objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
 }
 
@@ -125,6 +131,8 @@ function startArchiefgent() {
         options["adlib"] = objectAdlib;
         let objectMapper = new ArchiefGentMapper(options);
         objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
 }
 
@@ -143,6 +151,8 @@ function startStam() {
         options["adlib"] = objectAdlib;
         let objectMapper = new StamMapper(options);
         objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
 }
 
@@ -161,6 +171,8 @@ function startThesaurus() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.pipe(thesaurusMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, thesaurusMapper, backend, correlator);
     });
 }
 
@@ -179,6 +191,8 @@ function startPersonen() {
         options["adlib"] = objectAdlib;
         const thesaurusMapper = new TermenMapper(options);
         objectAdlib.pipe(thesaurusMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, thesaurusMapper, backend, correlator);
     });
 }
 
@@ -198,7 +212,28 @@ function startTentoonstellingen() {
         options["adlib"] = objectAdlib;
         const tentoonstellingsMapper = new TentoonstellingMapper(options);
         objectAdlib.pipe(tentoonstellingsMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, tentoonstellingsMapper, backend, correlator);
     })
+}
+
+function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator) {
+    objectAdlib.on('end', async () => {
+        let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
+        while (objectMapper.readableLength > 0 || objectMapper.writableLength > 0 || backend.writableLength > 0) {
+            Utils.log("Waiting until buffers of mapper (Writable: " + objectMapper.writableLength + ") and backend (Readable: " + backend.readableLength + " | Writable: " + backend.writableLength + ") are empty", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+            await sleep(timeout);
+        }
+        // Save integrity check
+        await objectAdlib.updateLastRecordWithDone();
+        Utils.log("Updated last record with done", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+    });
+}
+function sleep(ms) {
+    if (process.env.ADLIB_DEBUG) {
+        console.log('Debug: Sleeping ' + ms + 'ms');
+    }
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function startHealthcheckAPI() {

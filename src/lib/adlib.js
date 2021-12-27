@@ -32,6 +32,31 @@ Adlib.prototype._read = async function() {
     // Here, control is implemented in function fetchWithNTLMRecursively
 }
 
+Adlib.prototype.updateLastRecordWithDone = async function () {
+    const maxGeneratedAtTime = await this._db.models.Member.max('generatedAtTime', {
+        where: {
+            institution: this._institution,
+            adlibDatabase: this._adlibDatabase,
+            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+        }
+    });
+    const lastURI = await this._db.models.Member.max('URI', {
+        where: {
+            institution: this._institution,
+            adlibDatabase: this._adlibDatabase,
+            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0',
+            generatedAtTime: maxGeneratedAtTime
+        }
+    });
+    const lastObject = await this._db.models.Member.findOne({
+        where: {
+            URI: lastURI,
+            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+        }
+    });
+    lastObject.done = true;
+    await lastObject.save();
+}
 Adlib.prototype.run = async function () {
     const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
 
@@ -39,6 +64,7 @@ Adlib.prototype.run = async function () {
     var adlibDatabase = this._adlibDatabase;
     let lastModifiedDate = null;
     let lastPriref = null;
+    let lastWasDone = false;
     let maxGeneratedAtTime = await this._db.models.Member.max('generatedAtTime', {
         where: {
             institution: institution,
@@ -55,6 +81,12 @@ Adlib.prototype.run = async function () {
                 generatedAtTime: maxGeneratedAtTime
             }
         });
+        const lastObject = await this._db.models.Member.findOne({
+            where: {
+                URI: lastURI
+            }
+        });
+        if (lastObject.done) lastWasDone = true;
 
         let getPrirefFromURI = null;
         try {
@@ -75,6 +107,7 @@ Adlib.prototype.run = async function () {
         lastModifiedDate = maxGeneratedAtTime;
     }
 
+    if (lastWasDone) lastPriref = null; // don't repeat previous run to prevent duplicates
     let startFrom = 1;
     await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
 
