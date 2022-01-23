@@ -1,3 +1,5 @@
+import MainUtils from "../utils.js";
+
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
@@ -112,7 +114,8 @@ module.exports = {
             for (let p in input['Parts']) {
                 if (input['Parts'][p]['parts.title'] && input['Parts'][p]['parts.title'][0]) {
                     const title = input['Parts'][p]['parts.title'][0];
-                    const objectURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                    const institution = MainUtils.getInstitutionNameFromPriref(input['Parts'][p]['parts_reference.lref'][0]);
+                    const objectURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject/"+institution);
                     const object = {
                         "@id": objectURI,
                         "@type": "MensgemaaktObject",
@@ -139,7 +142,8 @@ module.exports = {
             for (let p in input['Parts']) {
                 if (input['Parts'][p]['parts_reference.lref'] && input['Parts'][p]['parts_reference.lref'][0]) {
                     const naam = (input['Parts'][p]['parts.title'] && input['Parts'][p]['parts.title'][0]) ? input['Parts'][p]['parts.title'][0] : "";
-                    const stukURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject");
+                    const institution = MainUtils.getInstitutionNameFromPriref(input['Parts'][p]['parts_reference.lref'][0]);
+                    const stukURI = await adlib.getURIFromPriref("objecten", input['Parts'][p]['parts_reference.lref'][0], "mensgemaaktobject/"+institution);
                     const stuk = {
                         "@id": stukURI,
                         "@type": "Stuk",
