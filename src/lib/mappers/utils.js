@@ -928,15 +928,17 @@ module.exports = {
                         "Entiteit.type": []
                     };
                     const eigennaamLabel = input["Content_subject"][s]["content.subject.name"][0];
+                    const subject_surnameURI = await adlib.getURIFromPriref("thesaurus", input["Content_subject"][s]["content.subject.name.lref"][0], "concept")
 
                     e["Entiteit.type"].push({
-                        "label": {
+                        "@id": subject_surnameURI,
+                        "skos:preflabel": {
                             "@value": eigennaamLabel,
                             "@language": "nl"
                         }
                     });
                     e["Entiteit.type"].push({
-                        "@id": "cest:Eigennaam_afgebeeld_onderwerp", // nog toe te voegen in CEST
+                        "@id": "cest:Eigennaam_afgebeeld_onderwerp", // todo: nog toe te voegen in CEST
                         "label": "inhoud.onderwerp.eigennaam"
                     });
                     mappedObject["Entiteit.beeldtUit"].push(e);
