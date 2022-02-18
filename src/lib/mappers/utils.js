@@ -356,6 +356,7 @@ module.exports = {
                         date = p['production.date.start'][0];
                         if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
                         date += "/";
+                        productie_date["@value"] = date; //todo
                         //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
                         // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
                         // niet nodig om die aan te pakken?
@@ -365,6 +366,7 @@ module.exports = {
                     if (p['production.date.end']) {
                         date += p['production.date.end'][0];
                         if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
+                        productie_date["@value"] = date; //todo
                     }
 
                     const ontwerpRegex = new RegExp('.*ontwerp.*');
@@ -382,9 +384,6 @@ module.exports = {
                 date = p['production.date.start'][0];
                 if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
                 date += '/';
-                //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                // niet nodig om die aan te pakken?
             } else {
                 date = '/';
             }
