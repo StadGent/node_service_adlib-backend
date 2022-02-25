@@ -1,4 +1,5 @@
 import MainUtils from "../utils.js";
+import Utils from "../utils";
 
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
@@ -337,6 +338,7 @@ module.exports = {
 
     mapVervaardiging: async (id, input, mappedObject, adlib) => {
         // Get ontwerp en uitvoering data
+        const _inst = Utils.getInstitutionNameFromPriref(input["@attributes"]["priref"])
         let ontwerp_date = {
             "@value": "..",
             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
@@ -356,24 +358,23 @@ module.exports = {
                         date = p['production.date.start'][0];
                         if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
                         date += "/";
-                        productie_date["@value"] = date; //todo
-                        //todo: moeilijk om hier 1 cest veld aan toe te kennen. Eindresultaat in de stroom
-                        // is een aggregaat van 4 velden in adlib. Hoe pakken we dit best aan of is het hier
-                        // niet nodig om die aan te pakken?
                     } else {
                         date = "/";
                     }
                     if (p['production.date.end']) {
                         date += p['production.date.end'][0];
                         if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
-                        productie_date["@value"] = date; //todo
                     }
 
-                    const ontwerpRegex = new RegExp('.*ontwerp.*');
-                    const uitvoeringRegex = new RegExp('.*uitvoering.*');
-                    const productieRegex = new RegExp('.*productie.*');
-                    if (ontwerpRegex.test(note)) ontwerp_date["@value"] = date;
-                    if (uitvoeringRegex.test(note) || productieRegex.test(note)) productie_date["@value"] = date;
+                    if (_inst == "dmg") {
+                        const ontwerpRegex = new RegExp('.*ontwerp.*');
+                        const uitvoeringRegex = new RegExp('.*uitvoering.*');
+                        const productieRegex = new RegExp('.*productie.*');
+                        if (ontwerpRegex.test(note)) ontwerp_date["@value"] = date;
+                        if (uitvoeringRegex.test(note) || productieRegex.test(note)) productie_date["@value"] = date;
+                    } else {
+                        productie_date["@value"] = date;
+                    }
                 }
             }
         } else if (input["Production_date"] && input["Production_date"][0]) {
@@ -793,8 +794,8 @@ module.exports = {
                 if (input["Associated_person"][p]["association.person"] && input["Associated_person"][p]["association.person"][0]) {
                     let personLabel = input["Associated_person"][p]["association.person"][0];
                     const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "agent");
-
-                    informatieObject["InformatieObject.verwijstNaar"].push({
+                    let io = informatieObject["InformatieObject.verwijstNaar"];
+                    let person = {
                         "@type": "Persoon",
                         "Entiteit.type": [{
                             "@id": personURI,
@@ -803,10 +804,29 @@ module.exports = {
                             "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
                             "label": "associatie.persoon"
                         }]
-                    });
+                    };
+
+                    if (input["Associated_person"][p]["association.person.association"] && input["Associated_person"][p]["association.person.association"][0]) {
+                        const _roleLabel = input["Associated_person"][p]["association.person.association"];
+                        const _roleURI = await adlib.getURIFromPriref("thesaurus", input["Associated_person"][p]["association.person.association.lref"][0], "concept");
+                        person["@reverse"] = {
+                            "Rol.agent": {
+                                "@type": "Rol",
+                                "Rol.rol": {
+                                    "@id": _roleURI,
+                                    "skos:prefLabel": {
+                                        "@value": _roleLabel,
+                                        "@language": "nl"
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    io.push(person);
                 }
             }
         }
+
         // Geass. Onderwerp
         if (input["Associated_subject"] && input["Associated_subject"][0]) {
             for (let p in input["Associated_subject"]) {
@@ -1022,16 +1042,16 @@ module.exports = {
         if (input["object_number"]) {
             const priref = input["@attributes"].priref;
             const institution =  utils.getInstitutionNameFromPriref(priref);
-            const objectNumber = input["object_number"][0];
+            const objectNumber = input["object_number"][0]
             const manifestURI = `https://api.collectie.gent/iiif/presentation/v2/manifest/${institution}:${objectNumber}`;
             const IIIFManifest = {
-                "id": manifestURI,
-                "type": "DigitalObject",
+                "@id": manifestURI,
+                "@type": "DigitalObject",
                 "conforms_to": [{
-                    "id": "http://iiif.example.org/presentation/1/manifest.json",
-                    "type": "InformatieObject"
+                    "@id": "https://iiif.io/api/presentation",
+                    "@type": "InformatieObject"
                 }],
-                "format": 'application/ld+json;profile=\\"http://iiif.io/api/presentation/3/context.json\\"'
+                "format": 'application/ld+json;profile=\\"http://iiif.io/api/presentation/2/context.json\\"'
             };
             if (!mappedObject["Entiteit.isHetOnderwerpVan"]) mappedObject["Entiteit.isHetOnderwerpVan"] = [];
             mappedObject["Entiteit.isHetOnderwerpVan"].push(IIIFManifest);
@@ -1039,25 +1059,5 @@ module.exports = {
     }
 };
 
-// Draft
-function processCondition(id, condition) {
-    let c = {
-        "@type": "Conditiebeoordeling",
-        "conditie_van": id
-    };
-    if (condition["condition"]) {
-        c["Conditiebeoordeling.vastgesteldeStaat"] = {
-            "@type": "Conditie",
-            "Conditie.nota": condition["condition"][0]
-        };
-    }
 
-    if (condition["condition.date"] && condition["condition.date"][0] != "") {
-        c["Conditie.periode"] = {
-            "@type": "Periode",
-            "Periode.begin": condition["condition.date"][0].begin,
-            "Periode.einde": condition["condition.date"][0].end
-        };
-    }
-    return c;
-}
+
