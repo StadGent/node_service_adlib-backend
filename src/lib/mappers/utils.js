@@ -1042,7 +1042,7 @@ module.exports = {
         if (input["object_number"]) {
             const priref = input["@attributes"].priref;
             const institution =  utils.getInstitutionNameFromPriref(priref);
-            const objectNumber = input["object_number"][0]
+            const objectNumber = input["object_number"][0];
             const manifestURI = `https://api.collectie.gent/iiif/presentation/v2/manifest/${institution}:${objectNumber}`;
             const IIIFManifest = {
                 "@id": manifestURI,
