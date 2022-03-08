@@ -807,7 +807,7 @@ module.exports = {
                     };
 
                     if (input["Associated_person"][p]["association.person.association"] && input["Associated_person"][p]["association.person.association"][0]) {
-                        const _roleLabel = input["Associated_person"][p]["association.person.association"];
+                        const _roleLabel = input["Associated_person"][p]["association.person.association"][0];
                         const _roleURI = await adlib.getURIFromPriref("thesaurus", input["Associated_person"][p]["association.person.association.lref"][0], "concept");
                         person["@reverse"] = {
                             "Rol.agent": {
