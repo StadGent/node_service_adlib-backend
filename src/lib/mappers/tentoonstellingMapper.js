@@ -78,7 +78,10 @@ export default class TentoonstellingMapper extends Transform {
             mappedObject["@type"] = "Activiteit";
             mappedObject["Entiteit.type"] = {
                 "@id": "http://vocab.getty.edu/aat/300417531",
-                "@value": "tentoonstelling"
+                "skos.prefLabel": {
+                    "@value": "tentoonstelling",
+                    "@language": "nl"
+                }
             }
             // Event stream metadata
             mappedObject["dcterms:isVersionOf"] = objectURI;
