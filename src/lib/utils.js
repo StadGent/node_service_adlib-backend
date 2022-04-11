@@ -56,7 +56,7 @@ export default class Utils {
         return sequelize;
     }
 
-    static getURIFromRecord(record, priref, type, database) {
+    static getURIFromRecord(record, priref, type) {
         if (record) {
             for (let s in record.source) {
                 const source = record.source[s].trim().endsWith('/') ? record.source[s].trim() : `${record.source[s].trim()}/`;
