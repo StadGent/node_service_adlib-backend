@@ -40,6 +40,9 @@ export default class ObjectMapper extends Transform {
                 "dig": "http://www.ics.forth.gr/isl/CRMdig/",
                 "DigitalObject": {
                     "@id": "dig:D1_Digital_Object"
+                },
+                "kwalificatie": {
+                    "@id": "http://purl.org/ontology/af/confidence"
                 }
             }
         ];

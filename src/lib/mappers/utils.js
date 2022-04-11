@@ -461,6 +461,10 @@ module.exports = {
                         "@id": "cest:Naam_vervaardiger",
                         "label": "vervaardiger"
                     }
+                };
+                // vervaardiger.kwalificatie
+                if (pro["creator.qualifier"] && pro["creator.qualifier"][0]) {
+                    c["Activiteit.uitgevoerdDoor"]["kwalificatie"] = pro["creator.qualifier"][0];
                 }
             }
             if (pro['production.place'] && pro['production.place.lref'] && pro['production.place.lref'][0] != "") {
