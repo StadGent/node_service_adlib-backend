@@ -643,6 +643,16 @@ module.exports = {
             }
         }
 
+        // afmeting.vrij
+        if (input["dimension.free"] && input["dimension.free"][0]) {
+            if (!mappedObject["MensgemaaktObject.dimensie"]) mappedObject["MensgemaaktObject.dimensie"] = [];
+
+            mappedObject["MensgemaaktObject.dimensie"].push({
+                "@type": "Dimensie",
+                "Dimensie.beschrijving": input["dimension.free"][0]
+            });
+        }
+
         // Attach components to main object
         if (Object.keys(components).length > 0 && !mappedObject['MaterieelDing.bestaatUit']) mappedObject['MaterieelDing.bestaatUit'] = [];
         for (let c in components) {
@@ -838,7 +848,7 @@ module.exports = {
                     const subjectLabel = input["Associated_subject"][p]["association.subject"][0];
                     const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.lref"][0], "concept");
 
-                    informatieObject["InformatieObject.gaatOver"].push({
+                    let entiteit = {
                         "@type": "Entiteit",
                         "Entiteit.type": [{
                             "@id": subjectURI,
@@ -847,10 +857,24 @@ module.exports = {
                                 "@language": "nl"
                             }
                         }, {
-                                "@id": "cest:Naam_geassocieerd_concept",
-                                "label": "associatie.onderwerp"
-                            }]
+                            "@id": "cest:Naam_geassocieerd_concept",
+                            "label": "associatie.onderwerp"
+                        }]
+                    };
+
+                    if (input["Associated_subject"][p]["association.subject.association"] && input["Associated_subject"][p]["association.subject.association"][0]) {
+                        const subjectAssociationLabel = input["Associated_subject"][p]["association.subject.association"][0];
+                        const subjectAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.association.lref"][0], "concept");
+
+                        entiteit["Entiteit.type"].push({
+                            "@id": subjectAssociationURI,
+                            "skos:prefLabel": {
+                                "@value": subjectAssociationLabel,
+                                "@language": "nl"
+                            }
                         });
+                    }
+                    informatieObject["InformatieObject.gaatOver"].push(entiteit);
                 }
             }
         }
@@ -861,7 +885,7 @@ module.exports = {
                     const periodLabel = input["Associated_period"][p]["association.period"][0];
                     const periodURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.lref"][0], "concept");
 
-                    informatieObject["InformatieObject.verwijstNaar"].push({
+                    let entiteit = {
                         "@type": "Entiteit",
                         "Entiteit.type": [{
                             "@id": periodURI,
@@ -873,7 +897,21 @@ module.exports = {
                             "@id": "cest:Periode",
                             "label": "associatie.periode"
                         }]
-                    });
+                    };
+
+                    if (input["Associated_period"][p]["association.period.association"] && input["Associated_period"][p]["association.period.association"][0]) {
+                        const periodAssociationLabel = input["Associated_period"][p]["association.period.association"][0];
+                        const periodAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.association.lref"][0], "concept");
+                        entiteit["Entiteit.type"].push({
+                            "@id": periodAssociationURI,
+                            "skos:prefLabel": {
+                                "@value": periodAssociationLabel,
+                                "@language": "nl"
+                            }
+                        })
+                    }
+
+                    informatieObject["InformatieObject.verwijstNaar"].push(entiteit);
                 }
             }
         }
