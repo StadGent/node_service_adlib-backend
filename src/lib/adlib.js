@@ -221,3 +221,26 @@ Adlib.prototype.getURIFromPriref = async function(database, priref, type) {
         return Utils.getURIFromRecord(null, priref, type, database);
     }
 };
+
+Adlib.prototype.getPrirefFromObjectNumber = async function(database, objectNumber) {
+    let querypath = `?output=json&database=${database}&search=object_number="${objectNumber}"&limit=1`;
+    // Try to get data from Redis cache.
+    let object = await redisClient.get(querypath);
+    if (object) {
+        object = JSON.parse(object);
+    } else {
+        // Wait for Adlib.
+        let timeout = process.env.ADLIB_SLEEP_URI ? process.env.ADLIB_SLEEP_URI : 1000;
+        await sleep(timeout);
+
+        // Get data from Adlib.
+        object = await this.fetchWithNTLM(querypath);
+        await redisClient.setEx(querypath, 3600, JSON.stringify(object));
+    }
+
+    if(object.adlibJSON.diagnostic.hits_on_display != "0" && object.adlibJSON.recordList && object.adlibJSON.recordList.record[0]) {
+        return object.adlibJSON.recordList.record[0]["@attributes"]["priref"];
+    } else {
+        return "";
+    }
+};

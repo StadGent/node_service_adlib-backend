@@ -1,5 +1,4 @@
 import MainUtils from "../utils.js";
-import Utils from "../utils";
 
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
@@ -151,6 +150,53 @@ module.exports = {
                         "Stuk.naam": naam
                     };
                     mappedObject["Dossier.bestaatUit"].push(stuk);
+                }
+            }
+        }
+    },
+
+    mapRelatiesKoepelrecordDMG: async (objectURI, input, mappedObject, adlib, institution) => {
+        // Regex om .*_[0-9][0-9]-[0-9][0-9]
+        const koepelrecord = /(.*)_([0-9]+)-([0-9]+)/g;
+        if (input["object_number"] && input["object_number"][0]) {
+            const objectNumber = input["object_number"][0];
+            const result = koepelrecord.exec(objectNumber)
+            if (result != null) {
+                const prefixObjectNumber = result[1];
+                const number = result[2];
+                const numberOfParts = result[3];
+                if (number == "0" || number == "00" || number == "000") {
+                    // Koepelrecord
+                    let objecten = [];
+                    for (let n of numberOfParts) {
+                        const objectNumberOfPart = prefixObjectNumber + "_" + n + "-" + numberOfParts;
+                        const objectPriref = await adlib.getPrirefFromObjectNumber("objecten", objectNumberOfPart);
+                        const institution = MainUtils.getInstitutionNameFromPriref(objectPriref);
+                        const objectURI = await adlib.getURIFromPriref("objecten", objectPriref, "mensgemaaktobject/"+institution);
+                        const object = {
+                            "@id": objectURI,
+                            "@type": "MensgemaaktObject"
+                        };
+                        objecten.push(object);
+                    }
+                    if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
+                    mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+                } else {
+                    // object - part of - koepelrecord
+                    let koepelrecordNumber = "0";
+                    if (numberOfParts.length === 2) koepelrecordNumber = "00";
+                    else if (numberOfParts.length === 3) koepelrecordNumber = "000";
+                    const koepelrecordObjectNumber = prefixObjectNumber + "_" + koepelrecordNumber + "-" + numberOfParts;
+                    const koepelrecordPriref = await adlib.getPrirefFromObjectNumber("objecten", koepelrecordObjectNumber);
+                    const institution = MainUtils.getInstitutionNameFromPriref(koepelrecordPriref);
+                    const koepelrecordURI = await adlib.getURIFromPriref("objecten", koepelrecordPriref, "mensgemaaktobject/"+institution);
+
+                    const koepelrecord = {
+                        "@id": koepelrecordURI,
+                        "@type": "GecureerdeCollectie"
+                    };
+                    if (!mappedObject["MensgemaaktObject.maaktDeelUitVan"]) mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
+                    mappedObject["MensgemaaktObject.maaktDeelUitVan"] = mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(koepelrecord);
                 }
             }
         }
@@ -338,7 +384,7 @@ module.exports = {
 
     mapVervaardiging: async (id, input, mappedObject, adlib) => {
         // Get ontwerp en uitvoering data
-        const _inst = Utils.getInstitutionNameFromPriref(input["@attributes"]["priref"])
+        const _inst = MainUtils.getInstitutionNameFromPriref(input["@attributes"]["priref"])
         let ontwerp_date = {
             "@value": "..",
             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
