@@ -393,56 +393,46 @@ module.exports = {
             "@value": "..",
             "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
         };
-        if (input["production.date.notes"]) {
-            for (let n in input["production.date.notes"]) {
-                let note = input["production.date.notes"][n];
-                // we veronderstellen dat Production_date op hetzelfde niveau als de production note staat
-                if (input["Production_date"] && input["Production_date"][n]) {
-                    const p = input["Production_date"][n];
-                    let date = "";
-                    if (p['production.date.start']) {
-                        date = p['production.date.start'][0];
-                        if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
-                        date += "/";
-                    } else {
-                        date = "/";
-                    }
-                    if (p['production.date.end']) {
-                        date += p['production.date.end'][0];
-                        if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
-                    }
+        // Loop door production dates
+        // Als er production notes gebruikt worden, zijn die even lang als de production dates (dmg)
+        // Indien geen note, by default production date
+        if (input["Production_date"] && input["Production_date"][0]) {
+            for (let n in input["Production_date"]) {
+                const p = input["Production_date"][n];
+                // format production date to EDTF
+                let date = "";
+                if (p['production.date.start']) {
+                    date = p['production.date.start'][0];
+                    if (p['production.date.start.prec'] && (p['production.date.start.prec'][0] === "circa" || p['production.date.start.prec'][0] === "ca.")) date += "~";
+                    date += "/";
+                } else {
+                    date = "/";
+                }
+                if (p['production.date.end']) {
+                    date += p['production.date.end'][0];
+                    if (p['production.date.end.prec'] && (p['production.date.end.prec'][0] === "circa" || p['production.date.start.prec'][0] === "ca.")) date += "~";
+                }
 
-                    if (_inst == "dmg") {
-                        const ontwerpRegex = new RegExp('.*ontwerp.*');
-                        const uitvoeringRegex = new RegExp('.*uitvoering.*');
-                        const productieRegex = new RegExp('.*productie.*');
-                        if (ontwerpRegex.test(note)) ontwerp_date["@value"] = date;
-                        if (uitvoeringRegex.test(note) || productieRegex.test(note)) productie_date["@value"] = date;
+                // When note with "ontwerp" than its ontwerp_date
+                if (input["production.date.notes"] && input["production.date.notes"][n]) {
+                    let note = input["production.date.notes"][n];
+                    const ontwerpRegex = new RegExp('.*ontwerp.*');
+                    // const uitvoeringRegex = new RegExp('.*uitvoering.*');
+                    // const productieRegex = new RegExp('.*productie.*');
+                    if (ontwerpRegex.test(note)) {
+                        ontwerp_date["@value"] = date;
                     } else {
                         productie_date["@value"] = date;
                     }
+                } else {
+                    productie_date["@value"] = date;
                 }
             }
-        } else if (input["Production_date"] && input["Production_date"][0]) {
-            // When no notes, use first production_date as production date
-            const p = input["Production_date"][0];
-            let date = "";
-            if (p['production.date.start']) {
-                date = p['production.date.start'][0];
-                if (p['production.date.start.prec'] && p['production.date.start.prec'][0] === "circa") date += "~";
-                date += '/';
-            } else {
-                date = '/';
-            }
-            if (p['production.date.end']) {
-                date += p['production.date.end'][0];
-                if (p['production.date.end.prec'] && p['production.date.end.prec'][0] === "circa") date += "~";
-            }
-            productie_date["@value"] = date;
         }
 
         // Loop over ontwerpers, uitvoerders en producenten
         let productions = [];
+        let creations = [];
         for (let p in input["Production"]) {
             let pro = input["Production"][p];
             const personURI = (pro["creator.lref"] && pro["creator.lref"][0]) ? await adlib.getURIFromPriref("personen", pro["creator.lref"][0], "agent") : undefined;
@@ -554,17 +544,21 @@ module.exports = {
             }
 
             if (pro['creator.role'] && pro['creator.role'][0] === "ontwerper") {
-                mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
-                    "@type": "ConceptueelDing",
-                    "ConceptueelDing.heeftCreatie": c
-                };
+                creations.push(c);
             } else {
                 productions.push(c);
             }
         }
 
-        if (mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = mappedObject["MaterieelDing.productie"].concat(productions);
-        else mappedObject["MaterieelDing.productie"] = productions;
+        if (creations.length) mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
+            "@type": "ConceptueelDing",
+            "ConceptueelDing.heeftCreatie": creations
+        };
+
+        if (productions.length) {
+            if (mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = mappedObject["MaterieelDing.productie"].concat(productions);
+            else mappedObject["MaterieelDing.productie"] = productions;
+        }
 
         // when there is no Production activity, map technieken here
         if(!input.Production && input.Technique && input.Technique[0]) {
@@ -597,6 +591,7 @@ module.exports = {
                     }
                 }
             }
+            if (!mappedObject["MaterieelDing.productie"]) mappedObject["MaterieelDing.productie"] = [];
             mappedObject["MaterieelDing.productie"].push(c);
         }
     },
