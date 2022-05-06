@@ -31,7 +31,7 @@ export default class DmgMapper extends ObjectMapper {
             mappedObject["prov:generatedAtTime"] = now;
 
             // Convenience method to make our URI dereferenceable by District09
-            if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI;
+            if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id", "/data");
 
             // Identificatie
             Utils.mapPriref(input, mappedObject, this._baseURI);
