@@ -203,8 +203,8 @@ module.exports = {
     },
 
     mapRecordType: (input, mappedObject) => {
-        if (input["record_type"] && input["record_type"][0]) {
-            const recordType = input["record_type"][0];
+        if (input["record_type"] && input["record_type"][0] && input["record_type"][0]["value"] && Array.isArray(input["record_type"][0]["value"])) {
+            const recordType = input["record_type"][0]["value"][0];
             mappedObject["Entiteit.type"] = {
                 "@value": recordType
             }
