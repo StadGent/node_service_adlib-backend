@@ -47,7 +47,7 @@ export default class DmgMapper extends ObjectMapper {
             await Utils.mapRelatiesKoepelrecordDMG(objectURI, input, mappedObject, this._adlib, this._institutionURI);
 
             // Vervaardiging | datering
-            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, true);
 
             // Fysieke kenmerken
             await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);

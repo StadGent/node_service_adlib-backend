@@ -43,7 +43,7 @@ export default class IndustriemuseumMapper extends ObjectMapper {
             Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging | datering
-            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, false);
 
             // Fysieke kenmerken
             await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);
