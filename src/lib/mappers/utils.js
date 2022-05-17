@@ -382,7 +382,7 @@ module.exports = {
         }
     },
 
-    mapVervaardiging: async (id, input, mappedObject, adlib) => {
+    mapVervaardiging: async (id, input, mappedObject, adlib, _techniek) => {
         // Get ontwerp en uitvoering data
         const _inst = MainUtils.getInstitutionNameFromPriref(input["@attributes"]["priref"])
         let ontwerp_date = {
@@ -452,30 +452,34 @@ module.exports = {
                     "Productie.product": id
                 };
 
-                // add techniques to the production event
-                // part and notes are not mapped
-                if (input.Technique) {
-                    for (let t in input.Technique) {
-                        if (input.Technique[t]["technique"] && input.Technique[t]["technique"][0]) {
-                            const techniqueLabel = input.Technique[t]["technique"][0];
-                            // const part = input.Technique[t]["technique.part"][0];
-                            // const notes = input.Technique[t]["technique.notes"][0];
-                            if (input.Technique[t]["technique.lref"] && input.Technique[t]["technique.lref"][0]) {
-                                const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
-                                if (!c["Activiteit.gebruikteTechniek"]) c["Activiteit.gebruikteTechniek"] = [];
-                                c["Activiteit.gebruikteTechniek"].push({
-                                    "@type": "TypeTechniek",
-                                    "Entiteit.type": [{
-                                        "@id": techniqueURI,
-                                        "skos:prefLabel": {
-                                            "@value": techniqueLabel,
-                                            "@language": "nl"
-                                        }
-                                    }, {
-                                        "@id": "cest:Term_techniek",
-                                        "label": "techniek"
-                                    }]
-                                });
+                // if techniek is true (Huis van Alijn doesn't want techniek in their evenstream)
+
+                if (_techniek==true) {
+                    // add techniques to the production event
+                    // part and notes are not mapped
+                    if (input.Technique) {
+                        for (let t in input.Technique) {
+                            if (input.Technique[t]["technique"] && input.Technique[t]["technique"][0]) {
+                                const techniqueLabel = input.Technique[t]["technique"][0];
+                                // const part = input.Technique[t]["technique.part"][0];
+                                // const notes = input.Technique[t]["technique.notes"][0];
+                                if (input.Technique[t]["technique.lref"] && input.Technique[t]["technique.lref"][0]) {
+                                    const techniqueURI = await adlib.getURIFromPriref("thesaurus", input.Technique[t]["technique.lref"][0], "concept");
+                                    if (!c["Activiteit.gebruikteTechniek"]) c["Activiteit.gebruikteTechniek"] = [];
+                                    c["Activiteit.gebruikteTechniek"].push({
+                                        "@type": "TypeTechniek",
+                                        "Entiteit.type": [{
+                                            "@id": techniqueURI,
+                                            "skos:prefLabel": {
+                                                "@value": techniqueLabel,
+                                                "@language": "nl"
+                                            }
+                                        }, {
+                                            "@id": "cest:Term_techniek",
+                                            "label": "techniek"
+                                        }]
+                                    });
+                                }
                             }
                         }
                     }

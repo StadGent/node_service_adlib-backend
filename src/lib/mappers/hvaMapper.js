@@ -43,7 +43,7 @@ export default class HvAMapper extends ObjectMapper {
             Utils.mapBeschrijving(input, mappedObject);
 
             // Vervaardiging
-            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, false);
 
             // Associaties
             await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
