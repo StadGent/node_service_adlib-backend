@@ -565,7 +565,7 @@ module.exports = {
         }
 
         // when there is no Production activity, map technieken here
-        if(!input.Production && input.Technique && input.Technique[0]) {
+        if(_techniek==true && !input.Production && input.Technique && input.Technique[0]) {
             let c = {
                 "@type": "Productie",
                 "Gebeurtenis.tijd": productie_date,
@@ -1109,9 +1109,7 @@ module.exports = {
             mappedObject["MensgemaaktObject.draagt"] = opschriften;
         }
     },
-    mapMerken: (input, mappedObject) => {
-        //console.log(input)
-    },
+
     mapPriref(input, mappedObject, baseURI) {
         const priref = input["@attributes"].priref;
         const id = {
