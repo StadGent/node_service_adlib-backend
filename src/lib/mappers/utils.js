@@ -454,7 +454,7 @@ module.exports = {
 
                 // if techniek is true (Huis van Alijn doesn't want techniek in their evenstream)
 
-                if (_techniek==true) {
+                if (_techniek == true) {
                     // add techniques to the production event
                     // part and notes are not mapped
                     if (input.Technique) {
@@ -565,7 +565,7 @@ module.exports = {
         }
 
         // when there is no Production activity, map technieken here
-        if(_techniek==true && !input.Production && input.Technique && input.Technique[0]) {
+        if(_techniek == true && !input.Production && input.Technique && input.Technique[0]) {
             let c = {
                 "@type": "Productie",
                 "Gebeurtenis.tijd": productie_date,
