@@ -410,7 +410,7 @@ module.exports = {
                 }
                 if (p['production.date.end']) {
                     date += p['production.date.end'][0];
-                    if (p['production.date.end.prec'] && (p['production.date.end.prec'][0] === "circa" || p['production.date.start.prec'][0] === "ca.")) date += "~";
+                    if (p['production.date.end.prec'] && (p['production.date.end.prec'][0] === "circa" || p['production.date.end.prec'][0] === "ca.")) date += "~";
                 }
 
                 // When note with "ontwerp" than its ontwerp_date
@@ -1030,20 +1030,22 @@ module.exports = {
                         "Entiteit.type": []
                     };
                     const eigennaamLabel = input["Content_subject"][s]["content.subject.name"][0];
-                    const subject_surnameURI = await adlib.getURIFromPriref("thesaurus", input["Content_subject"][s]["content.subject.name.lref"][0], "concept")
+                    if (eigennaamLabel != "") {
+                        const subject_surnameURI = await adlib.getURIFromPriref("thesaurus", input["Content_subject"][s]["content.subject.name.lref"][0], "concept")
 
-                    e["Entiteit.type"].push({
-                        "@id": subject_surnameURI,
-                        "skos:preflabel": {
-                            "@value": eigennaamLabel,
-                            "@language": "nl"
-                        }
-                    });
-                    e["Entiteit.type"].push({
-                        "@id": "cest:Eigennaam_afgebeeld_onderwerp", // todo: nog toe te voegen in CEST
-                        "label": "inhoud.onderwerp.eigennaam"
-                    });
-                    mappedObject["Entiteit.beeldtUit"].push(e);
+                        e["Entiteit.type"].push({
+                            "@id": subject_surnameURI,
+                            "skos:preflabel": {
+                                "@value": eigennaamLabel,
+                                "@language": "nl"
+                            }
+                        });
+                        e["Entiteit.type"].push({
+                            "@id": "cest:Eigennaam_afgebeeld_onderwerp", // todo: nog toe te voegen in CEST
+                            "label": "inhoud.onderwerp.eigennaam"
+                        });
+                        mappedObject["Entiteit.beeldtUit"].push(e);
+                    }
                 }
             }
         }
