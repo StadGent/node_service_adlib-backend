@@ -1000,7 +1000,7 @@ module.exports = {
 
     mapIconografie: async (input, mappedObject, adlib) => {
         // Content_person en Content_subject
-        if (!mappedObject["Entiteit.beeldtUit"]) mappedObject["Entiteit.beeldtUit"] = [];
+        if (!mappedObject["MensgemaaktObject.beeldtUit"]) mappedObject["MensgemaaktObject.beeldtUit"] = [];
 
         if (input["Content_subject"] && input["Content_subject"][0]) {
             for (let s in input["Content_subject"]) {
@@ -1055,7 +1055,7 @@ module.exports = {
         }
 
         if (input["Content_person"] && input["Content_person"][0]) {
-            if (!mappedObject["Entiteit.beeldtUit"]) mappedObject["Entiteit.beeldtUit"] = [];
+            if (!mappedObject["MensgemaaktObject.beeldtUit"]) mappedObject["MensgemaaktObject.beeldtUit"] = [];
             for (let p in input["Content_person"]) {
                 if (input["Content_person"][p]["content.person.name"]) {
                     let personLabel = input["Content_person"][p]["content.person.name"][0];
