@@ -713,10 +713,8 @@ module.exports = {
         if (input["acquisition.date"]) {
             const datum = input["acquisition.date"][0];
             v["Gebeurtenis.tijd"] = {
-                "@type": "Periode",
-                "Periode.begin": datum,
-                "Periode.einde": datum
-                //todo
+                "value": datum,
+                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
             };
         }
 
