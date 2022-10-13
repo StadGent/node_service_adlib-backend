@@ -1022,7 +1022,7 @@ module.exports = {
                         "@id": "cest:Naam_afgebeelde_gebeurtenis",
                         "label": "inhoud.onderwerp"
                     });
-                    mappedObject["Entiteit.beeldtUit"].push(e);
+                    mappedObject["MensgemaaktObject.beeldtUit"].push(e);
                 }
 
                 // Iconografie - eigennaam, bv. Gravensteen
@@ -1046,7 +1046,7 @@ module.exports = {
                             "@id": "cest:Eigennaam_afgebeeld_onderwerp", // todo: nog toe te voegen in CEST
                             "label": "inhoud.onderwerp.eigennaam"
                         });
-                        mappedObject["Entiteit.beeldtUit"].push(e);
+                        mappedObject["MensgemaaktObject.beeldtUit"].push(e);
                     }
                 }
             }
@@ -1059,7 +1059,7 @@ module.exports = {
                     let personLabel = input["Content_person"][p]["content.person.name"][0];
                     const personURI = await adlib.getURIFromPriref("personen", input["Content_person"][p]["content.person.name.lref"][0], "agent");
 
-                    mappedObject["Entiteit.beeldtUit"].push({
+                    mappedObject["MensgemaaktObject.beeldtUit"].push({
                         "@type": "Persoon",
                         "Entiteit.type": [{
                             "@id": personURI,
