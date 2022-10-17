@@ -713,7 +713,7 @@ module.exports = {
         if (input["acquisition.date"]) {
             const datum = input["acquisition.date"][0];
             v["Gebeurtenis.tijd"] = {
-                "value": datum,
+                "@value": datum,
                 "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
             };
         }
