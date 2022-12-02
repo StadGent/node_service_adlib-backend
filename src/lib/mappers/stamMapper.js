@@ -51,6 +51,9 @@ export default class StamMapper extends ObjectMapper {
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
+            // Tentoonstellingen
+            await Utils.mapTentoonstelling(objectURI, input, mappedObject, this._adlib);
+
             // reproductie
             await Utils.mapIIIFManifest(input, mappedObject, MainUtils);
 
