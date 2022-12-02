@@ -713,9 +713,12 @@ module.exports = {
         if (input["acquisition.date"]) {
             const datum = input["acquisition.date"][0];
             v["Gebeurtenis.tijd"] = {
-                "@value": datum,
-                "@type": "http://id.loc.gov/datatypes/edtf/EDTF"
+                "@type": "Periode",
+                "Periode.begin": datum,
+                "Periode.einde": datum
+                //todo
             };
+        }
         }
 
         if (input["acquisition.method"]) {
