@@ -719,7 +719,6 @@ module.exports = {
                 //todo
             };
         }
-        }
 
         if (input["acquisition.method"]) {
             const methode = input["acquisition.method"][0];
