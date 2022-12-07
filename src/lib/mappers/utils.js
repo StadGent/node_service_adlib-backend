@@ -556,7 +556,7 @@ module.exports = {
 
         if (creations.length) mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
             "@type": "ConceptueelDing",
-            "ConceptueelDing.heeftCreatie": creations
+            "ConceptueelDing.creatie": creations
         };
 
         if (productions.length) {
