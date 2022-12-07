@@ -806,7 +806,7 @@ module.exports = {
 
             const c = {
                 "@type": "Collectie",
-                "gebruiktBijActiviteit": exh
+                "Activiteit.gebruiktObject": exh
             };
             mappedObject["Entiteit.maaktDeelUitVan"].push(c);
         }
