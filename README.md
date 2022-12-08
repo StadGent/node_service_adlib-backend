@@ -64,4 +64,5 @@ Fill in `schedule` following the cron syntax, for example every day at midnight 
 ## Clean data
 
 If you want to clean up your database (e.g. you updated the mapping of the event stream), then you need to clean the Members table of the database manually.
+
 This can be configured in the future if preferred.
