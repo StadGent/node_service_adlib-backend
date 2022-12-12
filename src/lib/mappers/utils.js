@@ -556,7 +556,7 @@ module.exports = {
 
         if (creations.length) mappedObject["Entiteit.wordtNaarVerwezenDoor"] = {
             "@type": "ConceptueelDing",
-            "ConceptueelDing.heeftCreatie": creations
+            "ConceptueelDing.creatie": creations
         };
 
         if (productions.length) {
@@ -806,7 +806,7 @@ module.exports = {
 
             const c = {
                 "@type": "Collectie",
-                "gebruiktBijActiviteit": exh
+                "Activiteit.gebruiktObject": exh
             };
             mappedObject["Entiteit.maaktDeelUitVan"].push(c);
         }
