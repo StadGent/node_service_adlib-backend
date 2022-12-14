@@ -961,7 +961,8 @@ module.exports = {
             }
         }
 
-        mappedObject["MensgemaaktObject.draagt"] = informatieObject;
+        if (mappedObject["MensgemaaktObject.draagt"]) mappedObject["MensgemaaktObject.draagt"] = mappedObject["MensgemaaktObject.draagt"].concat(informatieObject);
+        else mappedObject["MensgemaaktObject.draagt"] = informatieObject;
     },
 
     mapBouwaanvraagArchief: async (objectURI, input, mappedObject, adlib) => {
@@ -1108,7 +1109,8 @@ module.exports = {
                 }
             }
 
-            mappedObject["MensgemaaktObject.draagt"] = opschriften;
+            if (mappedObject["MensgemaaktObject.draagt"]) mappedObject["MensgemaaktObject.draagt"] = mappedObject["MensgemaaktObject.draagt"].concat(opschriften);
+            else mappedObject["MensgemaaktObject.draagt"] = opschriften;
         }
     },
 
