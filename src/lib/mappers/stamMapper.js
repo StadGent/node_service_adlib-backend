@@ -45,6 +45,12 @@ export default class StamMapper extends ObjectMapper {
             // Vervaardiging | datering
             await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, true);
 
+            // Associaties
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+
+            // iconografie
+            await Utils.mapIconografie(input, mappedObject, this._adlib);
+
             // Fysieke kenmerken
             await Utils.mapFysiekeKenmerken(objectURI, input, mappedObject, this._adlib);
 
@@ -56,7 +62,6 @@ export default class StamMapper extends ObjectMapper {
 
             // reproductie
             await Utils.mapIIIFManifest(input, mappedObject, MainUtils);
-
 
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
