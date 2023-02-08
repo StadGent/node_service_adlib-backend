@@ -1,7 +1,6 @@
 import { Transform } from 'stream';
 import MainUtils from "../utils.js";
 import Config from "../../config/config";
-import Adlib from "../adlib.js";
 
 const config = Config.getConfig();
 
@@ -167,6 +166,7 @@ export default class TentoonstellingMapper extends Transform {
                         const obj_uri = await this._adlib.getURIFromPriref("objecten", obj_priref, "mensgemaaktobject", "dmg");
 
                         const object = {
+                            "@type": "MensgemaaktObject",
                             "@id": obj_uri,
                             "MensgemaaktObject.titel": obj_title
                         };
@@ -179,7 +179,7 @@ export default class TentoonstellingMapper extends Transform {
                             }
                         };
 
-                        const priref_identificator = {
+                        const priref_idfentificator = {
                             "@type": "Identificator",
                             "Identificator.identificator": {
                                 "@value": obj_priref,
@@ -188,7 +188,7 @@ export default class TentoonstellingMapper extends Transform {
                         };
                         object["Object.identificator"] = [];
                         object["Object.identificator"].push(objectnummer_identificator);
-                        object["Object.identificator"].push(priref_identificator);
+                        object["Object.identificator"].push(priref_idfentificator);
 
 
                         objecten.push(object);
