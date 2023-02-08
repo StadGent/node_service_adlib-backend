@@ -1,7 +1,6 @@
 import { Transform } from 'stream';
 import MainUtils from "../utils.js";
 import Config from "../../config/config";
-import Adlib from "../adlib.js";
 
 const config = Config.getConfig();
 
@@ -19,6 +18,7 @@ export default class TentoonstellingMapper extends Transform {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
                 },
+                "cidoc": "http://www.cidoc-crm.org/cidoc-crm/",
                 "prov": "http://www.w3.org/ns/prov#",
                 "skos": "http://www.w3.org/2004/02/skos/core#",
                 "label": "http://www.w3.org/2000/01/rdf-schema#label",
@@ -111,10 +111,16 @@ export default class TentoonstellingMapper extends Transform {
             mappedObject["Object.identificator"].push(prirefIdentificator);
 
             // tentoonstellingstitel
-            if (input['title'] && input['title'][0]) mappedObject["InformatieObject.titel"] = {
-                "@value": input['title'][0],
-                "@language": "nl" //  todo: parse from source, what language is used?
-            }
+            if (input['title'] && input['title'][0]) {
+                const _title = [{
+                    "@type": "cidoc:E33_E41_Linguistic_Appellation",
+                    "inhoud": {
+                        "@value": input['title'][0],
+                        "@language": "nl"
+                    }
+                }]
+                mappedObject["cidoc:P1_is_identified_by"].push(_title);
+            };
 
             // todo: alternatieve titel.
 
@@ -132,7 +138,7 @@ export default class TentoonstellingMapper extends Transform {
                     "@type": "Plaats",
                     "equivalent": {
                         "@id": placeURI,
-                        "skos.prefLabel": {
+                        "skos:prefLabel": {
                             "@value": placeLabel,
                             "@language": "nl"
                         }
@@ -148,12 +154,16 @@ export default class TentoonstellingMapper extends Transform {
                     "@type": "Organisatie",
                     "equivalent": {
                         "@id": placeURI,
-                        "skos.prefLabel": {
+                        "skos:prefLabel": {
                             "@value": placeLabel,
                             "@language": "nl"
                         }
                     }
                 }
+
+
+
+
             }
 
             // objecten tentoongesteld in tentoonstelling (obejctnummer + titel) //todo: if published; add URI.
@@ -167,6 +177,7 @@ export default class TentoonstellingMapper extends Transform {
                         const obj_uri = await this._adlib.getURIFromPriref("objecten", obj_priref, "mensgemaaktobject", "dmg");
 
                         const object = {
+                            "@type": "MensgemaaktObject",
                             "@id": obj_uri,
                             "MensgemaaktObject.titel": obj_title
                         };
@@ -194,8 +205,8 @@ export default class TentoonstellingMapper extends Transform {
                         objecten.push(object);
                     }
                 }
-                if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
-                mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+                if (!mappedObject["Activiteit.gebruiktObject"]) mappedObject["Activiteit.gebruiktObject"] = [];
+                mappedObject["Activiteit.gebruiktObject"] = mappedObject["Activiteit.gebruiktObject"].concat(objecten);
             }
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
