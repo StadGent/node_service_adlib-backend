@@ -194,8 +194,8 @@ export default class TentoonstellingMapper extends Transform {
                         objecten.push(object);
                     }
                 }
-                if (!mappedObject["GecureerdeCollectie.bestaatUit"]) mappedObject["GecureerdeCollectie.bestaatUit"] = [];
-                mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
+                if (!mappedObject["Activiteit.gebruiktObject"]) mappedObject["Activiteit.gebruiktObject"] = [];
+                mappedObject["Activiteit.gebruiktObject"] = mappedObject["Activiteit.gebruiktObject"].concat(objecten);
             }
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
