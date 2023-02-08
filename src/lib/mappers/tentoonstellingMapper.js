@@ -190,7 +190,7 @@ export default class TentoonstellingMapper extends Transform {
                             }
                         };
 
-                        const priref_idfentificator = {
+                        const priref_identificator = {
                             "@type": "Identificator",
                             "Identificator.identificator": {
                                 "@value": obj_priref,
@@ -199,7 +199,7 @@ export default class TentoonstellingMapper extends Transform {
                         };
                         object["Object.identificator"] = [];
                         object["Object.identificator"].push(objectnummer_identificator);
-                        object["Object.identificator"].push(priref_idfentificator);
+                        object["Object.identificator"].push(priref_identificator);
 
 
                         objecten.push(object);
