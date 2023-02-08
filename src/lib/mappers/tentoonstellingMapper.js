@@ -131,7 +131,7 @@ export default class TentoonstellingMapper extends Transform {
                     "@type": "Plaats",
                     "equivalent": {
                         "@id": placeURI,
-                        "skos.prefLabel": {
+                        "skos:prefLabel": {
                             "@value": placeLabel,
                             "@language": "nl"
                         }
@@ -147,7 +147,7 @@ export default class TentoonstellingMapper extends Transform {
                     "@type": "Organisatie",
                     "equivalent": {
                         "@id": placeURI,
-                        "skos.prefLabel": {
+                        "skos:prefLabel": {
                             "@value": placeLabel,
                             "@language": "nl"
                         }
