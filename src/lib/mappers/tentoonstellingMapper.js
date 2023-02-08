@@ -18,6 +18,7 @@ export default class TentoonstellingMapper extends Transform {
                 "dcterms:isVersionOf": {
                     "@type": "@id"
                 },
+                "cidoc": "http://www.cidoc-crm.org/cidoc-crm/",
                 "prov": "http://www.w3.org/ns/prov#",
                 "skos": "http://www.w3.org/2004/02/skos/core#",
                 "label": "http://www.w3.org/2000/01/rdf-schema#label",
@@ -110,10 +111,16 @@ export default class TentoonstellingMapper extends Transform {
             mappedObject["Object.identificator"].push(prirefIdentificator);
 
             // tentoonstellingstitel
-            if (input['title'] && input['title'][0]) mappedObject["InformatieObject.titel"] = {
-                "@value": input['title'][0],
-                "@language": "nl" //  todo: parse from source, what language is used?
-            }
+            if (input['title'] && input['title'][0]) {
+                const _title = [{
+                    "@type": "cidoc:E33_E41_Linguistic_Appellation",
+                    "inhoud": {
+                        "@value": input['title'][0],
+                        "@language": "nl"
+                    }
+                }]
+                mappedObject["cidoc:P1_is_identified_by"].push(_title);
+            };
 
             // todo: alternatieve titel.
 
@@ -153,6 +160,10 @@ export default class TentoonstellingMapper extends Transform {
                         }
                     }
                 }
+
+
+
+
             }
 
             // objecten tentoongesteld in tentoonstelling (obejctnummer + titel) //todo: if published; add URI.
