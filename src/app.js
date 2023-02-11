@@ -23,6 +23,7 @@ var server;
 let sequelize;
 
 const cron = require('node-cron');
+const isTest = process.env.NODE_ENV === 'test';
 
 startHealthcheckAPI();
 
@@ -45,14 +46,15 @@ async function start() {
 
         sequelize = await Utils.initDb(correlator);
 
-        startHva();
-        startDmg();
-        startIndustriemuseum();
-        startArchiefgent();
-        startStam();
-
-        startThesaurus();
-        startPersonen();
+        if (!isTest) {
+            startHva();
+            startDmg();
+            startIndustriemuseum();
+            startArchiefgent();
+            startStam();
+            startThesaurus();
+            startPersonen();
+        }
         startTentoonstellingen();
     });
 }
