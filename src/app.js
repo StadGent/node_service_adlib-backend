@@ -229,6 +229,12 @@ function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlat
         // Save integrity check
         await objectAdlib.updateLastRecordWithDone();
         Utils.log("Updated last record with done", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+
+        // End process.
+        if (isTest) {
+            Utils.log("Terminating process", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+            process.exit();
+        }
     });
 }
 function sleep(ms) {
