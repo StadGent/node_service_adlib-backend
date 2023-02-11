@@ -110,16 +110,15 @@ export default class TentoonstellingMapper extends Transform {
             };
             mappedObject["Object.identificator"].push(prirefIdentificator);
 
-            // tentoonstellingstitel
+            // tentoonstellings titel.
             if (input['title'] && input['title'][0]) {
-                const _title = [{
+                mappedObject["cidoc:P1_is_identified_by"] = {
                     "@type": "cidoc:E33_E41_Linguistic_Appellation",
                     "inhoud": {
                         "@value": input['title'][0],
                         "@language": "nl"
                     }
-                }]
-                mappedObject["cidoc:P1_is_identified_by"].push(_title);
+                };
             };
 
             // todo: alternatieve titel.
