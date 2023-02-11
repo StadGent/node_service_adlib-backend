@@ -26,6 +26,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+      env:
+        ADLIB_USER: ${{ secrets.ADLIB_USER }}
+        ADLIB_SECRET: ${{ secrets.ADLIB_SECRET }}
     - name: Start Redis
       uses: supercharge/redis-github-action@1.4.0
       with:
