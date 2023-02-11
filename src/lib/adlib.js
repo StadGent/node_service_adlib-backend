@@ -168,9 +168,9 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
             return;
         }
         if (process.env.NODE_ENV === 'test') {
-            // End process.
+            // End test process for this institution.
             Utils.log("End test first page for institution " + this._institution + " from database "  + this._adlibDatabase, "adlib-backend/lib/adlib.js:fetchWithNTLMRecursively", "INFO", this._correlator.getId());
-            process.exit();
+            return;
         }
     }
 };

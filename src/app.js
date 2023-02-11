@@ -46,15 +46,13 @@ async function start() {
 
         sequelize = await Utils.initDb(correlator);
 
-        if (!isTest) {
-            startHva();
-            startDmg();
-            startIndustriemuseum();
-            startArchiefgent();
-            startStam();
-            startThesaurus();
-            startPersonen();
-        }
+        startHva();
+        startDmg();
+        startIndustriemuseum();
+        startArchiefgent();
+        startStam();
+        startThesaurus();
+        startPersonen();
         startTentoonstellingen();
     });
 }
@@ -229,6 +227,12 @@ function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlat
         // Save integrity check
         await objectAdlib.updateLastRecordWithDone();
         Utils.log("Updated last record with done", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+
+        // End test process.
+        if (isTest) {
+            Utils.log("Terminating process", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
+            process.exit();
+        }
     });
 }
 function sleep(ms) {
