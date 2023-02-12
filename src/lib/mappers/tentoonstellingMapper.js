@@ -119,7 +119,7 @@ export default class TentoonstellingMapper extends Transform {
                         "@language": "nl"
                     }
                 };
-            };
+            }
 
             // todo: alternatieve titel.
 
