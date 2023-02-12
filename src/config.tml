@@ -1,13 +1,9 @@
 [adlib]
   schedule = '0 0 * * *'
-  baseUrl = 'https://cjm-web.adlibhosting.com/***REMOVED***/wwwopac.ashx'
-  username = '***REMOVED***'
-  password = '***REMOVED***'
-  limit = 5
+  limit = 10
 
 [database]
   connectionURI = 'sqlite://./eventstream.db'
-#  connectionURI = 'mssql://***REMOVED***:***REMOVED***@***REMOVED***'
 
 [redis]
   connectionURI = 'redis://localhost:6379'
