@@ -36,4 +36,5 @@ jobs:
         redis-version: ${{ matrix.redis-version }}
     - run: npm ci
     - run: npm run build --if-present
+    - run: rm -f eventstream.db
     - run: npm test
