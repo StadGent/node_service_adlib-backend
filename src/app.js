@@ -21,12 +21,11 @@ const config = Config.getConfig();
 var server;
 
 let sequelize;
+let mappers;
 
 const cron = require('node-cron');
 
 startHealthcheckAPI();
-
-let mappers = config.mapping.mappers;
 
 // Start immediately?
 if (process.env.ADLIB_START) {
@@ -46,6 +45,7 @@ async function start() {
         }
 
         sequelize = await Utils.initDb(correlator);
+        mappers = config.mapping.mappers;
 
         startHva();
         startDmg();
