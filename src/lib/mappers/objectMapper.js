@@ -46,6 +46,7 @@ export default class ObjectMapper extends Transform {
                 }
             }
         ];
+        this._id = options.id;
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
         this._institutionURI = config[options.institution].institutionURI;

@@ -59,6 +59,9 @@ export default class IndustriemuseumMapper extends ObjectMapper {
 
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
+            if (process.env.NODE_ENV === 'test') {
+                throw(e);
+            }
             console.error(e);
             console.error('Error mapping priref ' + priref);
             done();

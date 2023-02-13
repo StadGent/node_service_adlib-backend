@@ -19,7 +19,8 @@ export default class Config {
             connectionURI: process.env.REDIS_URI ? process.env.REDIS_URI : data.redis.connectionURI
         },
         mapping: {
-          baseURI: data.mapping.baseURI
+          baseURI: data.mapping.baseURI,
+          mappers: data.mapping.mappers
         },
         eventstream: {
             protocol: process.env.EVENTSTREAM_PROTOCOL ? process.env.EVENTSTREAM_PROTOCOL : data.eventstream.protocol,
