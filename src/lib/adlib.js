@@ -111,7 +111,7 @@ Adlib.prototype.run = async function () {
     let startFrom = 1;
     await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
 
-    if (lastPriref || process.env.NODE_ENV === 'test') {
+    if (lastPriref) {
         Utils.log("All objects for institution " + this._institution + " from database "  + this._adlibDatabase + " from previous run are fetched from Adlib! Now retrieving objects starting from " + lastModifiedDate, "adlib-backend/lib/adlib.js:run", "INFO", this._correlator.getId());
         lastPriref = null; // reset
         await this.fetchWithNTLMRecursively(lastModifiedDate, lastPriref, startFrom, config.adlib.limit);
