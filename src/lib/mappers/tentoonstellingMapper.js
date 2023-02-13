@@ -146,6 +146,7 @@ export default class TentoonstellingMapper extends Transform {
             }
 
             // organisator van de tentoonstelling
+            console.log(input.organiser);
             if (input.organiser[0]["organiser"] && input.organiser[0]["organiser.lref"]) {
                 const placeURI = await this._adlib.getURIFromPriref("personen", input.organiser[0]["organiser.lref"][0], "concept");
                 const placeLabel = input.organiser[0]["organiser"][0];
