@@ -26,6 +26,8 @@ const cron = require('node-cron');
 
 startHealthcheckAPI();
 
+let mappers = config.mapping.mappers;
+
 // Start immediately?
 if (process.env.ADLIB_START) {
     start();
@@ -60,6 +62,7 @@ async function start() {
 function startHva() {
     correlator.withId(async () => {
         let options = {
+            "id": "hva",
             "institution": "hva", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
@@ -79,6 +82,7 @@ function startHva() {
 function startDmg() {
     correlator.withId(async () => {
         let options = {
+            "id": "dmg",
             "institution": "dmg", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
@@ -99,6 +103,7 @@ function startDmg() {
 function startIndustriemuseum() {
     correlator.withId(async () => {
         let options = {
+            "id": "industriemuseum",
             "institution": "industriemuseum", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
@@ -119,6 +124,7 @@ function startIndustriemuseum() {
 function startArchiefgent() {
     correlator.withId(async () => {
         let options = {
+            "id": "archiefgent",
             "institution": "archiefgent", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
@@ -139,6 +145,7 @@ function startArchiefgent() {
 function startStam() {
     correlator.withId(async () => {
         let options = {
+            "id": "stam",
             "institution": "stam", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
@@ -159,6 +166,7 @@ function startStam() {
 function startThesaurus() {
     correlator.withId(async () => {
         let options = {
+            "id": "thesaurus",
             "institution": "adlib", // one thesaurus for all institutions
             "adlibDatabase": "thesaurus",
             "type": "concept",
@@ -179,6 +187,7 @@ function startThesaurus() {
 function startPersonen() {
     correlator.withId(async () => {
         let options = {
+            "id": "personen",
             "institution": "adlib", // one thesaurus for all institutions
             "adlibDatabase": "personen",
             "type": "agent",
@@ -199,6 +208,7 @@ function startPersonen() {
 function startTentoonstellingen() {
     correlator.withId(async () => {
         let options = {
+            "id": "tentoonstellingen",
             "institution": "dmg", // one list for all institutions
             "adlibDatabase": "tentoonstellingen",
             "type": "tentoonstelling",
@@ -219,6 +229,9 @@ function startTentoonstellingen() {
 
 function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator) {
     objectAdlib.on('end', async () => {
+        // Remove mapper from the list.
+        mappers.splice(mappers.indexOf(objectMapper._institution), 1);
+
         let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
         while (objectMapper.readableLength > 0 || objectMapper.writableLength > 0 || backend.writableLength > 0) {
             Utils.log("Waiting until buffers of mapper (Writable: " + objectMapper.writableLength + ") and backend (Readable: " + backend.readableLength + " | Writable: " + backend.writableLength + ") are empty", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
@@ -228,8 +241,8 @@ function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlat
         await objectAdlib.updateLastRecordWithDone();
         Utils.log("Updated last record with done", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
 
-        // Stop process when running tests.
-        if (process.env.NODE_ENV === 'test') {
+        // Stop process when finished running all tests.
+        if (!mappers.length && process.env.NODE_ENV === 'test') {
             Utils.log("Terminating process", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
             process.exit();
         }

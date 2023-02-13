@@ -20,6 +20,7 @@
 
 [mapping]
   baseURI = 'https://stad.gent/id/'
+  mappers = ["hva", "dmg", "industriemuseum", "archiefgent", "stam", "thesaurus", "personen", "tentoonstellingen"]
 
 [hva]
   institutionName = 'Het Huis van Alijn (Gent)'
