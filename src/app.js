@@ -229,9 +229,6 @@ function startTentoonstellingen() {
 
 function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator) {
     objectAdlib.on('end', async () => {
-        // Remove mapper from the list.
-        mappers.splice(mappers.indexOf(objectMapper._institution), 1);
-
         let timeout = process.env.ADLIB_SLEEP ? process.env.ADLIB_SLEEP : 5000;
         while (objectMapper.readableLength > 0 || objectMapper.writableLength > 0 || backend.writableLength > 0) {
             Utils.log("Waiting until buffers of mapper (Writable: " + objectMapper.writableLength + ") and backend (Readable: " + backend.readableLength + " | Writable: " + backend.writableLength + ") are empty", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
@@ -242,6 +239,7 @@ function saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlat
         Utils.log("Updated last record with done", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
 
         // Stop process when finished running all tests.
+        mappers.splice(mappers.indexOf(objectMapper._institution), 1);
         if (!mappers.length && process.env.NODE_ENV === 'test') {
             Utils.log("Terminating process", "adlib-backend/lib/app.js:saveIntegrityCheckWhenDone", "INFO", correlator.getId());
             process.exit();
