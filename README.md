@@ -5,6 +5,15 @@ This database is then used by [eventstream-api](https://github.com/StadGent/node
 
 \* an event stream is a collection of versioned objects (a version is like an event) and can be updated anytime at their own pace (slow and fast data). This way, consumers can easily discover and harvest the latest changes.
 
+## Prerequisites
+
+This project requires the [installation of a redis memory store](https://redis.io/docs/getting-started/installation/).
+
+```
+docker pull redis
+docker run --rm --name local-redis -p 6379:6379 -d redis
+```
+
 ## Install
 
 ```
