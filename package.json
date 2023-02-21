@@ -7,7 +7,7 @@
     "dev": "set ADLIB_START=true&&set ADLIB_SLEEP=1000&& set ADLIB_SLEEP_URI=5000&& nodemon --inspect --exec babel-node src/app.js",
     "start": "if [ -z \"$MAX_NODE_MEMORY\" ]; then export MAX_NODE_MEMORY=1024; fi; node --max-old-space-size=$MAX_NODE_MEMORY main.js",
     "lint": "eslint src/",
-    "test": "NODE_ENV=test ADLIB_START=true node --trace-warnings --unhandled-rejections=strict main.js"
+    "test": "ls -la && NODE_ENV=test ADLIB_START=true node --trace-warnings --unhandled-rejections=strict main.js"
   },
   "dependencies": {
     "@babel/cli": "^7.20.7",
