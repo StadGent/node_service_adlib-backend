@@ -87,6 +87,9 @@ export default class TentoonstellingMapper extends Transform {
             mappedObject["dcterms:isVersionOf"] = objectURI;
             mappedObject["prov:generatedAtTime"] = now;
 
+            // Convenience method to make our URI dereferenceable by District09
+            if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id", "/data");
+
             // referentienummer
             if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
             if (input['reference_number'] && input['reference_number'][0]) {
