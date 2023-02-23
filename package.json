@@ -32,7 +32,7 @@
     "pg-hstore": "^2.3.4",
     "pug": "3.0.2",
     "redis": "^4.6.4",
-    "sequelize": "^6.28.0",
+    "sequelize": "^6.28.2",
     "sqlite3": "^5.1.4",
     "tedious": "^15.1.2",
     "toml": "^3.0.0"
