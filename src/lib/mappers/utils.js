@@ -314,66 +314,6 @@ module.exports = {
                     "@id": "https://www.wikidata.org/wiki/Q1809071",
                     "label": "Design Museum Gent"
                 };
-            } else if (locationContext.startsWith('BELvue')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q728437",
-                    "opmerking": "bruikleen: BELvue museum"
-                };
-            } else if (locationContext.startsWith('Hotel')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q2120186",
-                    "opmerking": "bruikleen: objecten opgesteld in Hotel d'Hane Steenhuysen"
-                };
-            } else if (locationContext.startsWith('Museum voor Schone Kunsten')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q2365880",
-                    "opmerking": "bruikleen: Museum voor Schone Kunsten (MSK)"
-                };
-            } else if (locationContext.startsWith('Sint-Pietersabdij')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q1170767",
-                    "opmerking": "bruikleen: Sint-Pietersabdij"
-                };
-            } else if (locationContext.startsWith('Koninklijke Bibliotheek van België')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q383931",
-                    "opmerking": "bruikleen: KBR"
-                };
-            } else if (locationContext.startsWith('M-Museum')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q2362660",
-                    "opmerking": "bruikleen: M-leuven"
-                };
-            } else if (locationContext.startsWith('MAS')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q1646305",
-                    "opmerking": "bruikleen: MAS"
-                };
-            } else if (locationContext.startsWith('STAM')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q980285",
-                    "opmerking": "bruikleen: STAM"
-                };
-            } else if (locationContext.startsWith('Industriemuseum')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q2245203",
-                    "opmerking": "bruikleen: Industriemuseum"
-                };
-            } else if (locationContext.startsWith('Verbeke')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q1888920",
-                    "opmerking": "bruikleen: Verbeke Foundation"
-                };
-            } else if (locationContext.startsWith('Koninklijk Museum voor Schone Kunsten Antwerpen')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q1471477",
-                    "opmerking": "bruikleen: KMSKA"
-                };
-            } else if (locationContext.startsWith('Nederlands Zilvermuseum Schoonhoven')) {
-                mappedObject["MensgemaaktObject.locatie"] = {
-                    "@id": "https://www.wikidata.org/wiki/Q2246858",
-                    "opmerking": "bruikleen: Nederlands Zilvermuseum Schoonhoven"
-                };
             } else {
                 mappedObject["MensgemaaktObject.locatie"] = {
                     "opmerking": "depot"
