@@ -55,6 +55,9 @@ export default class DmgMapper extends ObjectMapper {
             // Verwerving
             await Utils.mapVerwerving(objectURI, this._institutionURI, input, mappedObject, this._adlib);
 
+            // Associaties
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+
             // Standplaats
             Utils.mapStandplaatsDMG(input, mappedObject);
 
