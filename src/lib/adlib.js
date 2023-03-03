@@ -201,7 +201,7 @@ Adlib.prototype.fetchWithNTLM = function(querypath) {
             Utils.log(`Error: ${e.message}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
             reject(err);
         }
-    });        
+    });
 };
 
 function sleep(ms) {
