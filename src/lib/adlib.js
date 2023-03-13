@@ -175,33 +175,29 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
     }
 };
 
-Adlib.prototype.fetchWithNTLM = function(querypath) {
+Adlib.prototype.fetchWithNTLM = async function (querypath) {
     Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTLM", "INFO", this._correlator.getId());
     const self = this;
-    return new Promise(async (resolve, reject) => {
-        try {
-            const res = await get({
-                url: config.adlib.baseUrl + querypath,
-                username: config.adlib.username,
-                password: config.adlib.password
-            });
+    try {
+        const res = await get({
+            url: config.adlib.baseUrl + querypath,
+            username: config.adlib.username,
+            password: config.adlib.password
+        });
 
-            if (res && res.body) {
-                try {
-                    resolve(JSON.parse(res.body));
-                } catch (e) {
-                    Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
-                }
+        if (res && res.body) {
+            try {
+                return JSON.parse(res.body);
+            } catch (e) {
+                Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
             }
-            else {
-                // retry.
-                self.fetchWithNTLM(querypath);
-            }
-        } catch (e) {
-            Utils.log(`Error: ${e.message}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
-            reject(err);
+        } else {
+            // retry.
+            return self.fetchWithNTLM(querypath);
         }
-    });
+    } catch (e) {
+        Utils.log(`Error: ${e.message}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
+    }
 };
 
 function sleep(ms) {
