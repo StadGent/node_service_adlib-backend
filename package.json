@@ -26,13 +26,13 @@
     "ladc": "^0.22.14",
     "mariadb": "^3.1.0",
     "md5": "^2.3.0",
-    "mysql2": "^3.1.2",
+    "mysql2": "^3.2.0",
     "node-cron": "^3.0.2",
-    "pg": "^8.9.0",
+    "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
     "pug": "3.0.2",
-    "redis": "^4.6.4",
-    "sequelize": "^6.29.0",
+    "redis": "^4.6.5",
+    "sequelize": "^6.29.3",
     "sqlite3": "^5.1.4",
     "tedious": "^15.1.2",
     "toml": "^3.0.0"
@@ -49,6 +49,6 @@
   "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme",
   "devDependencies": {
     "eslint": "^8.36.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.21"
   }
 }
