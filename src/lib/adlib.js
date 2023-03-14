@@ -193,7 +193,7 @@ Adlib.prototype.fetchWithNTLM = async function (querypath) {
             }
         } else {
             // retry.
-            return self.fetchWithNTLM(querypath);
+            return await self.fetchWithNTLM(querypath);
         }
     } catch (e) {
         Utils.log(`Error: ${e.message}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
