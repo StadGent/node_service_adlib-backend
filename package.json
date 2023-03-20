@@ -24,7 +24,7 @@
     "express-correlation-id": "^2.0.1",
     "http-errors": "~2.0.0",
     "ladc": "^0.22.14",
-    "mariadb": "^3.1.0",
+    "mariadb": "^3.1.1",
     "md5": "^2.3.0",
     "mysql2": "^3.2.0",
     "node-cron": "^3.0.2",
