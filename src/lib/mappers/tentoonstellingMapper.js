@@ -108,6 +108,7 @@ export default class TentoonstellingMapper extends Transform {
                 "@type": "Identificator",
                 "Identificator.identificator": {
                     "@value": priref,
+                    "@id": `${this._baseURI}identificatiesysteem/${priref}`,
                     "@type": `${this._baseURI}identificatiesysteem/priref`
                 }
             };
