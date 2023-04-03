@@ -1118,6 +1118,7 @@ module.exports = {
         const priref = input["@attributes"].priref;
         const id = {
             "@type": "Identificator",
+            "@id": `${baseURI}identificatiesysteem/${priref}`,
             "Identificator.identificator": {
                 "@value": priref,
                 "@type": `${baseURI}identificatiesysteem/priref`
