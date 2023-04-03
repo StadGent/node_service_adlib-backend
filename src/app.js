@@ -1,4 +1,5 @@
 import Adlib from './lib/adlib.js';
+import WvkMapper from "./lib/mappers/wvkMapper";
 import DmgMapper from './lib/mappers/dmgMapper';
 import StamMapper from './lib/mappers/stamMapper';
 import HvAMapper from "./lib/mappers/hvaMapper";
@@ -47,16 +48,39 @@ async function start() {
         sequelize = await Utils.initDb(correlator);
         mappers = config.mapping.mappers;
 
-        startHva();
         startDmg();
+        startTentoonstellingen();
+
+        startWvk();
+        startHva();
         startIndustriemuseum();
         startArchiefgent();
         startStam();
 
         startThesaurus();
         startPersonen();
-        startTentoonstellingen();
+
     });
+}
+
+function startWvk() {
+    correlator.withId(async ()=> {
+        let options = {
+            "id": "wvk",
+            "institution": "wvk", // to retrieve name and URI from config
+            "adlibDatabase": "objecten",
+            "db": sequelize,
+            "checkEuropeanaFlag": true,
+            "correlator": correlator
+        };
+        const backend = new Backend(options);
+        let objectAdlib = new Adlib(options);
+        options["adlib"] = objectAdlib;
+        let objectMapper = new WvkMapper(options);
+        objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
+    })
 }
 
 function startHva() {
@@ -356,6 +380,7 @@ function onError(error) {
         throw error;
     }
 
+    let port = 3000
     var bind = typeof port === 'string'
         ? 'Pipe ' + port
         : 'Port ' + port;

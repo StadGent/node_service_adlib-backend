@@ -33,6 +33,10 @@ export default class Config {
             institutionName: data.hva.institutionName,
             institutionURI: data.hva.institutionURI
         },
+        wvk: {
+            institutionName: data.wvk.institutionName,
+            institutionURI: data.wvk.institutionURI
+        },
         dmg: {
             institutionName: data.dmg.institutionName,
             institutionURI: data.dmg.institutionURI
