@@ -1,4 +1,4 @@
-import { get } from '@node-ntlm/httpreq';
+import httpntlm from 'httpntlm';
 import { Readable } from 'stream';
 import Config from "../config/config.js";
 import Utils from './utils.js';
@@ -175,29 +175,26 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
     }
 };
 
-Adlib.prototype.fetchWithNTLM = async function (querypath) {
+Adlib.prototype.fetchWithNTLM = function(querypath) {
     Utils.log("fetching: " + querypath, "adlib-backend/lib/adlib.js:fetchWithNTLM", "INFO", this._correlator.getId());
     const self = this;
-    try {
-        const res = await get({
+    return new Promise((resolve, reject) => {
+        httpntlm.get({
             url: config.adlib.baseUrl + querypath,
             username: config.adlib.username,
             password: config.adlib.password
-        });
-
-        if (res && res.body) {
+        }, function (err, res) {
+            if (err) reject(err);
             try {
-                return JSON.parse(res.body);
+                if (res && res.body) resolve(JSON.parse(res.body));
+                else {
+                    self.fetchWithNTLM(querypath);
+                }// retry
             } catch (e) {
                 Utils.log(`Error: ${e.message}\n${res.headers}\n${res.body}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
             }
-        } else {
-            // retry.
-            return await self.fetchWithNTLM(querypath);
-        }
-    } catch (e) {
-        Utils.log(`Error: ${e.message}`, "adlib-backend/lib/adlib.js:fetchWithNTLM", "ERROR", self._correlator.getId());
-    }
+        });
+    });
 };
 
 function sleep(ms) {

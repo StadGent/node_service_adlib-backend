@@ -95,6 +95,7 @@ export default class TentoonstellingMapper extends Transform {
             if (input['reference_number'] && input['reference_number'][0]) {
                 const id = {
                     "@type": "Identificator",
+                    "@id": `${this._baseURI}identificatiesysteem/${priref}/${input["reference_number"][0]}/${now}`,
                     "Identificator.identificator": {
                         "@value": input["reference_number"][0],
                         "@type": `${this._baseURI}identificatiesysteem/referentienummer`
@@ -106,6 +107,7 @@ export default class TentoonstellingMapper extends Transform {
             // priref
             const prirefIdentificator = {
                 "@type": "Identificator",
+                "@id": `${this._baseURI}identificatiesysteem/${priref}/${priref}/${now}`,
                 "Identificator.identificator": {
                     "@value": priref,
                     "@type": `${this._baseURI}identificatiesysteem/priref`
@@ -117,6 +119,7 @@ export default class TentoonstellingMapper extends Transform {
             if (input['title'] && input['title'][0]) {
                 mappedObject["cidoc:P1_is_identified_by"] = {
                     "@type": "cidoc:E33_E41_Linguistic_Appellation",
+                    "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['title'][0]}/${now}`,
                     "inhoud": {
                         "@value": input['title'][0],
                         "@language": "nl"
@@ -138,6 +141,7 @@ export default class TentoonstellingMapper extends Transform {
                 const placeLabel = input.venue[0]['venue'][0];
                 mappedObject["Gebeurtenis.plaats"] = {
                     "@type": "Plaats",
+                    "@id": `${this._baseURI}identificatiesysteem/${priref}/plaats/${now}`,
                     "equivalent": {
                         "@id": placeURI,
                         "skos:prefLabel": {
@@ -162,10 +166,6 @@ export default class TentoonstellingMapper extends Transform {
                         }
                     }
                 }
-
-
-
-
             }
 
             // objecten tentoongesteld in tentoonstelling (obejctnummer + titel) //todo: if published; add URI.
@@ -186,6 +186,7 @@ export default class TentoonstellingMapper extends Transform {
 
                         const objectnummer_identificator = {
                             "@type": "Identificator",
+                            "@id": `${this._baseURI}identificatiesysteem/${priref}/${obj_number}/${now}`,
                             "Identificator.identificator": {
                                 "@value": obj_number,
                                 "@type": `${this._baseURI}identificatiesysteem/objectnummer`
@@ -194,6 +195,7 @@ export default class TentoonstellingMapper extends Transform {
 
                         const priref_identificator = {
                             "@type": "Identificator",
+                            "@id": `${this._baseURI}identificatiesysteem/${priref}/${obj_priref}/${now}`,
                             "Identificator.identificator": {
                                 "@value": obj_priref,
                                 "@type": `${this._baseURI}identificatiesysteem/priref`
