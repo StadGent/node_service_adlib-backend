@@ -34,6 +34,12 @@ if (process.env.ADLIB_START) {
     cron.schedule(config.adlib.schedule, start);
 }
 
+// Public or private?
+let checkEuropeanaFlag = true;
+if (process.env.ADLIB_PRIVATE) {
+    checkEuropeanaFlag = false;
+}
+
 async function start() {
     correlator.withId(async () => {
         Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
@@ -66,7 +72,7 @@ function startHva() {
             "institution": "hva", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -86,7 +92,7 @@ function startDmg() {
             "institution": "dmg", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objects" of Design Museum Ghent
@@ -107,7 +113,7 @@ function startIndustriemuseum() {
             "institution": "industriemuseum", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objecten" of Industriemuseum
@@ -128,7 +134,7 @@ function startArchiefgent() {
             "institution": "archiefgent", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objecten" of Archief Gent
@@ -149,7 +155,7 @@ function startStam() {
             "institution": "stam", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "personen" of Stam
@@ -171,7 +177,7 @@ function startThesaurus() {
             "adlibDatabase": "thesaurus",
             "type": "concept",
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -192,7 +198,7 @@ function startPersonen() {
             "adlibDatabase": "personen",
             "type": "agent",
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -214,7 +220,7 @@ function startTentoonstellingen() {
             "type": "tentoonstelling",
             //todo:"InstitutionID": "57", //only fetch tentoonstelling data from Design Museum Gent
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
