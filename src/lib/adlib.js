@@ -131,6 +131,7 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
         else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
         else if (this._adlibDatabase === "tentoonstellingen" && this._institution === "dmg") querypath += `priref Greater '530000000' And priref Smaller '540000000' And reference_number = "TE_*"`;
         else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
+        else if (!this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication<>EUROPEANA AND institution.name='${this._institutionName}'`;
         else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
         else querypath += "all";
 
