@@ -37,7 +37,7 @@ if (process.env.ADLIB_START) {
 // Public or private?
 let checkEuropeanaFlag = true;
 if (process.env.ADLIB_PRIVATE) {
-    console.log('Fetching private objects.');
+    Utils.log("Fetching private objects.", "adlib-backend/lib/app.js", "INFO", correlator.getId());
     checkEuropeanaFlag = false;
 }
 
@@ -213,7 +213,6 @@ function startPersonen() {
 }
 
 function startTentoonstellingen() {
-    console.log(checkEuropeanaFlag);
     correlator.withId(async () => {
         let options = {
             "id": "tentoonstellingen",
