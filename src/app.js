@@ -54,15 +54,20 @@ async function start() {
         sequelize = await Utils.initDb(correlator);
         mappers = config.mapping.mappers;
 
-        startHva();
-        startDmg();
-        startIndustriemuseum();
-        startArchiefgent();
-        startStam();
+        // Only get private objects for DMG (for now).
+        if (process.env.ADLIB_PRIVATE) {
+          startDmg();
+        } else {
+          startHva();
+          startDmg();
+          startIndustriemuseum();
+          startArchiefgent();
+          startStam();
 
-        startThesaurus();
-        startPersonen();
-        startTentoonstellingen();
+          startThesaurus();
+          startPersonen();
+          startTentoonstellingen();
+        }
     });
 }
 
