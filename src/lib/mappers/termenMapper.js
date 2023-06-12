@@ -2,6 +2,8 @@ import { Transform } from 'stream';
 import Config from "../../config/config.js";
 import Utils from "../utils.js";
 import mappingUtils from "../mappers/utils.js";
+let now = new Date().toISOString();
+
 
 
 const config = Config.getConfig();
@@ -116,6 +118,7 @@ export default class TermenMapper extends Transform {
                 if (input['reference_number'] && input['reference_number'][0]) {
                     const id = {
                         "@type": "Identificator",
+                        "@id": `${this._baseURI}identificatiesysteem/${priref}/${input["reference_number"][0]}/${now}`,
                         "Identificator.identificator": {
                             "@value": input["reference_number"][0],
                             "@type": `${this._baseURI}identificatiesysteem/referentienummer`
@@ -206,6 +209,7 @@ export default class TermenMapper extends Transform {
                     if (input['birth.date.start'] && input['birth.date.start'][0]) {
                         mappedObject['heeftGeboorte'] = {
                             "@type": "Geboorte",
+                            "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['birth.date.start'][0]}/${now}`,
                             "datum": input['birth.date.start'][0]
                         };
                     }
@@ -232,6 +236,7 @@ export default class TermenMapper extends Transform {
                     if (input['death.date.start'] && input['death.date.start'][0]) {
                         mappedObject['heeftOverlijden'] = {
                             "@type": "Overlijden",
+                            "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['death.date.start'][0]}/${now}`,
                             "datum": input['death.date.start'][0]
                         };
                     }
@@ -366,6 +371,7 @@ export default class TermenMapper extends Transform {
                             "@type": "Nationaliteit",
                             "Entiteit.beschrijving": {
                                 "@value": input['nationality'][0],
+                                "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['nationality'][0]}/${now}`,
                                 "@language": "nl"
                             }
                         };

@@ -1,4 +1,5 @@
 import MainUtils from "../utils.js";
+let now = new Date().toISOString();
 
 module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
@@ -1118,6 +1119,7 @@ module.exports = {
         const priref = input["@attributes"].priref;
         const id = {
             "@type": "Identificator",
+            "@id": `${baseURI}identificatiesysteem/${priref}/${priref}/${now}`,
             "Identificator.identificator": {
                 "@value": priref,
                 "@type": `${baseURI}identificatiesysteem/priref`
