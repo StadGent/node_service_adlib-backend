@@ -46,7 +46,7 @@ export default class HvAMapper extends ObjectMapper {
             await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, false);
 
             // Associaties
-            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib, true, true, true, false, false, true);
 
             // iconografie
             await Utils.mapIconografie(input, mappedObject, this._adlib);
