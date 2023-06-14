@@ -1,6 +1,6 @@
 import Utils, {mapPriref} from "./utils.js";
 import MainUtils from "../utils.js"
-import ObjectMapper from "./ObjectMapper";
+import ObjectMapper from "./objectMapper";
 
 export default class DmgArchiefMapper extends ObjectMapper  {
     constructor(options) {
