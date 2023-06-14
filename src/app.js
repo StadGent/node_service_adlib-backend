@@ -122,7 +122,7 @@ function startDmg() {
 function startDmgArchief() {
     correlator.withId((async () => {
         let options = {
-            "id": "dmgArchief",
+            "id": "dmg-archief",
             "institution": "dmg", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
