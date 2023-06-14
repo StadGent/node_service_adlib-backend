@@ -16,6 +16,7 @@ export default class Adlib extends Readable {
     constructor(options) {
         super({objectMode: true, highWaterMark: 10});
 
+        this._id = options.id;
         this._adlibDatabase = options.adlibDatabase;
         this._institution = options.institution;
         this._institutionName = config[options.institution] && config[options.institution].institutionName ? config[options.institution].institutionName : "adlib";
@@ -130,9 +131,10 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
         else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
         else if (this._adlibDatabase === "tentoonstellingen" && this._institution === "dmg") querypath += `priref Greater '530000000' And priref Smaller '540000000' And reference_number = "TE_*"`;
-        else if (this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
-        else if (!this._checkEuropeanaFlag && this._institutionName != "adlib") querypath += `webpublication<>EUROPEANA AND institution.name='${this._institutionName}'`;
-        else if (this._institutionName != "adlib") querypath += `institution.name='${this._institutionName}'`;
+        else if (this._checkEuropeanaFlag && this._id === "dmgArchief") querypath += `webpublication=EUROPEANA AND priref Greater "536000000" AND priref Smaller "537000000"`;
+        else if (this._checkEuropeanaFlag && this._institutionName != "adlib" && this._id != "dmgArchief") querypath += `webpublication=EUROPEANA AND institution.name='${this._institutionName}'`;
+        else if (!this._checkEuropeanaFlag && this._institutionName != "adlib" && this._id != "dmgArchief") querypath += `webpublication<>EUROPEANA AND institution.name='${this._institutionName}'`;
+        else if (this._institutionName != "adlib" && this._id != "dmgArchief") querypath += `institution.name='${this._institutionName}'`;
         else querypath += "all";
 
         // When lastPriref is not null, then we try to finalize previous run with the max generatedAtTime and priref
