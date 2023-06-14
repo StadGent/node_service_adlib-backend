@@ -57,6 +57,8 @@ async function start() {
         // Only get private objects for DMG (for now).
         if (process.env.ADLIB_PRIVATE) {
           startDmg();
+        } else if (process.env.NODE_ENV === 'test') {
+          startTentoonstellingen();
         } else {
           startHva();
           startDmg();
