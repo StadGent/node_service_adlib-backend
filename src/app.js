@@ -59,7 +59,9 @@ async function start() {
         if (process.env.ADLIB_PRIVATE) {
           startDmg();
         } else {
-
+            // Remove private streams.
+            mappers.splice(mappers.indexOf('dmg-archief'), 1);
+            
             //design museum Gent
             startDmg();
             startDmgArchief();
