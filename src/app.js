@@ -15,6 +15,7 @@ import createError from 'http-errors';
 import path from 'path';
 import correlatorExpress from 'express-correlation-id';
 import express from 'express';
+import DmgArchiefMapper from "./lib/mappers/dmgArchiefMapper";
 
 const config = Config.getConfig();
 
@@ -58,15 +59,20 @@ async function start() {
         if (process.env.ADLIB_PRIVATE) {
           startDmg();
         } else {
-          startHva();
-          startDmg();
-          startIndustriemuseum();
-          startArchiefgent();
-          startStam();
+            //design museum Gent
+            startDmg();
+            startDmgArchief();
+            startTentoonstellingen();
 
-          startThesaurus();
-          startPersonen();
-          startTentoonstellingen();
+            //other organisations
+            startHva();
+            startIndustriemuseum();
+            startArchiefgent();
+            startStam();
+
+            // shared databases
+            startThesaurus();
+            startPersonen();
         }
     });
 }
@@ -110,6 +116,28 @@ function startDmg() {
 
         saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator);
     });
+}
+
+function startDmgArchief() {
+    correlator.withId((async () => {
+        let options = {
+            "id": "dmg-archief",
+            "institution": "dmg", // to retrieve name and URI from config
+            "adlibDatabase": "objecten",
+            "db": sequelize,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
+            "correlator": correlator
+        };
+        // create eventstream "archief" of Design Museum Gent
+        const backend = new Backend(options);
+        let objectAdlib = new Adlib(options);
+        options["adlib"] = objectAdlib;
+        let objectMapper = new DmgArchiefMapper(options)
+        objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator)
+
+    }))
 }
 
 function startIndustriemuseum() {

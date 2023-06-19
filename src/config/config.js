@@ -10,7 +10,7 @@ export default class Config {
             baseUrl: process.env.ADLIB_ENDPOINT ? process.env.ADLIB_ENDPOINT : data.adlib.baseUrl,
             username: process.env.ADLIB_USER ? process.env.ADLIB_USER : data.adlib.username,
             password: process.env.ADLIB_SECRET ? process.env.ADLIB_SECRET : data.adlib.password,
-            limit: data.adlib.limit
+            limit: process.env.NODE_ENV === 'test' ? 2 : data.adlib.limit
         },
         database: {
             connectionURI: process.env.DATABASE_URI ? process.env.DATABASE_URI : data.database.connectionURI
