@@ -19,7 +19,8 @@ Backend.prototype._write = function (chunk, encoding, done) {
 
     // hack to split virtual db (is merged in one but are seperate dbs.).
     if (this._id === "dmg-archief") {
-        db = "archief"
+        db = "archief";
+
     }
     let object = JSON.parse(chunk);
     Utils.insertObject(this._institution, this._db, object, db, this._correlator);
