@@ -59,7 +59,6 @@ async function start() {
         if (process.env.ADLIB_PRIVATE) {
           startDmg();
         } else {
-
             //design museum Gent
             startDmg();
             startDmgArchief();
