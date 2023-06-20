@@ -123,7 +123,7 @@ function startDmgArchief() {
         let options = {
             "id": "dmg-archief",
             "institution": "dmg", // to retrieve name and URI from config
-            "adlibDatabase": "objecten",
+            "adlibDatabase": "archief",
             "db": sequelize,
             "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator

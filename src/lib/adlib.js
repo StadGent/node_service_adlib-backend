@@ -126,7 +126,9 @@ Adlib.prototype.fetchWithNTLMRecursively = async function(lastModifiedDate, last
     let processed = 0;
     let nextStartFrom = startFrom + limit;
     while (!hits || (hits && (startFrom <= hits))) {
-        let querypath = "?output=json&database=" + this._adlibDatabase + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
+        // Hack to split virtual db (is merged in one db in Adlib but are seperate dbs.).
+        let db = this._adlibDatabase === 'archief' ? 'objecten' : this._adlibDatabase;
+        let querypath = "?output=json&database=" + db + "&startFrom=" + startFrom + "&limit=" + limit + "&search=";
 
         if (this._adlibDatabase === "personen") querypath += `name.status="approved preferred term"`;
         else if (this._adlibDatabase === "thesaurus") querypath += `term.status="approved preferred term"`;
