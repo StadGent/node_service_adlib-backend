@@ -371,7 +371,6 @@ export default class TermenMapper extends Transform {
                             "@type": "Nationaliteit",
                             "Entiteit.beschrijving": {
                                 "@value": input['nationality'][0],
-                                "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['nationality'][0]}/${now}`,
                                 "@language": "nl"
                             }
                         };
