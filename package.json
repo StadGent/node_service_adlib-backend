@@ -10,7 +10,7 @@
     "test": "NODE_ENV=test ADLIB_START=true node --trace-warnings --unhandled-rejections=strict main.js"
   },
   "dependencies": {
-    "@babel/cli": "^7.21.5",
+    "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.5",
     "@babel/node": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
