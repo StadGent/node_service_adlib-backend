@@ -369,6 +369,7 @@ export default class TermenMapper extends Transform {
                     if (input['nationality'] && input['nationality'][0]) {
                         mappedObject["heeftNationaliteit"] = {
                             "@type": "Nationaliteit",
+                            "@id": `${this._baseURI}identificatiesysteem/${priref}/${input['nationality'][0]}/${now}`,
                             "Entiteit.beschrijving": {
                                 "@value": input['nationality'][0],
                                 "@language": "nl"
