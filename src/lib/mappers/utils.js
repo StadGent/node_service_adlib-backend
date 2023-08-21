@@ -774,7 +774,8 @@ module.exports = {
             const exhibition = input["Exhibition"][e];
 
             // add link to PURI that documents the exhibition.
-            if (exhibition["exhibition.reference_number"][0] != "") {
+            // check if from Design Museum Gent based on the reference number. 
+            if (exhibition["exhibition.reference_number"][0].startsWith("TE_")) {
                 let exh_URI = "https://data.designmuseumgent.be/id/exhibition/" + exhibition["exhibition.reference_number"][0]
                 exh["@id"] = exh_URI
             }
