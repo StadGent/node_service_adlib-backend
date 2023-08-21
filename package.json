@@ -11,9 +11,9 @@
   },
   "dependencies": {
     "@babel/cli": "^7.21.5",
-    "@babel/core": "^7.21.4",
-    "@babel/node": "^7.20.7",
-    "@babel/preset-env": "^7.21.5",
+    "@babel/core": "^7.22.5",
+    "@babel/node": "^7.22.5",
+    "@babel/preset-env": "^7.22.5",
     "@babel/register": "^7.21.0",
     "cookie-parser": "^1.4.6",
     "correlation-id": "^5.0.0",
@@ -28,7 +28,7 @@
     "md5": "^2.3.0",
     "mysql2": "^3.2.3",
     "node-cron": "^3.0.2",
-    "pg": "^8.10.0",
+    "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",
     "pug": "3.0.2",
     "redis": "^4.6.5",
@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme",
   "devDependencies": {
-    "eslint": "^8.40.0",
+    "eslint": "^8.41.0",
     "nodemon": "^2.0.22"
   }
 }

@@ -15,6 +15,7 @@ import createError from 'http-errors';
 import path from 'path';
 import correlatorExpress from 'express-correlation-id';
 import express from 'express';
+import DmgArchiefMapper from "./lib/mappers/dmgArchiefMapper";
 
 const config = Config.getConfig();
 
@@ -34,6 +35,13 @@ if (process.env.ADLIB_START) {
     cron.schedule(config.adlib.schedule, start);
 }
 
+// Public or private?
+let checkEuropeanaFlag = true;
+if (process.env.ADLIB_PRIVATE) {
+    Utils.log("Fetching private objects.", "adlib-backend/lib/app.js", "INFO", correlator.getId());
+    checkEuropeanaFlag = false;
+}
+
 async function start() {
     correlator.withId(async () => {
         Utils.log("Starting", "adlib-backend/lib/app.js:start", "INFO", correlator.getId());
@@ -47,15 +55,25 @@ async function start() {
         sequelize = await Utils.initDb(correlator);
         mappers = config.mapping.mappers;
 
-        startHva();
-        startDmg();
-        startIndustriemuseum();
-        startArchiefgent();
-        startStam();
+        // Only get private objects for DMG (for now).
+        if (process.env.ADLIB_PRIVATE) {
+          startDmg();
+        } else {
+            //design museum Gent
+            startDmg();
+            startDmgArchief();
+            startTentoonstellingen();
 
-        startThesaurus();
-        startPersonen();
-        startTentoonstellingen();
+            //other organisations
+            startHva();
+            startIndustriemuseum();
+            startArchiefgent();
+            startStam();
+
+            // shared databases
+            startThesaurus();
+            startPersonen();
+        }
     });
 }
 
@@ -66,7 +84,7 @@ function startHva() {
             "institution": "hva", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -86,7 +104,7 @@ function startDmg() {
             "institution": "dmg", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objects" of Design Museum Ghent
@@ -100,6 +118,28 @@ function startDmg() {
     });
 }
 
+function startDmgArchief() {
+    correlator.withId((async () => {
+        let options = {
+            "id": "dmg-archief",
+            "institution": "dmg", // to retrieve name and URI from config
+            "adlibDatabase": "archief",
+            "db": sequelize,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
+            "correlator": correlator
+        };
+        // create eventstream "archief" of Design Museum Gent
+        const backend = new Backend(options);
+        let objectAdlib = new Adlib(options);
+        options["adlib"] = objectAdlib;
+        let objectMapper = new DmgArchiefMapper(options)
+        objectAdlib.pipe(objectMapper).pipe(backend);
+
+        saveIntegrityCheckWhenDone(objectAdlib, objectMapper, backend, correlator)
+
+    }))
+}
+
 function startIndustriemuseum() {
     correlator.withId(async () => {
         let options = {
@@ -107,7 +147,7 @@ function startIndustriemuseum() {
             "institution": "industriemuseum", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objecten" of Industriemuseum
@@ -128,7 +168,7 @@ function startArchiefgent() {
             "institution": "archiefgent", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "objecten" of Archief Gent
@@ -149,7 +189,7 @@ function startStam() {
             "institution": "stam", // to retrieve name and URI from config
             "adlibDatabase": "objecten",
             "db": sequelize,
-            "checkEuropeanaFlag": true,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         // Create eventstream "personen" of Stam
@@ -171,7 +211,7 @@ function startThesaurus() {
             "adlibDatabase": "thesaurus",
             "type": "concept",
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -192,7 +232,7 @@ function startPersonen() {
             "adlibDatabase": "personen",
             "type": "agent",
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
@@ -214,7 +254,7 @@ function startTentoonstellingen() {
             "type": "tentoonstelling",
             //todo:"InstitutionID": "57", //only fetch tentoonstelling data from Design Museum Gent
             "db": sequelize,
-            "checkEuropeanaFlag": false,
+            "checkEuropeanaFlag": checkEuropeanaFlag,
             "correlator": correlator
         };
         const backend = new Backend(options);
