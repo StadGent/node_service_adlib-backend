@@ -765,12 +765,20 @@ module.exports = {
     if (input["Exhibition"]) {
         mappedObject["Entiteit.maaktDeelUitVan"] = [];
         for (let e in input["Exhibition"]) {
-            // TODO: @id toevoegen van tentoonstelling
             let exh = {
                 "@type": "Activiteit",
                 "Entiteit.type": "http://vocab.getty.edu/aat/300054766" // Tentoonstelling
             };
+            
             const exhibition = input["Exhibition"][e];
+
+            // add link to PURI that documents the exhibition.
+            // check if from Design Museum Gent based on the reference number. 
+            if (exhibition["exhibition.reference_number"][0].startsWith("TE_")) {
+                let exh_URI = "https://data.designmuseumgent.be/id/exhibition/" + exhibition["exhibition.reference_number"][0]
+                exh["@id"] = exh_URI
+            }
+            
             if (exhibition["exhibition"] && exhibition["exhibition"][0]) {
                 const beschrijving = exhibition["exhibition"] && exhibition["exhibition"][0] ? exhibition["exhibition"][0] : "";
                 //exh["Entiteit.beschrijving"] = beschrijving;
