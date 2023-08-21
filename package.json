@@ -10,7 +10,7 @@
     "test": "NODE_ENV=test ADLIB_START=true node --trace-warnings --unhandled-rejections=strict main.js"
   },
   "dependencies": {
-    "@babel/cli": "^7.21.5",
+    "@babel/cli": "^7.22.9",
     "@babel/core": "^7.22.5",
     "@babel/node": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
@@ -26,7 +26,7 @@
     "ladc": "^0.22.14",
     "mariadb": "^3.1.2",
     "md5": "^2.3.0",
-    "mysql2": "^3.2.3",
+    "mysql2": "^3.5.2",
     "node-cron": "^3.0.2",
     "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",
@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme",
   "devDependencies": {
-    "eslint": "^8.41.0",
+    "eslint": "^8.46.0",
     "nodemon": "^2.0.22"
   }
 }
