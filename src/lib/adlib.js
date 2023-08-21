@@ -55,8 +55,10 @@ Adlib.prototype.updateLastRecordWithDone = async function () {
             version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
         }
     });
-    lastObject.done = true;
-    await lastObject.save();
+    if (lastObject) {
+        lastObject.done = true;
+        await lastObject.save();
+    }
 }
 Adlib.prototype.run = async function () {
     const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
