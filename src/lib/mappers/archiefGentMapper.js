@@ -49,7 +49,7 @@ export default class ArchiefGentMapper extends ObjectMapper {
             await Utils.mapVervaardiging(objectURI, input, mappedObject, this._adlib, true);
 
             // Associaties
-            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib);
+            await Utils.mapAssociaties(objectURI, input, mappedObject, this._adlib, true, true, true, false, false, true);
 
             await Utils.mapTrefwoorden(objectURI, input, mappedObject, this._adlib);
 

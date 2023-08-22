@@ -41,7 +41,6 @@ module.exports = {
                     "@id": "cest:Naam_collectie",
                     "label": "collectie"
                 });
-
                 mappedObject["MensgemaaktObject.maaktDeelUitVan"].push(collectie);
             }
         }
@@ -848,7 +847,7 @@ module.exports = {
     },
 
 
-    mapAssociaties: async (objectURI, input, mappedObject, adlib) => {
+    mapAssociaties: async (objectURI, input, mappedObject, adlib, person, subject, period,  onlyCommisioners, onlyVendors, all) => {
         let informatieObject = {
             "@type": "InformatieObject",
             "InformatieObject.drager": objectURI,
@@ -856,116 +855,184 @@ module.exports = {
             "InformatieObject.gaatOver": []
         };
 
-        // Geass. Persoon / instelling
-        if (input["Associated_person"] && input["Associated_person"][0]) {
-            for (let p in input["Associated_person"]) {
-                if (input["Associated_person"][p]["association.person"] && input["Associated_person"][p]["association.person"][0]) {
-                    let personLabel = input["Associated_person"][p]["association.person"][0];
-                    const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "agent");
-                    let io = informatieObject["InformatieObject.verwijstNaar"];
-                    let person = {
-                        "@type": "Persoon",
-                        "Entiteit.type": [{
-                            "@id": personURI,
-                            "label": personLabel
-                        }, {
-                            "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
-                            "label": "associatie.persoon"
-                        }]
-                    };
+        if (person) {
+            // Geass. Persoon / instelling
+            if (input["Associated_person"] && input["Associated_person"][0]) {
+                for (let p in input["Associated_person"]) {
+                    if (input["Associated_person"][p]["association.person"] && input["Associated_person"][p]["association.person"][0]) {
+                        let personLabel = input["Associated_person"][p]["association.person"][0];
+                        const personURI = await adlib.getURIFromPriref("personen", input["Associated_person"][p]["association.person.lref"][0], "agent");
+                        let io = informatieObject["InformatieObject.verwijstNaar"];
 
-                    if (input["Associated_person"][p]["association.person.association"] && input["Associated_person"][p]["association.person.association"][0]) {
-                        const _roleLabel = input["Associated_person"][p]["association.person.association"][0];
-                        const _roleURI = await adlib.getURIFromPriref("thesaurus", input["Associated_person"][p]["association.person.association.lref"][0], "concept");
-                        person["@reverse"] = {
-                            "Rol.agent": {
-                                "@type": "Rol",
-                                "Rol.rol": {
-                                    "@id": _roleURI,
-                                    "skos:prefLabel": {
-                                        "@value": _roleLabel,
-                                        "@language": "nl"
+                        if (all) {
+                            let person = {
+                                "@type": "Persoon",
+                                "Entiteit.type": [{
+                                    "@id": personURI,
+                                    "label": personLabel
+                                }, {
+                                    "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
+                                    "label": "associatie.persoon"
+                                }]
+                            };
+
+                            if (input["Associated_person"][p]["association.person.association"] && input["Associated_person"][p]["association.person.association"][0]) {
+                                const _roleLabel = input["Associated_person"][p]["association.person.association"][0];
+                                const _roleURI = await adlib.getURIFromPriref("thesaurus", input["Associated_person"][p]["association.person.association.lref"][0], "concept");
+                                person["@reverse"] = {
+                                    "Rol.agent": {
+                                        "@type": "Rol",
+                                        "Rol.rol": {
+                                            "@id": _roleURI,
+                                            "skos:prefLabel": {
+                                                "@value": _roleLabel,
+                                                "@language": "nl"
+                                            }
+                                        }
+                                    }
+                                };
+                            }
+                            io.push(person);
+                        }
+
+                        if (!all) {
+                            let person = {
+                                "@type": "Persoon",
+                                "Entiteit.type": [{
+                                    "@id": personURI,
+                                    "label": personLabel
+                                }, {
+                                    "@id": "cest:Naam_geassocieerde_persoon_of_instelling",
+                                    "label": "associatie.persoon"
+                                }]
+                            };
+
+                            if (input["Associated_person"][p]["association.person.association"] && input["Associated_person"][p]["association.person.association"][0]) {
+
+                                const _roleLabel = input["Associated_person"][p]["association.person.association"][0];
+                                const _roleURI = await adlib.getURIFromPriref("thesaurus", input["Associated_person"][p]["association.person.association.lref"][0], "concept");
+                                //todo: only commissioners (associatie rol = opdrachtgever)
+                                if (onlyCommisioners) {
+                                    if (_roleLabel === "opdrachtgever") {
+                                        person["@reverse"] = {
+                                            "Rol.agent": {
+                                                "@type": "Rol",
+                                                "Rol.rol": {
+                                                    "@id": _roleURI,
+                                                    "skos:prefLabel": {
+                                                        "@value": _roleLabel,
+                                                        "@language": "nl"
+                                                    }
+                                                }
+                                            }
+                                        };
                                     }
                                 }
+                                io.push(person);
+
+                                //todo: only vendors (associatie rol = handelaar)
+                                if (onlyVendors) {
+                                    if (_roleLabel === "handelaar") {
+                                        person["@reverse"] = {
+                                            "Rol.agent": {
+                                                "@type": "Rol",
+                                                "Rol.rol": {
+                                                    "@id": _roleURI,
+                                                    "skos:prefLabel": {
+                                                        "@value": _roleLabel,
+                                                        "@language": "nl"
+                                                    }
+                                                }
+                                            }
+                                        };
+                                    }
+                                }
+                                io.push(person);
                             }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        if (subject) {
+            // Geass. Onderwerp
+            if (input["Associated_subject"] && input["Associated_subject"][0]) {
+                for (let p in input["Associated_subject"]) {
+                    if (input["Associated_subject"][p]["association.subject"] && input["Associated_subject"][p]["association.subject"][0]) {
+                        const subjectLabel = input["Associated_subject"][p]["association.subject"][0];
+                        const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.lref"][0], "concept");
+
+                        let entiteit = {
+                            "@type": "Entiteit",
+                            "Entiteit.type": [{
+                                "@id": subjectURI,
+                                "skos:prefLabel": {
+                                    "@value": subjectLabel,
+                                    "@language": "nl"
+                                }
+                            }, {
+                                "@id": "cest:Naam_geassocieerd_concept",
+                                "label": "associatie.onderwerp"
+                            }]
                         };
+
+                        if (input["Associated_subject"][p]["association.subject.association"] && input["Associated_subject"][p]["association.subject.association"][0]) {
+                            const subjectAssociationLabel = input["Associated_subject"][p]["association.subject.association"][0];
+                            const subjectAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.association.lref"][0], "concept");
+
+                            entiteit["Entiteit.type"].push({
+                                "@id": subjectAssociationURI,
+                                "skos:prefLabel": {
+                                    "@value": subjectAssociationLabel,
+                                    "@language": "nl"
+                                }
+                            });
+                        }
+                        informatieObject["InformatieObject.gaatOver"].push(entiteit);
                     }
-                    io.push(person);
                 }
             }
         }
 
-        // Geass. Onderwerp
-        if (input["Associated_subject"] && input["Associated_subject"][0]) {
-            for (let p in input["Associated_subject"]) {
-                if (input["Associated_subject"][p]["association.subject"] && input["Associated_subject"][p]["association.subject"][0]) {
-                    const subjectLabel = input["Associated_subject"][p]["association.subject"][0];
-                    const subjectURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.lref"][0], "concept");
+        if (period) {
+            // Geass. Periode
+            if (input["Associated_period"] && input["Associated_period"][0]) {
+                for (let p in input["Associated_period"]) {
+                    if (input["Associated_period"][p]["association.period"] && input["Associated_period"][p]["association.period"][0]) {
+                        const periodLabel = input["Associated_period"][p]["association.period"][0];
+                        const periodURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.lref"][0], "concept");
 
-                    let entiteit = {
-                        "@type": "Entiteit",
-                        "Entiteit.type": [{
-                            "@id": subjectURI,
-                            "skos:prefLabel": {
-                                "@value": subjectLabel,
-                                "@language": "nl"
-                            }
-                        }, {
-                            "@id": "cest:Naam_geassocieerd_concept",
-                            "label": "associatie.onderwerp"
-                        }]
-                    };
+                        let entiteit = {
+                            "@type": "Entiteit",
+                            "Entiteit.type": [{
+                                "@id": periodURI,
+                                "skos:prefLabel": {
+                                    "@value": periodLabel,
+                                    "@language": "nl"
+                                }
+                            },{
+                                "@id": "cest:Periode",
+                                "label": "associatie.periode"
+                            }]
+                        };
 
-                    if (input["Associated_subject"][p]["association.subject.association"] && input["Associated_subject"][p]["association.subject.association"][0]) {
-                        const subjectAssociationLabel = input["Associated_subject"][p]["association.subject.association"][0];
-                        const subjectAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_subject"][p]["association.subject.association.lref"][0], "concept");
+                        if (input["Associated_period"][p]["association.period.association"] && input["Associated_period"][p]["association.period.association"][0]) {
+                            const periodAssociationLabel = input["Associated_period"][p]["association.period.association"][0];
+                            const periodAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.association.lref"][0], "concept");
+                            entiteit["Entiteit.type"].push({
+                                "@id": periodAssociationURI,
+                                "skos:prefLabel": {
+                                    "@value": periodAssociationLabel,
+                                    "@language": "nl"
+                                }
+                            })
+                        }
 
-                        entiteit["Entiteit.type"].push({
-                            "@id": subjectAssociationURI,
-                            "skos:prefLabel": {
-                                "@value": subjectAssociationLabel,
-                                "@language": "nl"
-                            }
-                        });
+                        informatieObject["InformatieObject.verwijstNaar"].push(entiteit);
                     }
-                    informatieObject["InformatieObject.gaatOver"].push(entiteit);
-                }
-            }
-        }
-        // Geass. Periode
-        if (input["Associated_period"] && input["Associated_period"][0]) {
-            for (let p in input["Associated_period"]) {
-                if (input["Associated_period"][p]["association.period"] && input["Associated_period"][p]["association.period"][0]) {
-                    const periodLabel = input["Associated_period"][p]["association.period"][0];
-                    const periodURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.lref"][0], "concept");
-
-                    let entiteit = {
-                        "@type": "Entiteit",
-                        "Entiteit.type": [{
-                            "@id": periodURI,
-                            "skos:prefLabel": {
-                                "@value": periodLabel,
-                                "@language": "nl"
-                            }
-                        },{
-                            "@id": "cest:Periode",
-                            "label": "associatie.periode"
-                        }]
-                    };
-
-                    if (input["Associated_period"][p]["association.period.association"] && input["Associated_period"][p]["association.period.association"][0]) {
-                        const periodAssociationLabel = input["Associated_period"][p]["association.period.association"][0];
-                        const periodAssociationURI = await adlib.getURIFromPriref("thesaurus", input["Associated_period"][p]["association.period.association.lref"][0], "concept");
-                        entiteit["Entiteit.type"].push({
-                            "@id": periodAssociationURI,
-                            "skos:prefLabel": {
-                                "@value": periodAssociationLabel,
-                                "@language": "nl"
-                            }
-                        })
-                    }
-
-                    informatieObject["InformatieObject.verwijstNaar"].push(entiteit);
                 }
             }
         }
@@ -974,7 +1041,7 @@ module.exports = {
         else mappedObject["MensgemaaktObject.draagt"] = informatieObject;
     },
 
-    mapBouwaanvraagArchief: async (objectURI, input, mappedObject, adlib) => {
+    mapBouwaanvraagArchief: async (objectURI, input, mappedObject) => {
         // vb. goedkeuring bouwaanvraag (Archief Gent)
         // steeds slechts 1 occurence!
         for (let p in input["Associated_period"]) {
