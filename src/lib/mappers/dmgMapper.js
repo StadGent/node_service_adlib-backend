@@ -43,7 +43,10 @@ export default class DmgMapper extends ObjectMapper {
             Utils.mapBeschrijving(input, mappedObject);
             Utils.mapOplage(input, mappedObject);
 
-            // Koepelrecord
+            // Koepelrecord (uit nummers en relaties)
+            await Utils.mapRelatiesKoepelrecord(objectURI, input, mappedObject, this._adlib, this._baseURI)
+
+            // Koepelrecord (afgeleid uit objectnummer)
             await Utils.mapRelatiesKoepelrecordDMG(objectURI, input, mappedObject, this._adlib, this._institutionURI);
 
             // Vervaardiging | datering
