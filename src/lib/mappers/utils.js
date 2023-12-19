@@ -91,25 +91,32 @@ module.exports = {
 
     mapRelatiesKoepelrecord: async (objectURI, input, mappedObject, adlib, baseURI) => {
         if (input['Part_of'] && input['Part_of'][0]) {
-            // object - part of - dossier
-            let dossiers = [];
+            // object - part of (dossier for archief gent, objects for museums)
+            let parts = [];
             for (let p in input['Part_of']) {
+                let partURI;
                 const title = input['Part_of'][p]['part_of.title'][0];
-                const dossierPriref = input['Part_of'][p]['part_of_reference.lref'][0];
-                const dossierURI = `${baseURI}dossier/${adlib._institution}/${dossierPriref}`;
-                const dossier = {
-                    "@id": dossierURI,
+                const partPriref = input['Part_of'][p]['part_of_reference.lref'][0];
+                // check if archief - gent
+                if (adlib._institution === "archiefgent"){
+                    // add dossier to URI.
+                    partURI = `${baseURI}dossier/${adlib._institution}/${partPriref}`;
+                } else {
+                    partURI = `${baseURI}/${adlib._institution}/${partPriref}`;
+                }
+                const part = {
+                    "@id": partURI,
                     "@type": "GecureerdeCollectie",
                     "Collectie.naam": title
                 };
-                dossiers.push(dossier);
+                parts.push(part);
             }
             if (!mappedObject["MensgemaaktObject.maaktDeelUitVan"]) mappedObject["MensgemaaktObject.maaktDeelUitVan"] = [];
-            mappedObject["MensgemaaktObject.maaktDeelUitVan"] = mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(dossiers);
+            mappedObject["MensgemaaktObject.maaktDeelUitVan"] = mappedObject["MensgemaaktObject.maaktDeelUitVan"].concat(parts);
         }
 
         if (input['Parts'] && input['Parts'][0]) {
-            // dossier - has parts
+            // object or dossier - has parts
             let objecten = [];
             for (let p in input['Parts']) {
                 if (input['Parts'][p]['parts.title'] && input['Parts'][p]['parts.title'][0]) {
