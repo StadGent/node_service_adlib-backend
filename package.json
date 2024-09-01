@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/StadGent/node_service_adlib-backend#readme",
   "devDependencies": {
-    "eslint": "^8.57.0",
+    "eslint": "^9.9.1",
     "nodemon": "^3.0.1"
   }
 }
