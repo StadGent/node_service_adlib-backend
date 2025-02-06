@@ -720,10 +720,10 @@ module.exports = {
         if (input["acquisition.date"]) {
             const datum = input["acquisition.date"][0];
             v["Gebeurtenis.tijd"] = {
-                "@type": "Periode",
+                // change from "Periode" to EDTF, because "Periode" refers to dateTime, here EDTF is used.
+                "@type": "http://id.loc.gov/datatypes/edtf/EDTF",
                 "Periode.begin": datum,
                 "Periode.einde": datum
-                //todo
             };
         }
 
