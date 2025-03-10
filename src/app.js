@@ -15,6 +15,7 @@ import createError from 'http-errors';
 import path from 'path';
 import correlatorExpress from 'express-correlation-id';
 import express from 'express';
+import helmet from 'helmet';
 import DmgArchiefMapper from "./lib/mappers/dmgArchiefMapper";
 
 const config = Config.getConfig();
@@ -295,6 +296,7 @@ function sleep(ms) {
 
 function startHealthcheckAPI() {
     const app = express();
+    app.use(helmet());
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'pug');
