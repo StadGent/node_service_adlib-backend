@@ -17,12 +17,13 @@ export default class Adlib extends Readable {
         super({objectMode: true, highWaterMark: 10});
 
         this._id = options.id;
-        this._adlibDatabase = options.adlibDatabase;
-        this._institution = options.institution;
-        this._institutionName = config[options.institution] && config[options.institution].institutionName ? config[options.institution].institutionName : "adlib";
+        this._adlibDatabase = String(options.adlibDatabase);
+        this._institution = String(options.institution);
+        this._institutionName = String(config[options.institution] && config[options.institution].institutionName ? config[options.institution].institutionName : "adlib");
         this._checkEuropeanaFlag = typeof options.checkEuropeanaFlag !== 'undefined' ? options.checkEuropeanaFlag : true;
         this._db = options.db;
         this._correlator = options.correlator;
+        this._version = String(process.env.npm_package_version ? process.env.npm_package_version : '0.0.0');
         this.run();
     }
 }
@@ -38,21 +39,21 @@ Adlib.prototype.updateLastRecordWithDone = async function () {
         where: {
             institution: this._institution,
             adlibDatabase: this._adlibDatabase,
-            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+            version: this._version
         }
     });
     const lastURI = await this._db.models.Member.max('URI', {
         where: {
             institution: this._institution,
             adlibDatabase: this._adlibDatabase,
-            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0',
-            generatedAtTime: maxGeneratedAtTime
+            version: this._version,
+            generatedAtTime: String(maxGeneratedAtTime)
         }
     });
     const lastObject = await this._db.models.Member.findOne({
         where: {
-            URI: lastURI,
-            version: process.env.npm_package_version ? process.env.npm_package_version : '0.0.0'
+            URI: String(lastURI),
+            version: this._version
         }
     });
     if (lastObject) {
@@ -61,7 +62,7 @@ Adlib.prototype.updateLastRecordWithDone = async function () {
     }
 }
 Adlib.prototype.run = async function () {
-    const version = process.env.npm_package_version ? process.env.npm_package_version : '0.0.0';
+    const version = this._version;
 
     var institution = this._institution;
     var adlibDatabase = this._adlibDatabase;
