@@ -47,7 +47,7 @@ Adlib.prototype.updateLastRecordWithDone = async function () {
             institution: this._institution,
             adlibDatabase: this._adlibDatabase,
             version: this._version,
-            generatedAtTime: String(maxGeneratedAtTime)
+            generatedAtTime: maxGeneratedAtTime
         }
     });
     const lastObject = await this._db.models.Member.findOne({
