@@ -1,7 +1,7 @@
 import { Transform } from 'stream';
 import Config from "../../config/config.js";
 import Utils from "../utils.js";
-import mappingUtils from "../mappers/utils.js";
+import mappingUtils, {mapMainEntityWebPage} from "../mappers/utils.js";
 let now = new Date().toISOString();
 
 
@@ -113,6 +113,21 @@ export default class TermenMapper extends Transform {
 
                 // map priref to identificator
                 mappingUtils.mapPriref(input, mappedObject, this._baseURI);
+
+                // Convenience method to make our URI dereferenceable by District09
+                if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id","/data")
+
+                // add main entitity property (if Design Museum Gent)
+
+                let _type = this._adlibDatabase
+                if (_type === "agent" && input["reference_number"] && input['reference_number'][0]) {
+                    mappingUtils.mapMainEntityWebPage(config.dmg.restServiceURI, input["reference_number"][0], this._adlibDatabase, mappedObject)
+                }
+
+                if (_type === "thesaurus") {
+                    mappingUtils.mapMainEntityWebPage(config.dmg.restServiceURI, priref, this._adlibDatabase, mappedObject)
+                }
+
 
                 // referentienummer
                 if (input['reference_number'] && input['reference_number'][0]) {
