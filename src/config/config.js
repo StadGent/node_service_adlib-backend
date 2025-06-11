@@ -35,7 +35,8 @@ export default class Config {
         },
         dmg: {
             institutionName: data.dmg.institutionName,
-            institutionURI: data.dmg.institutionURI
+            institutionURI: data.dmg.institutionURI,
+            restServiceURI: "http://data.designmuseumgent.be/v1/id"
         },
         industriemuseum: {
             institutionName: data.industriemuseum.institutionName,
