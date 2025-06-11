@@ -1,6 +1,9 @@
 import Utils, {mapPriref} from "./utils.js";
 import MainUtils from "../utils.js"
 import ObjectMapper from "./objectMapper";
+import Config from "../../config/config";
+const config = Config.getConfig();
+
 
 export default class DmgArchiefMapper extends ObjectMapper  {
     constructor(options) {
@@ -33,6 +36,7 @@ export default class DmgArchiefMapper extends ObjectMapper  {
 
             //identificatie
             Utils.mapPriref(input, mappedObject, this._baseURI);
+            Utils.mapMainEntityWebPage(config.dmg.restServiceURI, input, "archive", mappedObject);
             Utils.mapInstelling(this._institutionURI, input, mappedObject);
             Utils.mapObjectnummer(input, mappedObject, this._baseURI);
             Utils.mapTitel(input, mappedObject);
