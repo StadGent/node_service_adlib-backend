@@ -1,5 +1,6 @@
 import { Transform } from 'stream';
 import MainUtils from "../utils.js";
+import Utils from "./utils"
 import Config from "../../config/config";
 
 const config = Config.getConfig();
@@ -89,6 +90,9 @@ export default class TentoonstellingMapper extends Transform {
 
             // Convenience method to make our URI dereferenceable by District09
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id", "/data");
+
+            // add link to main json-ld entitity
+            Utils.mapMainEntityWebPage(config.dmg.restServiceURI, input["reference_number"][0], "exhibition", mappedObject);
 
             // referentienummer
             if (!mappedObject["Object.identificator"]) mappedObject["Object.identificator"] = [];
