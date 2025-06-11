@@ -18,6 +18,7 @@ export default class ObjectMapper extends Transform {
                     "@type": "@id"
                 },
                 "prov": "http://www.w3.org/ns/prov#",
+                "schema": "http://schema.org/",
                 "skos": "http://www.w3.org/2004/02/skos/core#",
                 "label": "http://www.w3.org/2000/01/rdf-schema#label",
                 "opmerking": "http://www.w3.org/2004/02/skos/core#note",
