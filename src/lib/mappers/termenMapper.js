@@ -18,6 +18,7 @@ export default class TermenMapper extends Transform {
             "https://apidg.gent.be/opendata/adlib2eventstream/v1/context/generiek-basis.jsonld",
             {
                 "skos": "http://www.w3.org/2004/02/skos/core#",
+                "schema": "http://schema.org/",
                 "skos:inScheme": {
                    "@type": "@id"
                 },

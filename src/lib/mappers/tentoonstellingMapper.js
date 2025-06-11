@@ -20,6 +20,7 @@ export default class TentoonstellingMapper extends Transform {
                     "@type": "@id"
                 },
                 "cidoc": "http://www.cidoc-crm.org/cidoc-crm/",
+                "schema": "http://schema.org/",
                 "prov": "http://www.w3.org/ns/prov#",
                 "skos": "http://www.w3.org/2004/02/skos/core#",
                 "label": "http://www.w3.org/2000/01/rdf-schema#label",
