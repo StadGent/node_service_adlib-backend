@@ -1,8 +1,8 @@
 [adlib]
   schedule = '0 0 * * *'
   baseUrl = 'https://cjm-web.adlibhosting.com/coghentapi/wwwopac.ashx'
-  username = ''
-  password = ''
+  username = 'coghentapi'
+  password = 'Gentenaar-9000$'
   limit = 10
 
 [database]
@@ -14,7 +14,7 @@
 [eventstream]
   protocol = 'https'
   hostname = 'localhost'
-  port = 3000
+  port = 3001
   path = ''
   numberOfObjectsPerFragment = 5
 
@@ -29,6 +29,7 @@
 [dmg]
   institutionName = 'Design Museum Gent'
   institutionURI = 'http://www.wikidata.org/entity/Q1809071'
+  restServiceURI = 'http://data.designmuseumgent.be/v1/id'
 
 [industriemuseum]
   institutionName = 'Industriemuseum'
