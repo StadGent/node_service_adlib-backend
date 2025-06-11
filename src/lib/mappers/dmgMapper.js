@@ -1,6 +1,9 @@
-import Utils from "./utils.js";
+import Utils, {mapInstelling} from "./utils.js";
 import MainUtils from "../utils.js";
 import ObjectMapper from "./objectMapper";
+import Config from "../../config/config";
+
+const config = Config.getConfig();
 
 export default class DmgMapper extends ObjectMapper {
     constructor(options) {
@@ -32,6 +35,9 @@ export default class DmgMapper extends ObjectMapper {
 
             // Convenience method to make our URI dereferenceable by District09
             if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id", "/data");
+
+            // method to refer to main json-ld representation for that object
+            Utils.mapMainEntityWebPage(config.dmg.restServiceURI, input, "object", mappedObject);
 
             // Identificatie
             Utils.mapPriref(input, mappedObject, this._baseURI);
@@ -69,7 +75,6 @@ export default class DmgMapper extends ObjectMapper {
 
             // reproductie
             await Utils.mapIIIFManifest(input, mappedObject, MainUtils);
-
             done(null, JSON.stringify(mappedObject));
         } catch (e) {
             if (process.env.NODE_ENV === 'test') {
