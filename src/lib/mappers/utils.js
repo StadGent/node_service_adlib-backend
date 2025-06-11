@@ -5,6 +5,38 @@ module.exports = {
     mapInstelling: (institutionURI, input, mappedObject) => {
         mappedObject["MaterieelDing.beheerder"] = institutionURI;
     },
+
+    mapMainEntityWebPage: (baseURI, identifier, type, mappedObject) => {
+
+            let pageURL = null;
+            switch (type) {
+                case "object":
+                case "archive":
+                    if (identifier["object_number"] && Array.isArray(identifier["object_number"]) && identifier["object_number"][0]) {
+                        const objectNumber = identifier["object_number"][0];
+                        pageURL = `${baseURI}/${type}/${objectNumber}`;
+                    } break;
+                case "agent":
+                    pageURL = `${baseURI}/agent/${identifier}`;
+                    break;
+                case "thesaurus":
+                    pageURL = `${baseURI}/concept/${identifier}`;
+                    break;
+                case "exhibition":
+                    pageURL = `${baseURI}/exhibition/${identifier}`;
+                    break;
+                default:
+                    console.warn(`Unhandled type: ${type}`);
+            }
+
+            if (pageURL) {
+                mappedObject["schema:mainEntityOfPage"] = {
+                    "@id": pageURL,
+                    "@type": "schema:WebPage"
+                };
+            }
+    },
+
     mapAfdeling: (institutionURI, input, mappedObject) => {
         if (input['administration_name'] && input['administration_name'][0]) {
             const administrationName = input['administration_name'][0];
