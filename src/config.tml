@@ -1,8 +1,8 @@
 [adlib]
   schedule = '0 0 * * *'
   baseUrl = 'https://cjm-web.adlibhosting.com/coghentapi/wwwopac.ashx'
-  username = 'coghentapi'
-  password = 'Gentenaar-9000$'
+  username = ''
+  password = ''
   limit = 10
 
 [database]
@@ -14,7 +14,7 @@
 [eventstream]
   protocol = 'https'
   hostname = 'localhost'
-  port = 3001
+  port = 3000
   path = ''
   numberOfObjectsPerFragment = 5
 
