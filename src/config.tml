@@ -29,6 +29,7 @@
 [dmg]
   institutionName = 'Design Museum Gent'
   institutionURI = 'http://www.wikidata.org/entity/Q1809071'
+  restServiceURI = 'http://data.designmuseumgent.be/v1/id'
 
 [industriemuseum]
   institutionName = 'Industriemuseum'
