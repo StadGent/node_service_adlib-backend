@@ -164,24 +164,27 @@ module.exports = {
 
     mapRelatiesKoepelrecordDMG: async (objectURI, input, mappedObject, adlib, institution) => {
         // Regex om .*_[0-9][0-9]-[0-9][0-9]
-        const koepelrecord = /(.*)_([0-9]+)-([0-9]+)/g;
-        if (input["object_number"] && input["object_number"][0]) {
+        const koepelrecord = /(.*)_([0-9]+)-([0-9]+)/;
+        if (input["object_number"]?.[0]) {
             const objectNumber = input["object_number"][0];
             const result = koepelrecord.exec(objectNumber)
             if (result != null) {
                 const prefixObjectNumber = result[1];
                 const number = result[2];
                 const numberOfParts = result[3];
+
                 if (number == "0" || number == "00" || number == "000") {
                     // Koepelrecord
                     let objecten = [];
-                    for (let n of numberOfParts) {
-                        const objectNumberOfPart = prefixObjectNumber + "_" + n + "-" + numberOfParts;
+                    const totalParts = parseInt(numberOfParts, 10);
+                    for (let n=1; n<=totalParts; n++) {
+                        const partNumber = n.toString().padStart(numberOfParts.length, "0");
+                        const objectNumberOfPart =  `${prefixObjectNumber}_${partNumber}-${numberOfParts}`;
                         const objectPriref = await adlib.getPrirefFromObjectNumber("objecten", objectNumberOfPart);
-                        const institution = MainUtils.getInstitutionNameFromPriref(objectPriref);
-                        const objectURI = await adlib.getURIFromPriref("objecten", objectPriref, "mensgemaaktobject/"+institution);
+                        const partInstitution = MainUtils.getInstitutionNameFromPriref(objectPriref);
+                        const partURI = await adlib.getURIFromPriref("objecten", objectPriref, "mensgemaaktobject/"+partInstitution);
                         const object = {
-                            "@id": objectURI,
+                            "@id": partURI,
                             "@type": "MensgemaaktObject"
                         };
                         objecten.push(object);
@@ -190,9 +193,7 @@ module.exports = {
                     mappedObject["GecureerdeCollectie.bestaatUit"] = mappedObject["GecureerdeCollectie.bestaatUit"].concat(objecten);
                 } else {
                     // object - part of - koepelrecord
-                    let koepelrecordNumber = "0";
-                    if (numberOfParts.length === 2) koepelrecordNumber = "00";
-                    else if (numberOfParts.length === 3) koepelrecordNumber = "000";
+                    const koepelrecordNumber = "0".repeat(numberOfParts.length - 1 || 1);
                     const koepelrecordObjectNumber = prefixObjectNumber + "_" + koepelrecordNumber + "-" + numberOfParts;
                     const koepelrecordPriref = await adlib.getPrirefFromObjectNumber("objecten", koepelrecordObjectNumber);
                     const institution = MainUtils.getInstitutionNameFromPriref(koepelrecordPriref);
