@@ -118,7 +118,8 @@ export default class TermenMapper extends Transform {
                 // Convenience method to make our URI dereferenceable by District09
                 if (versionURI.indexOf('stad.gent/id') != -1) mappedObject["foaf:page"] = versionURI.replace("/id","/data")
 
-                // add main entitity property (if Design Museum Gent)
+                // add main entity property (if Design Museum Gent)
+
 
                 let _type = this._adlibDatabase
                 if (_type === "agent" && input["reference_number"] && input['reference_number'][0]) {
